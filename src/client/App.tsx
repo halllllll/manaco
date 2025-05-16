@@ -198,33 +198,6 @@ const App: FC = () => {
             </div>
           </div>
           {'popoverを試したい始まり'}
-          {/* change popover-1 and --anchor-1 names. Use unique names for each dropdown */}
-          {/* For TSX uncomment the commented types below */}
-          <div>
-            <button
-              type="button"
-              className="btn"
-              popoverTarget="popover-1"
-              style={{ anchorName: '--anchor-1' } as CSSProperties}
-            >
-              Button
-            </button>
-            <ul
-              className="dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
-              popover="auto"
-              id="popover-1"
-              style={{ positionAnchor: '--anchor-1' } as CSSProperties}
-            >
-              <li>
-                {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
-                <a>Item 1</a>
-              </li>
-              <li>
-                {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
-                <a>Item 2</a>
-              </li>
-            </ul>
-          </div>
           <div>
             <button
               type="button"
@@ -233,7 +206,6 @@ const App: FC = () => {
               id="target-date-btn"
               // style="anchorName:--target-date" // anchorpositioning関係はエディタ上では現状のルール,環境およびツールチェインだとエラーになる
               style={{ anchorName: '--target-date' } as CSSProperties}
-              // placeholder="pick a date"
             >
               pick a date
             </button>
@@ -249,8 +221,15 @@ const App: FC = () => {
                 onchange={(e) => {
                   const value = (e.target as HTMLInputElement).value;
                   console.log(`value: ${value}`);
-                  // biome-ignore lint/style/noNonNullAssertion: <explanation>
-                  document.getElementById('target-date-btn')!.innerText = value;
+                  const targetDateButton = document.getElementById('target-date-btn');
+                  if (targetDateButton) {
+                    targetDateButton.innerText = value;
+                  }
+                  // close popover
+                  const popover = document.getElementById('date-popover');
+                  if (popover && 'hidePopover' in popover) {
+                    (popover as HTMLElement).hidePopover();
+                  }
                 }}
               >
                 <svg
