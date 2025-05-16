@@ -2,7 +2,7 @@ import 'cally';
 
 import { GASClient } from 'gas-client';
 import { isGASEnvironment } from 'gas-client/src/utils/is-gas-environment';
-import { type FC, useEffect, useState } from 'react';
+import { type FC, type FormEvent, useEffect, useState } from 'react';
 import { Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type * as server from '../server/main';
 import { SheetNameAPI, SheetUrlAPI } from './stubs/getSheetInfo';
@@ -19,6 +19,19 @@ const App: FC = () => {
 
   const [title, setTitle] = useState<string | null>('');
   const [sheetUrl, setSheetUrl] = useState<string>('');
+
+  // 投稿モーダル用のステート
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // フォーム送信処理
+  const handleSubmitPost = (e: FormEvent) => {
+    e.preventDefault();
+    console.log('投稿内容:');
+    // ここで実際の投稿処理（APIコールなど）
+
+    // フォームリセットとモーダルを閉じる
+    setIsModalOpen(false);
+  };
+
   useEffect(() => {
     const getTitle = async () => {
       const [spreadsheettitle, spreadsheeturl] = await Promise.all([SheetNameAPI(), SheetUrlAPI()]);
@@ -150,7 +163,7 @@ const App: FC = () => {
               <button
                 type={'button'}
                 slot={'previous'}
-                alia-label={'previous'}
+                aria-label={'previous'}
                 className="btn btn-secondary"
               >
                 <span className="flex items-center">
@@ -209,7 +222,78 @@ const App: FC = () => {
           <aside>
             <p>Copyright © {new Date().getFullYear()} - GIG SCHOOL</p>
           </aside>
-        </footer>{' '}
+        </footer>
+        {/* 右下に固定された投稿ボタン */}
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          className="btn btn-circle btn-primary btn-lg fixed bottom-20 right-6 shadow-lg"
+          aria-label="新規投稿"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-8 w-8"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <title>{'新規投稿'}</title>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+
+        {/* 投稿用モーダル */}
+        <dialog id="post_modal" className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">新規投稿</h3>
+
+            <form onSubmit={handleSubmitPost}>
+              <div className="form-control w-full">
+                <label className="label" htmlFor="post_title">
+                  <span className="label-text">タイトル</span>
+                </label>
+                <input
+                  id="post_title"
+                  type="text"
+                  placeholder="タイトルを入力"
+                  className="input input-bordered w-full"
+                  // value={postTitle}
+                  onChange={(e) => console.log(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="form-control w-full mt-4">
+                <label className="label" htmlFor="post_content">
+                  <span className="label-text">内容</span>
+                </label>
+                <textarea
+                  id="post_content"
+                  className="textarea textarea-bordered h-24"
+                  placeholder="投稿内容を入力"
+                  onChange={(e) => console.log(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="modal-action">
+                <button type="button" className="btn" onClick={() => setIsModalOpen(false)}>
+                  キャンセル
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  投稿する
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* モーダルの背景をクリックしても閉じられるようにする */}
+          <form method="dialog" className="modal-backdrop">
+            <button type={'button'} onClick={() => setIsModalOpen(false)}>
+              閉じる
+            </button>
+          </form>
+        </dialog>
       </div>
     </>
   );
