@@ -31,19 +31,11 @@ const App: FC = () => {
   return (
     <>
       <h1>カスタムメニューによって読み込まれるメニュー</h1>
-      {/* <QueryErrorResetBoundary> */}
-        <ErrorRecovery>
-          <Suspense
-            fallback={
-              <>
-              フォールバックコンポーネントがここに入る
-              </>
-            }
-          >
-            <SuspendComponent val={val} setVal={setVal} />
-          </Suspense>
-        </ErrorRecovery>
-      {/* </QueryErrorResetBoundary> */}
+      <ErrorRecovery>
+        <Suspense fallback={<>フォールバックコンポーネントがここに入る</>}>
+          <SuspendComponent val={val} setVal={setVal} />
+        </Suspense>
+      </ErrorRecovery>
       <p>
         ※{' '}
         <a href="https://jsonplaceholder.typicode.com/todos">

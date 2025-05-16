@@ -1,6 +1,6 @@
-import { type FC, useState, useEffect } from 'react';
 import { GASClient } from 'gas-client';
 import { isGASEnvironment } from 'gas-client/src/utils/is-gas-environment';
+import { type FC, useEffect, useState } from 'react';
 import type * as server from '../server/main';
 import './App.css';
 import { SheetNameAPI, SheetUrlAPI } from './stubs/getSheetInfo';
@@ -29,7 +29,7 @@ const App: FC = () => {
 
   return (
     <>
-      <div className="App">
+      <div className="container-mx-auto p-4 ">
         <a href="/src/server/Menu/menu.html">（カスタムメニューのhtmlサンプル）</a>
         <h1>{title !== '' ? title : 'Vite + React on GAS'}</h1>
         <div className="card">

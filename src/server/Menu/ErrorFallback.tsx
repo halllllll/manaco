@@ -10,6 +10,7 @@ const ErrorFallback: FC<FallbackProps> = ({ error, resetErrorBoundary }) => {
     <div>
       <p>エラー発生: {err.message}</p>
       <button
+        type={'button'}
         onClick={() => {
           resetErrorBoundary();
         }}
@@ -22,16 +23,15 @@ const ErrorFallback: FC<FallbackProps> = ({ error, resetErrorBoundary }) => {
 type Props = PropsWithChildren;
 
 const ErrorRecovery: FC<Props> = ({ children }) => {
-//  const { reset } = useQueryErrorResetBoundary();
-
   return (
-  //   <ErrorBoundary FallbackComponent={ErrorFallback} onReset={reset}>
-  <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => {
-    console.error("⚠️IMPORTANT⚠️\nNOT IMPMENTED YET\n\n");
-  }}>
+    <ErrorBoundary
+      FallbackComponent={ErrorFallback}
+      onReset={() => {
+        console.error('⚠️IMPORTANT⚠️\nNOT IMPMENTED YET\n\n');
+      }}
+    >
       {children}
-  </ErrorBoundary>
-
+    </ErrorBoundary>
   );
 };
 

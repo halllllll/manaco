@@ -1,6 +1,4 @@
-// import { useSuspenseQuery } from '@tanstack/react-query';
-
-import useSWR from "swr";
+import useSWR from 'swr';
 
 const sleep = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -15,26 +13,22 @@ const fetchFunc = async (val: unknown) => {
 };
 
 export const MyFetch = (val: number) => {
-  // const { isError, error, data, refetch } = useSuspenseQuery({
-  //   queryKey: ['myfetch', val],
-  //   queryFn: ({ pageParam = val }) => fetchFunc(pageParam),
-  //   retry: 0,
-  // });
-
-  // return { isError, error, data, refetch };
-
   // keyの使い方がわからないのでとりあえず無視
-  const {data, error, isLoading} = useSWR(`https://jsonplaceholder.typicode.com/todos/${val}`, () => fetchFunc(val), {
-    suspense: true,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    refreshInterval: 0,
-    refreshWhenHidden: false,
-    refreshWhenOffline: false,
-    shouldRetryOnError: false,
-    errorRetryInterval: 0,
-    errorRetryCount: 0,
-  });
+  const { data, error, isLoading } = useSWR(
+    `https://jsonplaceholder.typicode.com/todos/${val}`,
+    () => fetchFunc(val),
+    {
+      suspense: true,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 0,
+      refreshWhenHidden: false,
+      refreshWhenOffline: false,
+      shouldRetryOnError: false,
+      errorRetryInterval: 0,
+      errorRetryCount: 0,
+    },
+  );
 
-  return {data, isError: error, error, isLoading}
+  return { data, isError: error, error, isLoading };
 };
