@@ -1,9 +1,26 @@
 import { delay, http, HttpResponse } from 'msw';
+import { currentMockUserId } from './browser';
+import { mockUsers } from './data';
 
 export const handlers = [
   // スプレッドシート名取得 API
   http.get('/mock/sheet-name', async () => {
     await delay(800);
+    const user = mockUsers[currentMockUserId];
+    if (!user) {
+      return HttpResponse.json('データなし');
+    }
+    switch (user.id) {
+      case 'user1@sample.com':
+        return HttpResponse.json('（シート名）');
+      case 'user2@sample.com':
+        return HttpResponse.json('（シート名）');
+      case 'admin@sample.com':
+        return HttpResponse.json('（シート名）');
+      case 'alien@sample.com':
+        return HttpResponse.json('（シート名）');
+      default:
+    }
     return HttpResponse.json('開発環境のスプレッドシート');
   }),
 
@@ -13,9 +30,23 @@ export const handlers = [
     return HttpResponse.json('https://example.com/dev-spreadsheet');
   }),
 
-  // // 学習活動一覧取得 API
+  // アクセスしたときにdashboardに必要なデータをまとめて取得
+  http.get('/mock/dashboard', async () => {
+    await delay(1000);
+    const user = mockUsers[currentMockUserId];
+    if (!user) {
+    }
+    return HttpResponse.json({});
+  }),
+
+  // // // 学習活動一覧取得 API
   // http.get('/mock/learning-activities', async () => {
   //   await delay(1000);
+  //   const user = mockUsers[currentMockUserId];
+  //   if (!user) {
+  //     return HttpResponse.json('データなし');
+  //   }
+
   //   return HttpResponse.json(mockActivities);
   // }),
 

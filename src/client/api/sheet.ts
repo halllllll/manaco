@@ -15,6 +15,7 @@ export const SheetApp = {
     return await response.json();
   },
   getSheetUrl: async (): Promise<string> => {
+    console.log("let's get sheet url");
     if (isGASEnvironment()) {
       return await serverFunctions.getSpreadSheetUrl();
     }

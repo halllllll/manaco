@@ -22,10 +22,12 @@ const affectCountToA1 = (count: number): void => {
 };
 
 const getSpreadSheetName = (): string => {
+  console.log('キターーーーー');
   return ss.getActiveSheet().getName();
 };
 
 const getSpreadSheetUrl = (): string => {
+  console.log("let's get sheet url1!!!!!!!!!");
   return ss.getUrl();
 };
 
@@ -36,7 +38,7 @@ global.openDialog_ = openDialog;
 global.customMenu1_ = customMenu1;
 global.affectCountToA1 = affectCountToA1; // フロント側から呼ばれる関数もグローバルから叩けるようにしておく
 global.getSpreadSheetName = getSpreadSheetName; // 同上
-global.getSpreadSheetUrl;
+global.getSpreadSheetUrl = getSpreadSheetUrl;
 
 // Exposed to Frontend API
 export { affectCountToA1, getSpreadSheetName, getSpreadSheetUrl };
