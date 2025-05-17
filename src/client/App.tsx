@@ -2,8 +2,8 @@ import 'cally';
 
 import { type CSSProperties, type FC, type FormEvent, useEffect, useState } from 'react';
 import { Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { SheetApp } from './api/getSheetInfo';
 import { isGASEnvironment } from './serverFunctions';
-import { SheetNameAPI, SheetUrlAPI } from './stubs/getSheetInfo';
 
 // const { serverFunctions } = new GASClient<typeof server>();
 
@@ -22,7 +22,7 @@ const App: FC = () => {
   //   await serverFunctions.affectCountToA1(count);
   // };
 
-  const [_title, setTitle] = useState<string | null>('');
+  const [title, setTitle] = useState<string | null>('学習記録');
   const [sheetUrl, setSheetUrl] = useState<string>('');
 
   // 投稿モーダル用のステート
@@ -40,7 +40,10 @@ const App: FC = () => {
 
   useEffect(() => {
     const getTitle = async () => {
-      const [spreadsheettitle, spreadsheeturl] = await Promise.all([SheetNameAPI(), SheetUrlAPI()]);
+      const [spreadsheettitle, spreadsheeturl] = await Promise.all([
+        SheetApp.getSheetName(),
+        SheetApp.getSheetUrl(),
+      ]);
       console.log(`get spread sheet title: ${spreadsheettitle ?? '(null)'}`);
       setTitle(spreadsheettitle);
       setSheetUrl(spreadsheeturl);
@@ -100,7 +103,7 @@ const App: FC = () => {
     <>
       <div className="flex flex-col min-h-screen">
         <header className="flex justify-between items-center p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg rounded-b-lg">
-          <h1 className="text-2xl font-bold">まいにちの学習記録</h1>
+          <h1 className="text-2xl font-bold">{title}</h1>
           <div className="flex items-center gap-2">
             <span className="badge badge-outline badge-lg">レベル 5</span>
             <div className="avatar placeholder">
