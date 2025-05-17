@@ -197,7 +197,7 @@ const DashBoard: FC = () => {
                       type={'monotone'}
                       dataKey={'score'}
                       stroke="#8884d8"
-                      strokeWidth={2}
+                      strokeWidth={4}
                       activeDot={{ r: 8 }}
                       yAxisId={'line'}
                       name="点数"
@@ -206,9 +206,10 @@ const DashBoard: FC = () => {
                         position={'top'}
                         content={(props) => {
                           const { x, y, value } = props;
+                          console.log(`x: ${x}, y: ${y}, value: ${value}`);
                           const numValue = value !== undefined ? Number(value) : 0;
                           const numY = y !== undefined ? Number(y) : 0;
-                          const yPos = numValue > 19 ? numY + 20 : numY - 10;
+                          const yPos = numValue > 90 ? numY + 20 : numY - 10;
                           return (
                             <text
                               x={x}
