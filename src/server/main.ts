@@ -22,12 +22,10 @@ const affectCountToA1 = (count: number): void => {
 };
 
 const getSpreadSheetName = (): string => {
-  console.log('キターーーーー');
   return ss.getActiveSheet().getName();
 };
 
 const getSpreadSheetUrl = (): string => {
-  console.log("let's get sheet url1!!!!!!!!!");
   return ss.getUrl();
 };
 
