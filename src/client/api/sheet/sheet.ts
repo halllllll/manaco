@@ -1,6 +1,9 @@
-import { isGASEnvironment, serverFunctions } from '../serverFunctions';
+import { isGASEnvironment, serverFunctions } from '../../serverFunctions';
+import { API_ENDPOINTS, getMSWPath } from '../endpoint';
 
 export const SheetApp = {
+  // getSheetName: apiRequest('sheet-name'),
+  // getSheetUrl: apiRequest('sheet-url'),
   getSheetName: async (): Promise<string> => {
     if (isGASEnvironment()) {
       const ret = await serverFunctions.getSpreadSheetName();
@@ -11,11 +14,10 @@ export const SheetApp = {
      * in dev, intercepted by MSW
      * @see src/client/mock/handlers.ts
      */
-    const response = await fetch('/mock/sheet-name');
+    const response = await fetch(getMSWPath(API_ENDPOINTS.SHEET_NAME));
     return await response.json();
   },
   getSheetUrl: async (): Promise<string> => {
-    console.log("let's get sheet url");
     if (isGASEnvironment()) {
       return await serverFunctions.getSpreadSheetUrl();
     }
@@ -23,7 +25,7 @@ export const SheetApp = {
      * in dev, intercepted by MSW
      * @see src/client/mock/handlers.ts
      */
-    const response = await fetch('/mock/spreadsheet-url');
+    const response = await fetch(getMSWPath(API_ENDPOINTS.SHEET_URL));
     return await response.json();
   },
 };

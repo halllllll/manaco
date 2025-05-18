@@ -1,6 +1,7 @@
 import type { LearningActivity } from '@/shared/types/activity';
 import type { User } from '@/shared/types/user';
-import { isGASEnvironment, serverFunctions } from '../serverFunctions';
+import { isGASEnvironment, serverFunctions } from '../../serverFunctions';
+import { API_ENDPOINTS, getMSWPath } from '../endpoint';
 
 export const DashboardAPI = {
   // ダッシュボードデータ取得
@@ -9,8 +10,11 @@ export const DashboardAPI = {
       return await serverFunctions.getDashboard();
     }
 
-    // DEV環境: モックデータ
-    const response = await fetch('/mock/dashboard');
+    /**
+     * in dev, intercepted by MSW
+     * @see src/client/mock/handlers.ts
+     */
+    const response = await fetch(getMSWPath(API_ENDPOINTS.DASHBOARD));
     return await response.json();
   },
 

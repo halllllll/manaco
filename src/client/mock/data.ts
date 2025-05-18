@@ -4,7 +4,7 @@ import type { User } from '@shared/types/user';
 // export type MockUserId = "user1@sample.com" | "user2@sample.com" | "admin@sample.com" | "alien@sample.com"
 
 // 開発用ユーザープロファイル
-export const mockUsers: Record<string, User & { activities: LearningActivity[] }> = {
+export const mockUserData: Record<string, User & { activities: LearningActivity[] }> = {
   'dev-user-1': {
     id: 'user1@sample.com',
     name: '開発太郎',

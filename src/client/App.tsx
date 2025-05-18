@@ -15,7 +15,8 @@ import {
   YAxis,
 } from 'recharts';
 import { ErrorFallback } from './ErrorFallback';
-import { SheetApp } from './api/sheet';
+import { useDashboard } from './api/dashboard/hooks';
+import { SheetApp } from './api/sheet/sheet';
 import { DevTools } from './devtool';
 import { isGASEnvironment } from './serverFunctions';
 
@@ -197,7 +198,7 @@ const DashBoard: FC = () => {
                       type={'monotone'}
                       dataKey={'score'}
                       stroke="#8884d8"
-                      strokeWidth={4}
+                      strokeWidth={2}
                       activeDot={{ r: 8 }}
                       yAxisId={'line'}
                       name="点数"
@@ -206,7 +207,6 @@ const DashBoard: FC = () => {
                         position={'top'}
                         content={(props) => {
                           const { x, y, value } = props;
-                          console.log(`x: ${x}, y: ${y}, value: ${value}`);
                           const numValue = value !== undefined ? Number(value) : 0;
                           const numY = y !== undefined ? Number(y) : 0;
                           const yPos = numValue > 90 ? numY + 20 : numY - 10;
@@ -278,6 +278,7 @@ const DashBoard: FC = () => {
             </div>
           </div>
           <p>ここにはログがリストもしくはテーブルの形式で仮想テーブルで列挙される予定</p>
+          <Pseudo_Dashboard />
           {isGASEnvironment() ? (
             <>
               <div>here is PROD env</div>
@@ -718,5 +719,12 @@ const App: FC = () => {
     </>
   );
 };
-
 export default App;
+
+const Pseudo_Dashboard: FC = () => {
+  const { data, error, isLoading } = useDashboard();
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!data) return <div>No data</div>;
+  console.log('Dashboard data:', data);
+};

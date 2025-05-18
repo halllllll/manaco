@@ -1,42 +1,44 @@
 import { delay, http, HttpResponse } from 'msw';
+import { API_ENDPOINTS, getMSWPath } from '../api/endpoint';
 import { currentMockUserId } from './browser';
-import { mockUsers } from './data';
+import { mockUserData } from './data';
 
 export const handlers = [
   // スプレッドシート名取得 API
-  http.get('/mock/sheet-name', async () => {
+  http.get(getMSWPath(API_ENDPOINTS.SHEET_NAME), async () => {
     await delay(800);
-    const user = mockUsers[currentMockUserId];
-    if (!user) {
+    const data = mockUserData[currentMockUserId];
+    if (!data) {
       return HttpResponse.json('データなし');
     }
-    switch (user.id) {
-      case 'user1@sample.com':
-        return HttpResponse.json('（シート名）');
-      case 'user2@sample.com':
-        return HttpResponse.json('（シート名）');
-      case 'admin@sample.com':
-        return HttpResponse.json('（シート名）');
-      case 'alien@sample.com':
-        return HttpResponse.json('（シート名）');
-      default:
-    }
-    return HttpResponse.json('開発環境のスプレッドシート');
+    return HttpResponse.json('（シート名）');
+    // switch (data.id) {
+    //   case 'user1@sample.com':
+    //   case 'user2@sample.com':
+    //     return HttpResponse.json('（シート名）');
+    //   case 'admin@sample.com':
+    //     return HttpResponse.json('（シート名）');
+    //   case 'alien@sample.com':
+    //     return HttpResponse.json('（シート名）');
+    //   default:
+    // }
+    // return HttpResponse.json('開発環境のスプレッドシート');
   }),
 
   // スプレッドシートURL取得 API
-  http.get('/mock/spreadsheet-url', async () => {
+  http.get(getMSWPath(API_ENDPOINTS.SHEET_URL), async () => {
     await delay(800);
     return HttpResponse.json('https://example.com/dev-spreadsheet');
   }),
 
   // アクセスしたときにdashboardに必要なデータをまとめて取得
-  http.get('/mock/dashboard', async () => {
+  http.get(getMSWPath(API_ENDPOINTS.DASHBOARD), async () => {
     await delay(1000);
-    const user = mockUsers[currentMockUserId];
-    if (!user) {
+    const data = mockUserData[currentMockUserId];
+    if (!data) {
+      return HttpResponse.json('データなし');
     }
-    return HttpResponse.json({});
+    return HttpResponse.json(data);
   }),
 
   // // // 学習活動一覧取得 API
