@@ -43,78 +43,6 @@ const AppLayout: FC<AppLayoutProps> = ({ setIsModalOpen, isModalOpen: _isModalOp
   const isRegistered = data?.id && data?.name && data?.belonging;
   const hasActivities = data?.activities && data.activities.length > 0;
 
-  // const pseudoLearningActivities: Omit<LearningActivity, 'userId'>[] = [
-  //   {
-  //     activityDate: '2023-06-01',
-  //     score: 70,
-  //     duration: 30,
-  //     mood: 'normal',
-  //   },
-  //   {
-  //     activityDate: '2023-06-02',
-
-  //     score: 85,
-  //     duration: 45,
-  //     mood: 'happy',
-  //   },
-  //   {
-  //     activityDate: '2023-06-03',
-
-  //     score: 60,
-  //     duration: 20,
-  //     mood: 'tired',
-  //   },
-  //   {
-  //     activityDate: '2023-06-04',
-
-  //     score: 90,
-  //     duration: 60,
-  //     mood: 'happy',
-  //   },
-  //   {
-  //     activityDate: '2023-06-05',
-
-  //     score: 75,
-  //     duration: 40,
-  //     mood: 'normal',
-  //   },
-  //   {
-  //     activityDate: '2023-06-06',
-
-  //     score: 65,
-  //     duration: 35,
-  //     mood: 'hard',
-  //   },
-  //   {
-  //     activityDate: '2023-06-07',
-
-  //     score: 80,
-  //     duration: 50,
-  //     mood: 'happy',
-  //   },
-  //   {
-  //     activityDate: '2023-06-08',
-
-  //     score: 60,
-  //     duration: 25,
-  //     mood: 'tired',
-  //   },
-  //   {
-  //     activityDate: '2023-06-09',
-
-  //     score: 95,
-  //     duration: 75,
-  //     mood: 'happy',
-  //   },
-  //   {
-  //     activityDate: '2023-06-10',
-
-  //     score: 85,
-  //     duration: 55,
-  //     mood: 'normal',
-  //   },
-  // ];
-
   return (
     <>
       <div className="flex flex-col min-h-screen">
@@ -122,15 +50,10 @@ const AppLayout: FC<AppLayoutProps> = ({ setIsModalOpen, isModalOpen: _isModalOp
 
         <main className="container mx-auto p-4">
           {isLoading ? (
-            <div>
-              <div>Loading...</div>
-              <div className="flex w-52 flex-col gap-4">
-                <div className="skeleton h-32 w-full" />
-                <div className="skeleton h-4 w-28" />
-                <div className="skeleton h-4 w-full" />
-                <div className="skeleton h-4 w-full" />
-              </div>
-            </div>
+            <>
+              {/** 本当は各コンポーネントでやったほうがデザインやレイアウトの変更耐性があるが面倒なので一旦全部スケルトンを受け持つ */}
+              <DashboardSkelton />
+            </>
           ) : error ? (
             <div className="alert alert-error">
               <div>
@@ -1281,6 +1204,121 @@ const UnregisteredView: FC<{ sheetName: string; sheetUrl: string }> = ({ sheetNa
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+const DashboardSkelton: FC = () => {
+  return (
+    <div className="card bg-base-100 shadow-xl border border-base-200 w-full max-w-full mx-auto p-6 animate-pulse">
+      {/* ヘッダー部分のスケルトン */}
+      <div className="flex justify-between items-center mb-6">
+        <div className="skeleton h-8 w-1/3" />
+        <div className="skeleton rounded-full h-12 w-12" />
+      </div>
+
+      {/* グラフとデータ表示部分のスケルトン */}
+      <div className="flex flex-col lg:flex-row gap-4">
+        {/* グラフスケルトン */}
+        <div className="card bg-base-100 shadow-sm border border-base-200 w-full">
+          <div className="card-body">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="skeleton rounded-full h-6 w-6" />
+              <div className="skeleton h-6 w-1/4" />
+            </div>
+
+            {/* グラフスケルトン */}
+            <div className="h-64 w-full">
+              <div className="flex h-full items-end justify-between px-2">
+                <div className="skeleton h-1/3 w-8" />
+                <div className="skeleton h-2/3 w-8" />
+                <div className="skeleton h-1/2 w-8" />
+                <div className="skeleton h-3/4 w-8" />
+                <div className="skeleton h-1/4 w-8" />
+                <div className="skeleton h-2/5 w-8" />
+                <div className="skeleton h-3/5 w-8" />
+              </div>
+              <div className="skeleton h-0.5 w-full mt-2" />
+              <div className="flex justify-between mt-2">
+                <div className="skeleton h-4 w-16" />
+                <div className="skeleton h-4 w-16" />
+                <div className="skeleton h-4 w-16" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ランキングスケルトン */}
+        <div className="card shadow-md lg:w-1/3 bg-base-100 border border-base-200">
+          <div className="card-body">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="skeleton rounded-full h-6 w-6" />
+              <div className="skeleton h-6 w-2/3" />
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="skeleton h-6 w-1/3" />
+                <div className="skeleton h-6 w-1/4" />
+              </div>
+              <div className="skeleton h-0.5 w-full" />
+              <div className="flex items-center justify-between">
+                <div className="skeleton h-6 w-1/3" />
+                <div className="skeleton h-6 w-1/4" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 学習ログテーブルスケルトン */}
+      <div className="mt-6">
+        <div className="skeleton h-8 w-1/4 mb-4" />
+        <div className="overflow-x-auto">
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th>
+                  <div className="skeleton h-6 w-16" />
+                </th>
+                <th>
+                  <div className="skeleton h-6 w-16" />
+                </th>
+                <th>
+                  <div className="skeleton h-6 w-16" />
+                </th>
+                <th>
+                  <div className="skeleton h-6 w-16" />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2, 3].map((i) => (
+                <tr key={i}>
+                  <td>
+                    <div className="skeleton h-6 w-24" />
+                  </td>
+                  <td>
+                    <div className="skeleton h-6 w-12" />
+                  </td>
+                  <td>
+                    <div className="skeleton h-6 w-16" />
+                  </td>
+                  <td>
+                    <div className="skeleton h-6 w-20" />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ローディングインジケーター */}
+      <div className="flex justify-center items-center mt-8 gap-2">
+        <div className="loading loading-spinner loading-md text-primary" />
+        <p className="text-base font-medium text-primary">データを読み込み中...</p>
       </div>
     </div>
   );
