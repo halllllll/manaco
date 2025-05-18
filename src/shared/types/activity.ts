@@ -6,5 +6,6 @@ export interface LearningActivity {
   duration: number;
   activityDate: string;
   userId: string; // Apps Script側でやるとAPI呼び出しのオーバーヘッドがあるので
+  memo?: string;
   mood?: Mood;
 }

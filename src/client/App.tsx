@@ -1,5 +1,6 @@
 import 'cally';
 
+import { formatDate, formatDuration } from '@/shared/common/func';
 import type { LearningActivity } from '@/shared/types/activity';
 import type { User } from '@/shared/types/user';
 import { QRCodeSVG } from 'qrcode.react';
@@ -70,7 +71,6 @@ const AppLayout: FC<AppLayoutProps> = ({ setIsModalOpen, isModalOpen: _isModalOp
           ) : (
             <UserDashboard userData={data} />
           )}
-          <p>ここにはログがリストもしくはテーブルの形式で仮想テーブルで列挙される予定</p>
         </main>
 
         <footer className="footer footer-center p-4 bg-base-300 text-base-content mt-auto">
@@ -959,9 +959,12 @@ const UserDashboard: FC<{ userData: User & { activities: LearningActivity[] } }>
   userData,
 }) => {
   return (
-    <div className="flex flex-col lg:flex-row gap-4 mb-8">
-      <Graph activities={userData.activities} />
-      <Torophy />
+    <div className="flex flex-col">
+      <div className="flex flex-col lg:flex-row gap-4 mb-8">
+        <Graph activities={userData.activities} />
+        <Torophy />
+      </div>
+      <LearningLogSection activities={userData.activities} />
     </div>
   );
 };
@@ -1320,6 +1323,220 @@ const DashboardSkelton: FC = () => {
         <div className="loading loading-spinner loading-md text-primary" />
         <p className="text-base font-medium text-primary">データを読み込み中...</p>
       </div>
+    </div>
+  );
+};
+
+const LearningLogSection: FC<{ activities: LearningActivity[] }> = ({ activities }) => {
+  const [selectedActivity, setSelectedActivity] = useState<LearningActivity | null>(null);
+
+  // 点数に応じたスタイル
+  const getScoreStyle = (score: number) => {
+    if (score >= 95) return 'text-warning font-bold';
+    if (score >= 80) return 'text-success font-bold';
+    if (score >= 60) return 'text-info';
+    return 'text-error';
+  };
+
+  // ムードに対応する絵文字を取得
+  const getMoodEmoji = (mood?: string) => {
+    if (!mood) return '';
+    const moodOption = moodOptions.find((option) => option.value === mood);
+    return moodOption ? moodOption.label.split(' ')[0] : '';
+  };
+
+  return (
+    <div className="card bg-base-100 shadow-md border border-base-200 w-full">
+      <div className="card-body">
+        <h2 className="card-title text-xl flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <title>{'学習記録'}</title>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+            />
+          </svg>
+          学習の記録
+          <span className="badge badge-sm">{activities.length}件</span>
+        </h2>
+
+        <div className="overflow-x-auto max-h-[40vh] overflow-y-auto">
+          <table className="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th className="sticky top-0 bg-base-100">日付</th>
+                <th className="sticky top-0 bg-base-100">点数</th>
+                <th className="hidden md:table-cell sticky top-0 bg-base-100">かかった時間</th>
+                <th className="hidden md:table-cell sticky top-0 bg-base-100">きもち</th>
+                <th className="sticky top-0 bg-base-100">{''}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activities.map((activity) => (
+                // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+                <tr
+                  key={activity.activityDate}
+                  className="hover cursor-pointer"
+                  onClick={() => setSelectedActivity(activity)}
+                >
+                  <td>{formatDate(activity.activityDate)}</td>
+                  <td>
+                    <span className={getScoreStyle(activity.score)}>{activity.score}点</span>
+                  </td>
+                  <td className="hidden md:table-cell">{formatDuration(activity.duration)}</td>
+                  <td className="hidden md:table-cell">
+                    <span
+                      className="text-xl"
+                      title={moodOptions.find((m) => m.value === activity.mood)?.label}
+                    >
+                      {getMoodEmoji(activity.mood)}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn btn-xs btn-ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedActivity(activity);
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <title>詳細</title>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <dialog
+        id="activity_detail_modal"
+        className={`modal ${selectedActivity ? 'modal-open' : ''}`}
+      >
+        <div className="modal-box">
+          {selectedActivity && (
+            <>
+              <h3 className="font-bold text-lg">
+                {formatDate(selectedActivity.activityDate)}の記録
+              </h3>
+
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="stats shadow">
+                  <div className="stat">
+                    <div className="stat-title">今回の点数</div>
+                    <div className={`stat-value ${getScoreStyle(selectedActivity.score)}`}>
+                      {selectedActivity.score}
+                      <span className="text-xs">点</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="stats shadow">
+                  <div className="stat">
+                    <div className="stat-title">かかった時間</div>
+                    <div className="stat-value text-lg">
+                      {formatDuration(selectedActivity.duration)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 気分 */}
+              {selectedActivity.mood && (
+                <div className="bg-base-200/50 rounded-lg p-4 mt-4">
+                  <div className="font-bold mb-2">このときの気持ち</div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl">{getMoodEmoji(selectedActivity.mood)}</span>
+                    <span className="text-lg">
+                      {
+                        moodOptions
+                          .find((m) => m.value === selectedActivity.mood)
+                          ?.label.split(' ')[1]
+                      }
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* メモ */}
+              {selectedActivity.memo && (
+                <div className="bg-base-200/50 rounded-lg p-4 mt-4">
+                  <div className="font-bold mb-2">メモ</div>
+                  <p className="whitespace-pre-wrap">{selectedActivity.memo}</p>
+                </div>
+              )}
+
+              {/* 先生からのコメント (将来の機能として) */}
+
+              {/* <div className="bg-primary/10 rounded-lg p-4 mt-4">
+                <div className="font-bold mb-2 flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-primary"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <title>{'comment'}</title>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                    />
+                  </svg>
+                  <span>先生からのコメント</span>
+                </div>
+                <p className="italic">"{'先生からのコメント'}"</p>
+              </div> */}
+
+              {/* ごほうび機能 (将来の機能として) */}
+              {/* {selectedActivity.score >= 90 && (
+                <div className="bg-warning/20 rounded-lg p-4 mt-4 text-center animate-pulse">
+                  <div className="text-2xl mb-2">🎉 すごい！ 🎉</div>
+                  <div className="font-bold">高得点のごほうび</div>
+                  <div className="badge badge-warning gap-2 mt-1">ゴールドメダル獲得！</div>
+                </div>
+              )} */}
+              <p>{null}</p>
+            </>
+          )}
+
+          <div className="modal-action">
+            <button type="button" className="btn" onClick={() => setSelectedActivity(null)}>
+              とじる
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button type={'button'} onClick={() => setSelectedActivity(null)}>
+            close
+          </button>
+        </form>
+      </dialog>
     </div>
   );
 };
