@@ -1,7 +1,7 @@
 import type { LearningActivity } from '@/shared/types/activity';
 import type { User } from '@/shared/types/user';
-import { isGASEnvironment, serverFunctions } from '../../serverFunctions';
 import { API_ENDPOINTS, getMSWPath } from '../endpoint';
+import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 export const DashboardAPI = {
   // ダッシュボードデータ取得

@@ -1,5 +1,5 @@
-import { isGASEnvironment, serverFunctions } from '../../serverFunctions';
 import { API_ENDPOINTS, getMSWPath } from '../endpoint';
+import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 export const SheetApp = {
   getSpreadsheetName: async (): Promise<string> => {
