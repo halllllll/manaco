@@ -801,7 +801,7 @@ const Pseudo_Dashboard: FC = () => {
           </div>
 
           <div className="bg-warning/10 rounded-lg p-4 mb-4 w-full">
-            <div className="flex gap-3 items-start">
+            {/* <div className="flex gap-3 items-start">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6 text-warning mt-1 flex-shrink-0"
@@ -828,6 +828,51 @@ const Pseudo_Dashboard: FC = () => {
                     このアプリのSpreadSheet
                   </a>
                 </p>
+              </div>
+            </div> */}
+            <div className="flex gap-3 items-start">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-warning mt-1 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <title>{'warning'}</title>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div className="flex-1">
+                <h3 className="font-bold text-lg">先生へのおねがい</h3>
+                <div className="text-sm mt-2 space-y-2">
+                  <p>生徒の基本情報を登録するための管理画面（Spreadsheet）があります。</p>
+
+                  <div className="flex justify-center">
+                    <details className="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box max-w-lg">
+                      <summary className="collapse-title py-2 text-lg font-medium bg-base-100">
+                        先生はここをクリック
+                      </summary>
+                      <div className="collapse-content">
+                        <div className="divider divider-warning text-xs">注意</div>
+                        <p className="text-xs mb-2 bg-warning/10 p-2 rounded-lg">
+                          SpreadSheetは適切なアクセス管理・共有権限管理をお願いします。
+                        </p>
+                        <a
+                          className="btn btn-sm btn-outline text-md mt-2"
+                          href={sheetUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          このアプリのSpreadsheetを開く
+                        </a>
+                      </div>
+                    </details>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
