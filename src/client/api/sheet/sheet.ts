@@ -2,9 +2,7 @@ import { isGASEnvironment, serverFunctions } from '../../serverFunctions';
 import { API_ENDPOINTS, getMSWPath } from '../endpoint';
 
 export const SheetApp = {
-  // getSheetName: apiRequest('sheet-name'),
-  // getSheetUrl: apiRequest('sheet-url'),
-  getSheetName: async (): Promise<string> => {
+  getSpreadsheetName: async (): Promise<string> => {
     if (isGASEnvironment()) {
       const ret = await serverFunctions.getSpreadSheetName();
 

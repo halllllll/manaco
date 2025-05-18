@@ -11,7 +11,7 @@ export const handlers = [
     if (!data) {
       return HttpResponse.json('データなし');
     }
-    return HttpResponse.json('（シート名）');
+    return HttpResponse.json('（スプレッドシート名）');
     // switch (data.id) {
     //   case 'user1@sample.com':
     //   case 'user2@sample.com':

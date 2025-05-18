@@ -24,7 +24,8 @@ const affectCountToA1 = (count: number): void => {
 };
 
 const getSpreadSheetName = (): string => {
-  return ss.getActiveSheet().getName();
+  // return ss.getActiveSheet().getName();
+  return ss.getName();
 };
 
 const getSpreadSheetUrl = (): string => {

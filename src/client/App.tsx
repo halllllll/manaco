@@ -1,7 +1,9 @@
 import 'cally';
 
 import type { LearningActivity } from '@/shared/types/activity';
-import { type CSSProperties, type FC, type FormEvent, Suspense, useEffect, useState } from 'react';
+import type { User } from '@/shared/types/user';
+import { QRCodeSVG } from 'qrcode.react';
+import { type CSSProperties, type FC, type FormEvent, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
   Bar,
@@ -16,12 +18,8 @@ import {
 } from 'recharts';
 import { ErrorFallback } from './ErrorFallback';
 import { useDashboard } from './api/dashboard/hooks';
-import { useSheetUrl } from './api/sheet/hooks';
-import { SheetApp } from './api/sheet/sheet';
+import { useSheetName, useSheetUrl } from './api/sheet/hooks';
 import { DevTools } from './devtool';
-import { isGASEnvironment } from './serverFunctions';
-
-// const { serverFunctions } = new GASClient<typeof server>();
 
 // 感情アイコンの定義
 const moodOptions = [
@@ -31,277 +29,140 @@ const moodOptions = [
   { value: 'hard', label: '🤔 むずかしかった', color: 'bg-error/20' },
 ];
 
-const DashBoard: FC = () => {
-  // const [count, setCount] = useState(0);
-  // const handleButtonClick = async () => {
-  //   console.log(`affect value ${count} to SpreadSheet A1 cell!`);
-  //   await serverFunctions.affectCountToA1(count);
-  // };
+interface AppLayoutProps {
+  setIsModalOpen: (isOpen: boolean) => void;
+  isModalOpen: boolean;
+}
 
-  // const [userInfo, setUserInfo] = useState<User | null>(null);
+const AppLayout: FC<AppLayoutProps> = ({ setIsModalOpen, isModalOpen: _isModalOpen }) => {
+  const { data, error, isLoading } = useDashboard();
+  const { data: sheetUrl } = useSheetUrl();
+  const { data: sheetName } = useSheetName();
 
-  const [title, setTitle] = useState<string | null>('学習記録');
-  const [sheetUrl, setSheetUrl] = useState<string>('');
-  useEffect(() => {
-    console.info('start get title');
-    const getTitle = async () => {
-      const [spreadsheettitle, spreadsheeturl] = await Promise.all([
-        SheetApp.getSheetName(),
-        SheetApp.getSheetUrl(),
-      ]);
-      console.info(`get spread sheet title: ${spreadsheettitle ?? '(null)'}`);
-      setTitle(spreadsheettitle);
-      setSheetUrl(spreadsheeturl);
-    };
-    void getTitle();
-  }, []);
+  // ユーザーの状態を確認
+  const isRegistered = data?.id && data?.name && data?.belonging;
+  const hasActivities = data?.activities && data.activities.length > 0;
 
-  const pseudoLearningActivities: Omit<LearningActivity, 'userId'>[] = [
-    {
-      activityDate: '2023-06-01',
-      score: 70,
-      duration: 30,
-      mood: 'normal',
-    },
-    {
-      activityDate: '2023-06-02',
+  // const pseudoLearningActivities: Omit<LearningActivity, 'userId'>[] = [
+  //   {
+  //     activityDate: '2023-06-01',
+  //     score: 70,
+  //     duration: 30,
+  //     mood: 'normal',
+  //   },
+  //   {
+  //     activityDate: '2023-06-02',
 
-      score: 85,
-      duration: 45,
-      mood: 'happy',
-    },
-    {
-      activityDate: '2023-06-03',
+  //     score: 85,
+  //     duration: 45,
+  //     mood: 'happy',
+  //   },
+  //   {
+  //     activityDate: '2023-06-03',
 
-      score: 60,
-      duration: 20,
-      mood: 'tired',
-    },
-    {
-      activityDate: '2023-06-04',
+  //     score: 60,
+  //     duration: 20,
+  //     mood: 'tired',
+  //   },
+  //   {
+  //     activityDate: '2023-06-04',
 
-      score: 90,
-      duration: 60,
-      mood: 'happy',
-    },
-    {
-      activityDate: '2023-06-05',
+  //     score: 90,
+  //     duration: 60,
+  //     mood: 'happy',
+  //   },
+  //   {
+  //     activityDate: '2023-06-05',
 
-      score: 75,
-      duration: 40,
-      mood: 'normal',
-    },
-    {
-      activityDate: '2023-06-06',
+  //     score: 75,
+  //     duration: 40,
+  //     mood: 'normal',
+  //   },
+  //   {
+  //     activityDate: '2023-06-06',
 
-      score: 65,
-      duration: 35,
-      mood: 'hard',
-    },
-    {
-      activityDate: '2023-06-07',
+  //     score: 65,
+  //     duration: 35,
+  //     mood: 'hard',
+  //   },
+  //   {
+  //     activityDate: '2023-06-07',
 
-      score: 80,
-      duration: 50,
-      mood: 'happy',
-    },
-    {
-      activityDate: '2023-06-08',
+  //     score: 80,
+  //     duration: 50,
+  //     mood: 'happy',
+  //   },
+  //   {
+  //     activityDate: '2023-06-08',
 
-      score: 60,
-      duration: 25,
-      mood: 'tired',
-    },
-    {
-      activityDate: '2023-06-09',
+  //     score: 60,
+  //     duration: 25,
+  //     mood: 'tired',
+  //   },
+  //   {
+  //     activityDate: '2023-06-09',
 
-      score: 95,
-      duration: 75,
-      mood: 'happy',
-    },
-    {
-      activityDate: '2023-06-10',
+  //     score: 95,
+  //     duration: 75,
+  //     mood: 'happy',
+  //   },
+  //   {
+  //     activityDate: '2023-06-10',
 
-      score: 85,
-      duration: 55,
-      mood: 'normal',
-    },
-  ];
-
-  // const today = new Date().toISOString().split('T')[0];
+  //     score: 85,
+  //     duration: 55,
+  //     mood: 'normal',
+  //   },
+  // ];
 
   return (
     <>
       <div className="flex flex-col min-h-screen">
-        <header className="flex justify-between items-center p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg rounded-b-lg">
-          <h1 className="text-2xl font-bold">{title}</h1>
-          <div className="flex items-center gap-2">
-            <span className="badge badge-outline badge-lg">レベル 5</span>
-            <div className="avatar placeholder">
-              <div className="bg-neutral-focus text-neutral-content rounded-full w-10">
-                <span>Me</span>
-              </div>
-            </div>
-          </div>
-        </header>
+        <Header />
 
-        <div className="container mx-auto p-4">
-          <div className="flex flex-col lg:flex-row gap-4 mb-8">
-            {/** chart */}
-            <div className="card bg-base-100 w-full shadow-md border border-base-200">
-              <div className="card-body">
-                <h2 className="card-title text-xl flex items-center gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-primary"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <title>{'学習時間'}</title>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                  これまでの記録
-                </h2>
-                <ResponsiveContainer width={'95%'} height={300}>
-                  <ComposedChart
-                    data={pseudoLearningActivities}
-                    margin={{
-                      top: 5,
-                      right: 5,
-                      left: 5,
-                      bottom: -5,
-                    }}
-                  >
-                    <XAxis dataKey="activityDate" />
-                    <YAxis yAxisId="bar" dataKey={'duration'} orientation={'right'} />
-                    <YAxis
-                      dataKey={'score'}
-                      domain={['dataMin -10', 'datamax']}
-                      yAxisId={'line'}
-                      orientation={'left'}
-                    />
-                    <Bar
-                      yAxisId={'bar'}
-                      dataKey={'duration'}
-                      fill="#82ca9d"
-                      barSize={'30'}
-                      name="かかった時間（秒）"
-                    >
-                      <LabelList />
-                    </Bar>
-
-                    <Line
-                      type={'monotone'}
-                      dataKey={'score'}
-                      stroke="#8884d8"
-                      strokeWidth={2}
-                      activeDot={{ r: 8 }}
-                      yAxisId={'line'}
-                      name="点数"
-                    >
-                      <LabelList
-                        position={'top'}
-                        content={(props) => {
-                          const { x, y, value } = props;
-                          const numValue = value !== undefined ? Number(value) : 0;
-                          const numY = y !== undefined ? Number(y) : 0;
-                          const yPos = numValue > 90 ? numY + 20 : numY - 10;
-                          return (
-                            <text
-                              x={x}
-                              y={yPos}
-                              fontSize={16}
-                              textAnchor="middle"
-                              className="text-primary"
-                            >
-                              {value}
-                            </text>
-                          );
-                        }}
-                      />
-                    </Line>
-                    <Tooltip />
-                    <Legend />
-                  </ComposedChart>
-                </ResponsiveContainer>
+        <main className="container mx-auto p-4">
+          {isLoading ? (
+            <div>
+              <div>Loading...</div>
+              <div className="flex w-52 flex-col gap-4">
+                <div className="skeleton h-32 w-full" />
+                <div className="skeleton h-4 w-28" />
+                <div className="skeleton h-4 w-full" />
+                <div className="skeleton h-4 w-full" />
               </div>
             </div>
-            {/** ranking */}
-            <div className="card shadow-md lg:w-1/3 bg-base-100 border border-base-200">
-              <div className="card-body">
-                <h2 className="card-title text-xl flex items-center gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-secondary"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <title>{'ranking'}</title>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                  がんばったよ！ランキング
-                </h2>
-                <div className="overflow-x-auto">
-                  <table className="table border border-base-content/5">
-                    <tbody>
-                      {/* row 1 */}
-                      <tr className="hover bg-warning/10">
-                        <th className="text-nowrap">
-                          <div className="badge badge-warning gap-2">1位</div>
-                          <span className="ml-2">最高得点！</span>
-                        </th>
-                        <td className="font-bold text-lg">99点</td>
-                        <td>{'2025-05-21'}</td>
-                      </tr>
-                      {/* row 2 */}
-                      <tr className="hover bg-info/10">
-                        <th className="text-nowrap">
-                          <div className="badge badge-info gap-2">2位</div>
-                          <span className="ml-2">最速回答！</span>
-                        </th>
-                        <td className="font-bold text-lg">148秒</td>
-                        <td>{'2025-04-11'}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <p>ここにはログがリストもしくはテーブルの形式で仮想テーブルで列挙される予定</p>
-          <Pseudo_Dashboard />
-          {isGASEnvironment() ? (
-            <>
-              <div>here is PROD env</div>
+          ) : error ? (
+            <div className="alert alert-error">
               <div>
-                Go to Sheet:{' '}
-                <a href={sheetUrl} target="_blank" rel="noreferrer">
-                  LINK
-                </a>
+                <span>Error: {error.message}</span>
               </div>
-            </>
+            </div>
+          ) : !isRegistered ? (
+            <UnregisteredView
+              sheetName={sheetName ?? '取得できませんでした'}
+              sheetUrl={sheetUrl ?? '取得できませんでした'}
+            />
+          ) : !hasActivities ? (
+            <EmptyDashboard openModal={() => setIsModalOpen(true)} />
           ) : (
-            <div>here is DEV env</div>
+            <UserDashboard userData={data} />
           )}
-        </div>
+          <p>ここにはログがリストもしくはテーブルの形式で仮想テーブルで列挙される予定</p>
+        </main>
 
         <footer className="footer footer-center p-4 bg-base-300 text-base-content mt-auto">
           <aside>
             <p>Copyright © {new Date().getFullYear()} - GIG SCHOOL</p>
           </aside>
         </footer>
+
+        {isRegistered && hasActivities && (
+          <LearningRecordButton
+            openModal={() => setIsModalOpen(true)}
+            variant="fixed"
+            label="学習を記録する"
+          />
+        )}
       </div>
     </>
   );
@@ -330,28 +191,9 @@ const App: FC = () => {
 
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Suspense>
-          <DashBoard />
+          <AppLayout setIsModalOpen={setIsModalOpen} isModalOpen={isModalOpen} />
         </Suspense>
       </ErrorBoundary>
-      {/* 記録追加用のボタン - 固定位置 */}
-      <button
-        type="button"
-        onClick={() => setIsModalOpen(true)}
-        className="btn btn-primary btn-lg fixed bottom-8 right-8 shadow-lg rounded-full gap-2 text-lg animate-bounce"
-        aria-label="今日の学習を記録する"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <title>{'新規投稿'}</title>
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-        </svg>
-        学習を記録する
-      </button>
 
       {/* 記録用モーダル */}
       <dialog id="post_modal" className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
@@ -713,9 +555,11 @@ const App: FC = () => {
 };
 export default App;
 
-const Pseudo_Dashboard: FC = () => {
+const _Dashboard: FC = () => {
   const { data, error, isLoading, mutate } = useDashboard();
   const { data: sheetUrl } = useSheetUrl();
+  const { data: sheetName } = useSheetName();
+
   if (isLoading)
     return (
       <div>
@@ -801,35 +645,6 @@ const Pseudo_Dashboard: FC = () => {
           </div>
 
           <div className="bg-warning/10 rounded-lg p-4 mb-4 w-full">
-            {/* <div className="flex gap-3 items-start">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-warning mt-1 flex-shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <title>{'warning'}</title>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg">先生へのおねがい</h3>
-                <p className="text-sm mt-3">
-                  <p>
-                    {'スプレッドシートで生徒の基本情報（氏名、学年・クラス）を登録してください。'}
-                  </p>
-
-                  <a className="link" href={sheetUrl}>
-                    このアプリのSpreadSheet
-                  </a>
-                </p>
-              </div>
-            </div> */}
             <div className="flex gap-3 items-start">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -852,50 +667,26 @@ const Pseudo_Dashboard: FC = () => {
                   <p>生徒の基本情報を登録するための管理画面（Spreadsheet）があります。</p>
 
                   <div className="flex justify-center">
-                    <details className="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box max-w-lg">
+                    <details className="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box max-w-xl">
                       <summary className="collapse-title py-2 text-lg font-medium bg-base-100">
                         先生はここをクリック
                       </summary>
                       <div className="collapse-content">
                         <div className="divider divider-warning text-xs">注意</div>
-                        <p className="text-xs mb-2 bg-warning/10 p-2 rounded-lg">
-                          SpreadSheetは適切なアクセス管理・共有権限管理をお願いします。
-                        </p>
-                        <a
-                          className="btn btn-sm btn-outline text-md mt-2"
-                          href={sheetUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          このアプリのSpreadsheetを開く
-                        </a>
+                        <div className="flex flex-col items-center gap-2">
+                          <p className="text-xs bg-warning/10 p-2 rounded-lg">
+                            SpreadSheetは適切なアクセス管理・共有権限管理をお願いします。
+                          </p>
+                          <p className="">{`このアプリのSpreadsheet名: ${sheetName}`}</p>
+                          {/* biome-ignore lint/style/noNonNullAssertion: <explanation> */}
+                          <QRCodeSVG value={sheetUrl!} className="w-80 h-100" />
+                        </div>
                       </div>
                     </details>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="card-actions mt-2">
-            <button type="button" onClick={() => mutate()} className="btn btn-primary gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <title>{'refresh'}</title>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              ページを更新する
-            </button>
           </div>
         </div>
       </div>
@@ -1063,5 +854,434 @@ const Pseudo_Dashboard: FC = () => {
         </div>
       </div>
     </>
+  );
+};
+
+const Header: FC = () => {
+  const { data: title, isLoading: isSheetLoading } = useSheetName();
+
+  return (
+    <header className="flex justify-between items-center p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg rounded-b-lg max-h-24">
+      <h1 className="text-2xl font-bold">
+        {isSheetLoading ? (
+          <>
+            <span className="m-2">よみこみちゅう</span>
+            <span className="loading loading-spinner loading-md" />
+          </>
+        ) : (
+          title
+        )}
+      </h1>
+      <div className="flex items-center gap-2">
+        <span className="badge badge-outline badge-lg">レベル 5</span>
+        <div className="avatar placeholder">
+          <div className="bg-neutral-focus text-neutral-content rounded-full w-10">
+            <span>Me</span>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+const EmptyDashboard: FC<{ openModal: () => void }> = ({ openModal }) => {
+  return (
+    <>
+      <div className="card bg-base-100 shadow-xl border border-base-200 w-full max-w-full mx-auto p-6">
+        <figure className="px-10 pt-10">
+          <img
+            src="https://img.icons8.com/clouds/256/000000/school.png"
+            alt="学校のイラスト"
+            className="w-48 h-48 mx-auto animate-bounce-slow"
+          />
+        </figure>
+        <div className="card-body items-center text-center">
+          <h2 className="card-title text-2xl font-bold text-primary">
+            はじめての学習記録をつけてみよう！
+          </h2>
+
+          <div className="bg-info/10 rounded-lg p-4 my-4 w-full">
+            <h3 className="text-lg font-bold flex items-center gap-2 mb-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-info"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <title>{''}</title>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              どうやって記録するの？
+            </h3>
+            <ol className="steps steps-vertical">
+              <li className="step step-primary">画面下の「学習を記録する」ボタンをタップしよう</li>
+              <li className="step step-primary">勉強した日にち・時間・点数を入力しよう</li>
+              <li className="step step-primary">どんな気持ちだったか選んでみよう</li>
+              <li className="step step-primary">「記録する」ボタンを押して完成！</li>
+            </ol>
+          </div>
+
+          <div className="bg-success/10 rounded-lg p-4 mb-4 w-full">
+            <h3 className="text-lg font-bold flex items-center gap-2 mb-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-success"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <title>{''}</title>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              記録すると何がいいの？
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+              <div className="card bg-base-100 shadow-sm">
+                <div className="card-body p-3">
+                  <div className="text-center mb-2">
+                    <span className="text-2xl">📊</span>
+                  </div>
+                  <h4 className="font-bold text-center mb-1">自分の成長が見える</h4>
+                  <p className="text-sm">これまでの勉強の記録がグラフで見られるよ</p>
+                </div>
+              </div>
+              <div className="card bg-base-100 shadow-sm">
+                <div className="card-body p-3">
+                  <div className="text-center mb-2">
+                    <span className="text-2xl">🏆</span>
+                  </div>
+                  <h4 className="font-bold text-center mb-1">自己ベストを知れる</h4>
+                  <p className="text-sm">あなたの最高点や最長時間が記録されるよ</p>
+                </div>
+              </div>
+              <div className="card bg-base-100 shadow-sm">
+                <div className="card-body p-3">
+                  <div className="text-center mb-2">
+                    <span className="text-2xl">👨‍👩‍👧‍👦</span>
+                  </div>
+                  <h4 className="font-bold text-center mb-1">記録を振り返る</h4>
+                  <p className="text-sm">勉強の習慣がついて、もっと上手になれるよ</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="card-actions">
+            <LearningRecordButton
+              openModal={openModal}
+              variant="inline"
+              label="はじめての記録をつける"
+            />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+type ButtonVariant = 'fixed' | 'inline';
+
+type LearningRecordButtonProps = {
+  openModal: () => void;
+  variant?: ButtonVariant;
+  label?: string;
+};
+const LearningRecordButton: FC<LearningRecordButtonProps> = ({
+  openModal,
+  variant = 'fixed',
+  label = '',
+}) => {
+  const getButtonClasses = () => {
+    const baseClasses = 'btn btn-primary gap-2';
+
+    switch (variant) {
+      case 'fixed':
+        return `${baseClasses} btn-xl fixed bottom-8 right-8 shadow-lg rounded-full text-xl animate-bounce`;
+      case 'inline':
+        return `${baseClasses} btn-xl animate-pulse`;
+      default:
+        return baseClasses;
+    }
+  };
+
+  return (
+    <button type="button" className={getButtonClasses()} onClick={openModal} aria-label={label}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <title>{'add'}</title>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+      </svg>
+      {label}
+    </button>
+  );
+};
+
+const UserDashboard: FC<{ userData: User & { activities: LearningActivity[] } }> = ({
+  userData,
+}) => {
+  return (
+    <div className="flex flex-col lg:flex-row gap-4 mb-8">
+      <Graph activities={userData.activities} />
+      <Torophy />
+    </div>
+  );
+};
+
+const Graph: FC<{ activities: Omit<LearningActivity, 'userId'>[] }> = ({ activities }) => {
+  /** chart */
+  return (
+    <div className="card bg-base-100 w-full shadow-md border border-base-200">
+      <div className="card-body">
+        <h2 className="card-title text-xl flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <title>{'学習時間'}</title>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+          これまでの記録
+        </h2>
+        <ResponsiveContainer width={'95%'} height={300}>
+          <ComposedChart
+            data={activities}
+            margin={{
+              top: 5,
+              right: 5,
+              left: 5,
+              bottom: -5,
+            }}
+          >
+            <XAxis dataKey="activityDate" />
+            <YAxis yAxisId="bar" dataKey={'duration'} orientation={'right'} />
+            <YAxis
+              dataKey={'score'}
+              domain={['dataMin -10', 'datamax']}
+              yAxisId={'line'}
+              orientation={'left'}
+            />
+            <Bar
+              yAxisId={'bar'}
+              dataKey={'duration'}
+              fill="#82ca9d"
+              barSize={'30'}
+              name="かかった時間（秒）"
+            >
+              <LabelList />
+            </Bar>
+
+            <Line
+              type={'monotone'}
+              dataKey={'score'}
+              stroke="#8884d8"
+              strokeWidth={2}
+              activeDot={{ r: 8 }}
+              yAxisId={'line'}
+              name="点数"
+            >
+              <LabelList
+                position={'top'}
+                content={(props) => {
+                  const { x, y, value } = props;
+                  const numValue = value !== undefined ? Number(value) : 0;
+                  const numY = y !== undefined ? Number(y) : 0;
+                  const yPos = numValue > 90 ? numY + 20 : numY - 10;
+                  return (
+                    <text x={x} y={yPos} fontSize={16} textAnchor="middle" className="text-primary">
+                      {value}
+                    </text>
+                  );
+                }}
+              />
+            </Line>
+            <Tooltip />
+            <Legend />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+};
+
+const Torophy: FC = () => {
+  /** ranking */
+  return (
+    <div className="card shadow-md lg:w-1/3 bg-base-100 border border-base-200">
+      <div className="card-body">
+        <h2 className="card-title text-xl flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-secondary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <title>{'ranking'}</title>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
+          </svg>
+          がんばったよ！ランキング
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="table border border-base-content/5">
+            <tbody>
+              {/* row 1 */}
+              <tr className="hover bg-warning/10">
+                <th className="text-nowrap">
+                  <div className="badge badge-warning gap-2">1位</div>
+                  <span className="ml-2">最高得点！</span>
+                </th>
+                <td className="font-bold text-lg">99点</td>
+                <td>{'2025-05-21'}</td>
+              </tr>
+              {/* row 2 */}
+              <tr className="hover bg-info/10">
+                <th className="text-nowrap">
+                  <div className="badge badge-info gap-2">2位</div>
+                  <span className="ml-2">最速回答！</span>
+                </th>
+                <td className="font-bold text-lg">148秒</td>
+                <td>{'2025-04-11'}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const UnregisteredView: FC<{ sheetName: string; sheetUrl: string }> = ({ sheetName, sheetUrl }) => {
+  return (
+    <div className="card bg-base-100 shadow-xl border border-base-200 w-full max-w-full mx-auto p-6">
+      <div className="card-body items-center text-center">
+        <div className="badge badge-warning gap-2 p-3 mb-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <title>{'warning'}</title>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <span className="text-base font-medium">まだ登録が完了していません</span>
+        </div>
+
+        <h2 className="card-title text-2xl font-bold text-primary mt-2">
+          先生に登録してもらおう！
+        </h2>
+
+        <div className="bg-info/10 rounded-lg p-4 my-4 w-full">
+          <h3 className="text-lg font-bold flex items-center gap-2 mb-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-info"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <title>{''}</title>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            どうすればいいの？
+          </h3>
+          <ol className="steps steps-vertical">
+            <li className="step step-primary">この画面を先生に見せよう</li>
+            <li className="step step-primary">
+              先生があなたのお名前と学年・クラスを登録してくれるよ
+            </li>
+            <li className="step step-primary">
+              登録が終わったら、このページをもういちど開いてみよう
+            </li>
+            <li className="step step-primary">これで学習記録が使えるようになるよ！</li>
+          </ol>
+        </div>
+
+        <div className="bg-warning/10 rounded-lg p-4 mb-4 w-full">
+          <div className="flex gap-3 items-start">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-warning mt-1 flex-shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <title>{'warning'}</title>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div className="flex-1">
+              <h3 className="font-bold text-lg">先生へのおねがい</h3>
+              <div className="text-sm mt-2 space-y-2">
+                <p>生徒の基本情報を登録するための管理画面（Spreadsheet）があります。</p>
+
+                <div className="flex justify-center">
+                  <details className="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box max-w-xl">
+                    <summary className="collapse-title py-2 text-lg font-medium bg-base-100">
+                      先生はここをクリック
+                    </summary>
+                    <div className="collapse-content">
+                      <div className="divider divider-warning text-xs">注意</div>
+                      <div className="flex flex-col items-center gap-2">
+                        <p className="text-xs bg-warning/10 p-2 rounded-lg">
+                          SpreadSheetは適切なアクセス管理・共有権限管理をお願いします。
+                        </p>
+                        <p className="">{`このアプリのSpreadsheet名: ${sheetName}`}</p>
+                        {/* biome-ignore lint/style/noNonNullAssertion: <explanation> */}
+                        <QRCodeSVG value={sheetUrl!} className="w-80 h-100" />
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

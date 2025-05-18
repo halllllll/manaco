@@ -4,13 +4,13 @@ import { SheetApp } from './sheet';
 
 // Individual hooks for specific data pieces
 
-preload(API_ENDPOINTS.SHEET_NAME, SheetApp.getSheetName);
+preload(API_ENDPOINTS.SHEET_NAME, SheetApp.getSpreadsheetName);
 preload(API_ENDPOINTS.SHEET_URL, SheetApp.getSheetUrl);
 
 export const useSheetName = () => {
   const { data, error, isLoading } = useSWR<string>(
     API_ENDPOINTS.SHEET_NAME,
-    SheetApp.getSheetName,
+    SheetApp.getSpreadsheetName,
   );
   return { data, error, isLoading };
 };
