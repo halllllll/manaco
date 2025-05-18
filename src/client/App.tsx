@@ -810,26 +810,7 @@ const UnregisteredView: FC<{ sheetName: string; sheetUrl: string }> = ({ sheetNa
   return (
     <div className="card bg-base-100 shadow-xl border border-base-200 w-full max-w-full mx-auto p-6">
       <div className="card-body items-center text-center">
-        <div className="badge badge-warning gap-2 p-3 mb-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <title>{'warning'}</title>
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            />
-          </svg>
-          <span className="text-base font-medium">まだ登録が完了していません</span>
-        </div>
-
-        <h2 className="card-title text-2xl font-bold text-primary mt-2">
+        <h2 className="card-title text-3xl font-bold text-primary mt-2">
           先生に登録してもらおう！
         </h2>
 
@@ -854,9 +835,7 @@ const UnregisteredView: FC<{ sheetName: string; sheetUrl: string }> = ({ sheetNa
           </h3>
           <ol className="steps steps-vertical">
             <li className="step step-primary">この画面を先生に見せよう</li>
-            <li className="step step-primary">
-              先生があなたのお名前と学年・クラスを登録してくれるよ
-            </li>
+            <li className="step step-primary">先生があなたのお名前とクラスを登録してくれるよ</li>
             <li className="step step-primary">
               登録が終わったら、このページをもういちど開いてみよう
             </li>
@@ -884,7 +863,9 @@ const UnregisteredView: FC<{ sheetName: string; sheetUrl: string }> = ({ sheetNa
             <div className="flex-1">
               <h3 className="font-bold text-lg">先生へのおねがい</h3>
               <div className="text-sm mt-2 space-y-2">
-                <p>生徒の基本情報を登録するための管理画面（Spreadsheet）があります。</p>
+                <p>
+                  このアプリの設定管理画面（Spreadsheet）で、生徒の基本情報の登録をお願いします。
+                </p>
 
                 <div className="flex justify-center">
                   <details className="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box max-w-xl">
@@ -892,12 +873,15 @@ const UnregisteredView: FC<{ sheetName: string; sheetUrl: string }> = ({ sheetNa
                       先生はここをクリック
                     </summary>
                     <div className="collapse-content">
-                      <div className="divider divider-warning text-xs">注意</div>
+                      <div className="divider divider-warning text-md">⚠️ 注意 ⚠️</div>
                       <div className="flex flex-col items-center gap-2">
-                        <p className="text-xs bg-warning/10 p-2 rounded-lg">
+                        <p className="text-xs font-extrabold bg-warning/25 p-4 rounded-lg">
                           SpreadSheetは適切なアクセス管理・共有権限管理をお願いします。
                         </p>
-                        <p className="">{`このアプリのSpreadsheet名: ${sheetName}`}</p>
+                        <p className="">
+                          {'アプリのSpreadsheet名: '}
+                          <span className="font-bold">【{sheetName}】</span>
+                        </p>
                         {/* biome-ignore lint/style/noNonNullAssertion: <explanation> */}
                         <QRCodeSVG value={sheetUrl!} className="w-80 h-100" />
                       </div>
