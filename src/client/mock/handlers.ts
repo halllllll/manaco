@@ -33,11 +33,16 @@ export const handlers = [
 
   // アクセスしたときにdashboardに必要なデータをまとめて取得
   http.get(getMSWPath(API_ENDPOINTS.DASHBOARD), async () => {
-    await delay(1000);
+    await delay(1400);
+    // simulate fetch error
+    if (Math.random() > 0.9) {
+      return new HttpResponse(null, { status: 500, statusText: 'Internal Server Error' });
+    }
     const data = mockUserData[currentMockUserId];
     if (!data) {
-      return HttpResponse.json('データなし');
+      return new HttpResponse(null, { status: 404, statusText: 'Not Found' });
     }
+
     return HttpResponse.json(data);
   }),
 

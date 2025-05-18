@@ -9,7 +9,7 @@ export const DevTools = () => {
   // ユーザープロファイルのサンプル
   const userProfiles = [
     { id: 'dev-user-1', name: '開発太郎', role: 'student' },
-    { id: 'dev-user-2', name: '初心者花子', role: 'student' },
+    { id: 'dev-user-2', name: '未投稿ユーザー', role: 'student' },
     { id: 'dev-user-3', name: '管理者次郎', role: 'admin' },
     { id: 'new-user', name: '未登録ユーザー', role: 'guest' },
   ];

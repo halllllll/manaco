@@ -5,7 +5,7 @@ import { API_ENDPOINTS, getMSWPath } from '../endpoint';
 
 export const DashboardAPI = {
   // ダッシュボードデータ取得
-  getDashboard: async (): Promise<User & { activity: LearningActivity }> => {
+  getDashboard: async (): Promise<User & { activities: LearningActivity[] }> => {
     if (isGASEnvironment()) {
       return await serverFunctions.getDashboard();
     }

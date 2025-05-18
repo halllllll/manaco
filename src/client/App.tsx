@@ -16,6 +16,7 @@ import {
 } from 'recharts';
 import { ErrorFallback } from './ErrorFallback';
 import { useDashboard } from './api/dashboard/hooks';
+import { useSheetUrl } from './api/sheet/hooks';
 import { SheetApp } from './api/sheet/sheet';
 import { DevTools } from './devtool';
 import { isGASEnvironment } from './serverFunctions';
@@ -146,6 +147,7 @@ const DashBoard: FC = () => {
 
         <div className="container mx-auto p-4">
           <div className="flex flex-col lg:flex-row gap-4 mb-8">
+            {/** chart */}
             <div className="card bg-base-100 w-full shadow-md border border-base-200">
               <div className="card-body">
                 <h2 className="card-title text-xl flex items-center gap-2">
@@ -230,6 +232,7 @@ const DashBoard: FC = () => {
                 </ResponsiveContainer>
               </div>
             </div>
+            {/** ranking */}
             <div className="card shadow-md lg:w-1/3 bg-base-100 border border-base-200">
               <div className="card-body">
                 <h2 className="card-title text-xl flex items-center gap-2">
@@ -305,17 +308,6 @@ const DashBoard: FC = () => {
 };
 
 const App: FC = () => {
-  // const [count, setCount] = useState(0);
-  // const handleButtonClick = async () => {
-  //   console.log(`affect value ${count} to SpreadSheet A1 cell!`);
-  //   await serverFunctions.affectCountToA1(count);
-  // };
-
-  // const [userInfo, setUserInfo] = useState<User | null>(null);
-
-  // const [title, setTitle] = useState<string | null>('学習記録');
-  // const [sheetUrl, setSheetUrl] = useState<string>('');
-
   // 投稿モーダル用のステート
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -722,9 +714,309 @@ const App: FC = () => {
 export default App;
 
 const Pseudo_Dashboard: FC = () => {
-  const { data, error, isLoading } = useDashboard();
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  const { data, error, isLoading, mutate } = useDashboard();
+  const { data: sheetUrl } = useSheetUrl();
+  if (isLoading)
+    return (
+      <div>
+        <div>Loading...</div>
+        <div className="flex w-52 flex-col gap-4">
+          <div className="skeleton h-32 w-full" />
+          <div className="skeleton h-4 w-28" />
+          <div className="skeleton h-4 w-full" />
+          <div className="skeleton h-4 w-full" />
+        </div>
+      </div>
+    );
+  if (error) {
+    return (
+      <div className="alert alert-error">
+        <div>
+          <span>Error: {error.message}</span>
+          <button type="button" className="btn btn-sm btn-outline ml-4" onClick={() => mutate()}>
+            再試行
+          </button>
+        </div>
+      </div>
+    );
+  }
   if (!data) return <div>No data</div>;
-  console.log('Dashboard data:', data);
+  // 登録自体されていない場合
+  if (!data.id || !data.name || !data.belonging) {
+    return (
+      <div className="card bg-base-100 shadow-xl border border-base-200 w-full max-w-full mx-auto p-6">
+        <div className="card-body items-center text-center">
+          <div className="badge badge-warning gap-2 p-3 mb-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <title>{'warning'}</title>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <span className="text-base font-medium">まだ登録が完了していません</span>
+          </div>
+
+          <h2 className="card-title text-2xl font-bold text-primary mt-2">
+            先生に登録してもらおう！
+          </h2>
+
+          <div className="bg-info/10 rounded-lg p-4 my-4 w-full">
+            <h3 className="text-lg font-bold flex items-center gap-2 mb-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-info"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <title>{''}</title>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              どうすればいいの？
+            </h3>
+            <ol className="steps steps-vertical">
+              <li className="step step-primary">この画面を先生に見せよう</li>
+              <li className="step step-primary">
+                先生があなたのお名前と学年・クラスを登録してくれるよ
+              </li>
+              <li className="step step-primary">
+                登録が終わったら、このページをもういちど開いてみよう
+              </li>
+              <li className="step step-primary">これで学習記録が使えるようになるよ！</li>
+            </ol>
+          </div>
+
+          <div className="bg-warning/10 rounded-lg p-4 mb-4 w-full">
+            <div className="flex gap-3 items-start">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-warning mt-1 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <title>{'warning'}</title>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div className="flex-1">
+                <h3 className="font-bold text-lg">先生へのおねがい</h3>
+                <p className="text-sm mt-3">
+                  <p>
+                    {'スプレッドシートで生徒の基本情報（氏名、学年・クラス）を登録してください。'}
+                  </p>
+
+                  <a className="link" href={sheetUrl}>
+                    このアプリのSpreadSheet
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="card-actions mt-2">
+            <button type="button" onClick={() => mutate()} className="btn btn-primary gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <title>{'refresh'}</title>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              ページを更新する
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  // 学習記録がない場合
+  if (data.activities.length === 0)
+    return (
+      <>
+        <div className="card bg-base-100 shadow-xl border border-base-200 w-full max-w-full mx-auto p-6">
+          <figure className="px-10 pt-10">
+            <img
+              src="https://img.icons8.com/clouds/256/000000/school.png"
+              alt="学校のイラスト"
+              className="w-48 h-48 mx-auto animate-bounce-slow"
+            />
+          </figure>
+          <div className="card-body items-center text-center">
+            <h2 className="card-title text-2xl font-bold text-primary">
+              はじめての学習記録をつけてみよう！
+            </h2>
+
+            <div className="bg-info/10 rounded-lg p-4 my-4 w-full">
+              <h3 className="text-lg font-bold flex items-center gap-2 mb-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-info"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <title>{''}</title>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                どうやって記録するの？
+              </h3>
+              <ol className="steps steps-vertical">
+                <li className="step step-primary">
+                  画面下の「学習を記録する」ボタンをタップしよう
+                </li>
+                <li className="step step-primary">勉強した日にち・時間・点数を入力しよう</li>
+                <li className="step step-primary">どんな気持ちだったか選んでみよう</li>
+                <li className="step step-primary">「記録する」ボタンを押して完成！</li>
+              </ol>
+            </div>
+
+            <div className="bg-success/10 rounded-lg p-4 mb-4 w-full">
+              <h3 className="text-lg font-bold flex items-center gap-2 mb-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-success"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <title>{''}</title>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                記録すると何がいいの？
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+                <div className="card bg-base-100 shadow-sm">
+                  <div className="card-body p-3">
+                    <div className="text-center mb-2">
+                      <span className="text-2xl">📊</span>
+                    </div>
+                    <h4 className="font-bold text-center mb-1">自分の成長が見える</h4>
+                    <p className="text-sm">これまでの勉強の記録がグラフで見られるよ</p>
+                  </div>
+                </div>
+                <div className="card bg-base-100 shadow-sm">
+                  <div className="card-body p-3">
+                    <div className="text-center mb-2">
+                      <span className="text-2xl">🏆</span>
+                    </div>
+                    <h4 className="font-bold text-center mb-1">自己ベストを知れる</h4>
+                    <p className="text-sm">あなたの最高点や最長時間が記録されるよ</p>
+                  </div>
+                </div>
+                <div className="card bg-base-100 shadow-sm">
+                  <div className="card-body p-3">
+                    <div className="text-center mb-2">
+                      <span className="text-2xl">👨‍👩‍👧‍👦</span>
+                    </div>
+                    <h4 className="font-bold text-center mb-1">記録を振り返る</h4>
+                    <p className="text-sm">勉強の習慣がついて、もっと上手になれるよ</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card-actions">
+              <button
+                type="button"
+                onClick={() => {
+                  // モーダルを開くためのコード
+                  const modalOpenButton = document.querySelector('.fixed.bottom-8.right-8');
+                  if (modalOpenButton) {
+                    (modalOpenButton as HTMLButtonElement).click();
+                  }
+                }}
+                className="btn btn-primary btn-lg gap-2 animate-pulse"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <title>{'add'}</title>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                はじめての記録をつける
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  return (
+    <>
+      <div className="card bg-base-100 shadow-md border border-base-200 w-full max-w-xl p-4">
+        <h1 className="text-2xl font-bold">ダッシュボード</h1>
+        <div className="flex flex-col gap-4">
+          <div>{`ID: ${data.id} - name: ${data.name}`}</div>
+          <div>{`${data.belonging}`}</div>
+          <div className="overflow-x-auto">
+            <table className="table table-zebra w-full">
+              <thead>
+                <tr>
+                  <th>日付</th>
+                  <th>点数</th>
+                  <th>時間</th>
+                  <th>感情</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.activities.map((activity) => (
+                  <tr key={activity.activityDate}>
+                    <td>{activity.activityDate}</td>
+                    <td>{activity.score}</td>
+                    <td>{activity.duration}</td>
+                    <td>{activity.mood}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 };

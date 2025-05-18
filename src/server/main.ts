@@ -1,3 +1,5 @@
+import type { LearningActivity } from '@/shared/types/activity';
+import type { User } from '@/shared/types/user';
 import { ss } from './Const';
 import { customMenu1, openDialog } from './Menu/Menu';
 
@@ -29,6 +31,17 @@ const getSpreadSheetUrl = (): string => {
   return ss.getUrl();
 };
 
+// TODO: あとで実装する とりあえず呼び出せるか確認
+const getDashboard = (): User & { activities: LearningActivity[] } => {
+  console.log('---- getDashboard ----');
+  return {
+    id: '',
+    name: '',
+    belonging: '',
+    activities: [],
+  };
+};
+
 // Exposed to GAS global function
 global.doGet = doGet;
 global.onOpen = onOpen;
@@ -38,5 +51,7 @@ global.affectCountToA1 = affectCountToA1; // フロント側から呼ばれる�
 global.getSpreadSheetName = getSpreadSheetName; // 同上
 global.getSpreadSheetUrl = getSpreadSheetUrl;
 
+global.getDashboard = getDashboard; // TODO: あとで実装する
+
 // Exposed to Frontend API
-export { affectCountToA1, getSpreadSheetName, getSpreadSheetUrl };
+export { affectCountToA1, getDashboard, getSpreadSheetName, getSpreadSheetUrl };

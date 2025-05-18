@@ -32,28 +32,9 @@ export const mockUserData: Record<string, User & { activities: LearningActivity[
   },
   'dev-user-2': {
     id: 'user2@sample.com',
-    name: '初心者花子',
+    name: '（dev）未投稿ユーザー',
     belonging: '3年2組',
-    activities: [
-      {
-        score: 60,
-        duration: 90,
-        activityDate: '2025-05-15',
-        userId: 'dev-user-2',
-      },
-      {
-        score: 70,
-        duration: 110,
-        activityDate: '2025-05-14',
-        userId: 'dev-user-2',
-      },
-      {
-        score: 50,
-        duration: 80,
-        activityDate: '2025-05-10',
-        userId: 'dev-user-2',
-      },
-    ],
+    activities: [],
   },
   'dev-user-3': {
     id: 'admin@sample.com',
@@ -62,9 +43,28 @@ export const mockUserData: Record<string, User & { activities: LearningActivity[
 
     activities: [
       {
+        score: 60,
+        duration: 90,
+        activityDate: '2025-04-13',
+        userId: 'dev-user-3',
+      },
+      {
+        score: 70,
+        duration: 110,
+        activityDate: '2025-05-01',
+        userId: 'dev-user-3',
+      },
+      {
+        score: 50,
+        duration: 80,
+        activityDate: '2025-05-02',
+        userId: 'dev-user-3',
+      },
+
+      {
         score: 100,
         duration: 180,
-        activityDate: '2025-05-15',
+        activityDate: '2025-05-10',
         userId: 'dev-user-3',
       },
       {
@@ -76,15 +76,15 @@ export const mockUserData: Record<string, User & { activities: LearningActivity[
       {
         score: 85,
         duration: 140,
-        activityDate: '2025-05-10',
+        activityDate: '2025-05-18',
         userId: 'dev-user-3',
       },
     ],
   },
   'new-user': {
     id: 'alien@sample.com',
-    name: '未登録ユーザー',
-    belonging: '２ねん１くみ',
+    name: '',
+    belonging: '',
     activities: [],
   },
 };
