@@ -880,8 +880,20 @@ const UnregisteredView: FC<{ sheetName: string; sheetUrl: string }> = ({ sheetNa
                         <div className="text-sm font-extrabold bg-warning/25 p-4 rounded-lg text-left flex flex-col gap-2">
                           <p>SpreadSheetは適切なアクセス管理・共有権限管理をお願いします。</p>
                           <p>
-                            学習系データ（ワークシートや学習ドリル、アンケートなどの学習に関する、教職員や児童
-                            生徒自身が日々の学校における教育活動において活用する情報）と、校務系データ（指導要録に記載のある成績情報・学習指導、生徒指導、生活指導等に活用する情報）を守り、適切に管理してください。
+                            <span
+                              className="tooltip cursor-help border-b border-dashed border-primary inline-flex items-center gap-1"
+                              data-tip="ワークシートや学習ドリル、アンケートなどの学習に関する、教職員や児童生徒自身が日々の学校における教育活動において活用する情報"
+                            >
+                              学習系データ
+                            </span>
+                            と、
+                            <span
+                              className="tooltip cursor-help border-b border-dashed border-primary inline-flex items-center gap-1"
+                              data-tip="指導要録に記載のある成績情報・学習指導、生徒指導、生活指導等に活用する情報"
+                            >
+                              校務系データ
+                            </span>
+                            を認識し、適切に管理してください。
                           </p>
                           <p>
                             参考:{' '}
