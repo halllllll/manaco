@@ -873,11 +873,26 @@ const UnregisteredView: FC<{ sheetName: string; sheetUrl: string }> = ({ sheetNa
                       先生はここをクリック
                     </summary>
                     <div className="collapse-content">
-                      <div className="divider divider-warning text-md">⚠️ 注意 ⚠️</div>
+                      <div className="divider divider-warning text-lg font-bold text-red-500">
+                        ⚠️ 注意 ⚠️
+                      </div>
                       <div className="flex flex-col items-center gap-2">
-                        <p className="text-xs font-extrabold bg-warning/25 p-4 rounded-lg">
-                          SpreadSheetは適切なアクセス管理・共有権限管理をお願いします。
-                        </p>
+                        <div className="text-sm font-extrabold bg-warning/25 p-4 rounded-lg text-left flex flex-col gap-2">
+                          <p>SpreadSheetは適切なアクセス管理・共有権限管理をお願いします。</p>
+                          <p>
+                            学習系データ（ワークシートや学習ドリル、アンケートなどの学習に関する、教職員や児童
+                            生徒自身が日々の学校における教育活動において活用する情報）と、校務系データ（指導要録に記載のある成績情報・学習指導、生徒指導、生活指導等に活用する情報）を守り、適切に管理してください。
+                          </p>
+                          <p>
+                            参考:{' '}
+                            <a
+                              href="https://www.mext.go.jp/content/20250328-mxt_syoto01-000028144_01.pdf"
+                              className="text-blue-500 underline"
+                            >
+                              {'教育データの利活用に係る留意事項 第３版（文部科学省：R7.3）'}
+                            </a>
+                          </p>
+                        </div>
                         <p className="">
                           {'アプリのSpreadsheet名: '}
                           <span className="font-bold">【{sheetName}】</span>
