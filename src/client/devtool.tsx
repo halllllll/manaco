@@ -8,9 +8,9 @@ export const DevTools = () => {
 
   // ユーザープロファイルのサンプル
   const userProfiles = [
-    { id: 'dev-user-1', name: '開発太郎', role: 'student' },
+    { id: 'dev-user-1', name: '開発用ユーザー', role: 'student' },
     { id: 'dev-user-2', name: '未投稿ユーザー', role: 'student' },
-    { id: 'dev-user-3', name: '管理者次郎', role: 'admin' },
+    { id: 'dev-user-3', name: '管理者アカウント', role: 'admin' },
     { id: 'new-user', name: '未登録ユーザー', role: 'guest' },
   ];
 
@@ -21,7 +21,7 @@ export const DevTools = () => {
     window.postMessage({ type: 'MSW_SET_USER', userId: currentUser }, '*');
   }, [currentUser]);
 
-  if (!import.meta.env.DEV) return null;
+  // if (!import.meta.env.DEV) return null;
 
   return (
     <div className="flex justify-end top-4 right-4 z-50 gap-2 bg-pink-400">

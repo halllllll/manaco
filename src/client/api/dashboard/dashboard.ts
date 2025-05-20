@@ -7,7 +7,11 @@ export const DashboardAPI = {
   // ダッシュボードデータ取得
   getDashboard: async (): Promise<User & { activities: LearningActivity[] }> => {
     if (isGASEnvironment()) {
-      return await serverFunctions.getDashboard();
+      const ret = await serverFunctions.getDashboard();
+      if (ret.success) {
+        return ret.data;
+      }
+      throw new Error(`${ret.message}${ret.details ?? ` - ${ret.details}`}`);
     }
 
     /**

@@ -111,7 +111,6 @@ const App: FC = () => {
     <>
       {/* 開発ツールを追加 */}
       {import.meta.env.DEV && <DevTools />}
-
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Suspense>
           <AppLayout setIsModalOpen={setIsModalOpen} isModalOpen={isModalOpen} />
