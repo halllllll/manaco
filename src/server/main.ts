@@ -1,4 +1,4 @@
-import type { DashboardDTO, SpreadsheetValidateDTO } from '@/shared/types/dto';
+import type { DashboardDTO, InitAppDTO, SpreadsheetValidateDTO } from '@/shared/types/dto';
 import type { User } from '@/shared/types/user';
 import {
   LEARNING_ACTIVITY_SHEET_HEADERS,
@@ -9,8 +9,8 @@ import {
   USER_SHEET_NAME,
   ss,
 } from './Const';
-import { customMenu1, openDialog } from './Menu/Menu';
-import { getUser, getUserActivities } from './query';
+import { customMenu1, initAppMenu, openDialog } from './Menu/Menu';
+import { getUser, getUserActivities, init } from './query';
 import {
   AppSettingSheetValidationTest,
   LearningLogSheetValidationTest,
@@ -27,6 +27,7 @@ export const doGet = (): GoogleAppsScript.HTML.HtmlOutput => {
 const onOpen = (e: GoogleAppsScript.Events.SheetsOnOpen): void => {
   console.log(e.user);
   const menu = SpreadsheetApp.getUi().createMenu('Custom menu');
+  menu.addItem('初期化', 'initAppMenu_');
   menu.addItem('ダイアログ表示', 'openDialog_');
   menu.addItem('custom menu from html', 'customMenu1_');
   menu.addToUi();
@@ -56,6 +57,7 @@ const getAccessUser = (): User | null => {
 const validateAll = (): SpreadsheetValidateDTO => {
   // アプリの状態が正しく機能するかをSheetValidatorクラスで検証する
   // 各シートの名前とそれに対応する（正しくアプリが動くことを前提とした、想定としている）ヘッダの検証
+  // データ自体に関しては検証しない
   const resultValidateUserSheet = SheetValidator.getAndValidateHeaders<User[]>(USER_SHEET_NAME, [
     ...USER_SHEET_HEADERS,
   ]);
@@ -71,22 +73,32 @@ const validateAll = (): SpreadsheetValidateDTO => {
     !resultValidateActivitySheet.isValid ||
     !resultValidateSettingsSheet.isValid
   ) {
-    // throw new Error(
-    //   `Validation failed: \n
-    //   ${resultValidateUserSheet.messages.join('\n')}\n${resultValidateActivitySheet.messages.join('\n')}\n${resultValidateSettingsSheet.messages.join('\n')}`,
-    // );
-    return {
-      success: false,
-      message: `Validation failed: \n
-      ${resultValidateUserSheet.messages.join('\n')}\n${resultValidateActivitySheet.messages.join(
-        '\n',
-      )}\n${resultValidateSettingsSheet.messages.join('\n')}`,
-    };
+    throw new Error(
+      `Validation failed: \n
+      ${resultValidateUserSheet.messages.join('\n')}\n${resultValidateActivitySheet.messages.join('\n')}\n${resultValidateSettingsSheet.messages.join('\n')}`,
+    );
   }
   return {
     success: true,
-    data: {},
+    data: null,
   };
+};
+
+const initApp = (): InitAppDTO => {
+  try {
+    init();
+    return {
+      success: true,
+      data: null,
+    };
+  } catch (e) {
+    const err = e as Error;
+    console.error(err);
+    return {
+      success: false,
+      message: `Error: ${err.name}: ${err.message}`,
+    };
+  }
 };
 
 const getDashboard = (): DashboardDTO => {
@@ -120,8 +132,11 @@ const getDashboard = (): DashboardDTO => {
 // Exposed to GAS global function
 global.doGet = doGet;
 global.onOpen = onOpen;
+// メニュー関連（アプリから呼び出されないようにする
 global.openDialog_ = openDialog;
 global.customMenu1_ = customMenu1;
+global.initAppMenu_ = initAppMenu;
+
 global.affectCountToA1 = affectCountToA1; // フロント側から呼ばれる関数もグローバルから叩けるようにしておく
 global.getSpreadSheetName = getSpreadSheetName; // 同上
 global.getSpreadSheetUrl = getSpreadSheetUrl;
@@ -132,5 +147,15 @@ global._test_student_sheet = StudentSheetValidationTest;
 global._test_learning_log_sheet = LearningLogSheetValidationTest;
 global._test_app_setting_sheet = AppSettingSheetValidationTest;
 
+global.validateAll = validateAll;
+global.initApp = initApp;
+
 // Exposed to Frontend API
-export { affectCountToA1, getDashboard, getSpreadSheetName, getSpreadSheetUrl };
+export {
+  affectCountToA1,
+  getDashboard,
+  getSpreadSheetName,
+  getSpreadSheetUrl,
+  initApp,
+  validateAll,
+};

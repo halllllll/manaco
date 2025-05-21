@@ -97,20 +97,6 @@ export class SheetValidator {
         messages: [`Sheet "${sheetName}" does not exist.`],
       };
     }
-    // const expectedHeaders = ['設定項目', '値', '説明'];
-    // // biome-ignore lint/complexity/noThisInStatic: <explanation>
-    // const headerResult = this.getAndValidateHeaders(sheetName, expectedHeaders);
-    // if (!headerResult.isValid || !headerResult.data) {
-    //   return {
-    //     isValid: false,
-    //     messages: headerResult.messages,
-    //     data: null,
-    //     details: {
-    //       expectedHeaders,
-    //       actualHeaders: headerResult.data,
-    //     },
-    //   };
-    // }
 
     const settingValues = sheet.getDataRange().getValues().slice(1);
 

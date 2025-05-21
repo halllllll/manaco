@@ -15,4 +15,6 @@ type BaseDTO<T> =
 
 export type DashboardDTO = BaseDTO<User & { activities: LearningActivity[] }>;
 
-export type SpreadsheetValidateDTO = BaseDTO<Omit<ValidationResult, 'data>'>>;
+export type SpreadsheetValidateDTO = BaseDTO<Omit<ValidationResult, keyof ValidationResult> | null>;
+
+export type InitAppDTO = BaseDTO<null>;

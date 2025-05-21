@@ -12,6 +12,37 @@ export type SettingsSheetItem = {
   type: SettingsType;
 };
 
+export const DefaultSettingsItemValue: {
+  name: SettingsItem;
+  value: Date | number | boolean;
+  desc: string;
+}[] = [
+  {
+    name: '点数下限',
+    value: 0,
+    desc: 'フォームで受け入れる点数の下限',
+  },
+  {
+    name: '点数上限',
+    value: 100,
+    desc: 'フォームで受け入れる点数の上限',
+  },
+  {
+    name: '制限時間（秒）',
+    value: 60,
+    desc: 'フォームで受け入れる時間の上限',
+  },
+  {
+    name: 'きもち表示',
+    value: true,
+    desc: 'フォームで「きもち」の表示切り替え',
+  },
+  {
+    name: 'メモ表示',
+    value: true,
+    desc: 'フォームで「メモ」の表示切り替え',
+  },
+];
 export type SettingsResult = {
   item: SettingsItem;
   value: Date | number | boolean;
@@ -46,7 +77,7 @@ export const SETTINGS_SHEET_LABEL: readonly SettingsSheetItem[] = [
 ] as const;
 
 export const USER_SHEET_NAME = '児童情報';
-export const USER_SHEET_HEADERS: readonly string[] = ['アカウントID', '名前', '所属'];
+export const USER_SHEET_HEADERS: readonly string[] = ['アカウントID', '名前', '所属（任意）'];
 
 export const LEARNING_ACTIVITY_SHEET_NAME = '学習ログ';
 export const LEARNING_ACTIVITY_SHEET_HEADERS: readonly string[] = [

@@ -24,7 +24,7 @@ const StudentSheetValidationTest = () => {
   const result2 = SheetValidator.getAndValidateHeaders<User[]>('学習ログ', [
     'アカウントID',
     '名前',
-    '所属',
+    '所属（任意）',
   ]);
   console.info(result2);
   if (result2.isValid) {
