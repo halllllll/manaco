@@ -48,7 +48,7 @@ const AppLayout: FC<AppLayoutProps> = ({ setIsModalOpen, isModalOpen: _isModalOp
 
   return (
     <>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white-50 to-purple-100">
         <Header />
 
         <main className="container mx-auto p-4">
