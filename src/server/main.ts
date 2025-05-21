@@ -39,12 +39,6 @@ const onOpen = (e: GoogleAppsScript.Events.SheetsOnOpen): void => {
   menu.addToUi();
 };
 
-const affectCountToA1 = (count: number): void => {
-  const sheet = ss.getActiveSheet();
-  const range = sheet.getRange('A1');
-  range.setValue(count);
-};
-
 const getSpreadSheetName = (): string => {
   // return ss.getActiveSheet().getName();
   return ss.getName();
@@ -59,11 +53,12 @@ const getAccessUser = (): User | null => {
   const email = accessedUser.getEmail();
   return getUser(email);
 };
-
+/**
+ * アプリの状態が正しく機能するかをSheetValidatorクラスで検証する
+ * 各シートの名前とそれに対応する（正しくアプリが動くことを前提とした、想定としている）ヘッダの検証
+ *データ自体に関しては検証しない
+ */
 const validateAll = (): SpreadsheetValidateDTO => {
-  // アプリの状態が正しく機能するかをSheetValidatorクラスで検証する
-  // 各シートの名前とそれに対応する（正しくアプリが動くことを前提とした、想定としている）ヘッダの検証
-  // データ自体に関しては検証しない
   const resultValidateUserSheet = SheetValidator.getAndValidateHeaders<User[]>(USER_SHEET_NAME, [
     ...USER_SHEET_HEADERS,
   ]);
@@ -194,7 +189,6 @@ global.openDialog_ = openDialog;
 global.customMenu1_ = customMenu1;
 global.initAppMenu_ = initAppMenu;
 
-global.affectCountToA1 = affectCountToA1; // フロント側から呼ばれる関数もグローバルから叩けるようにしておく
 global.getSpreadSheetName = getSpreadSheetName; // 同上
 global.getSpreadSheetUrl = getSpreadSheetUrl;
 
@@ -210,11 +204,4 @@ global.initApp = initApp;
 global.getSettingsData = getSettingsData;
 
 // Exposed to Frontend API
-export {
-  affectCountToA1,
-  getDashboard,
-  getSpreadSheetName,
-  getSpreadSheetUrl,
-  initApp,
-  validateAll,
-};
+export { getDashboard, getSpreadSheetName, getSpreadSheetUrl, initApp, validateAll };
