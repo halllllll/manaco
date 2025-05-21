@@ -6,6 +6,8 @@ import {
   LEARNING_ACTIVITY_SHEET_NAME,
   SETTINGS_SHEET_HEADERS,
   SETTINGS_SHEET_NAME,
+  type SettingsResult,
+  type SettingsSheetItem,
   USER_SHEET_HEADERS,
   USER_SHEET_NAME,
   ss,
@@ -60,6 +62,21 @@ export const getUserActivities = (userId: string): LearningActivity[] => {
   const activities = getActivityLogs();
   const userActivities = activities.filter((activity) => activity.userId === userId);
   return userActivities;
+};
+
+/**
+ * 設定シートから設定を取得
+ * MUST be called after validation
+ */
+export const getSettings = (sheet: GoogleAppsScript.Spreadsheet.Sheet): SettingsResult[] => {
+  const settingValues = sheet.getDataRange().getValues().slice(1);
+
+  let result: SettingsResult[] = [];
+
+  for (const row of settingValues) {
+    result = [...result, { item: row[0] as SettingsSheetItem['name'], value: row[1] }];
+  }
+  return result;
 };
 
 /**

@@ -160,26 +160,26 @@ export class SheetValidator {
     };
   }
 
-  static getSettingItems(sheetName: string, items: SettingsSheetItem[]): SettingsResult[] {
-    // biome-ignore lint/complexity/noThisInStatic: <explanation>
-    const { isExist, sheet } = this.validateSheetExists(sheetName);
-    if (!isExist) {
-      throw new Error(`Sheet "${sheetName}" does not exist.`);
-    }
-    const settingValues = sheet.getDataRange().getValues().slice(1);
+  // static getSettingItems(sheetName: string, items: SettingsSheetItem[]): SettingsResult[] {
+  //   // biome-ignore lint/complexity/noThisInStatic: <explanation>
+  //   const { isExist, sheet } = this.validateSheetExists(sheetName);
+  //   if (!isExist) {
+  //     throw new Error(`Sheet "${sheetName}" does not exist.`);
+  //   }
+  //   const settingValues = sheet.getDataRange().getValues().slice(1);
 
-    let result: SettingsResult[] = [];
-    const itemValuesAndType = settingValues.map((row, idx) => {
-      return {
-        type: items[idx].type,
-        key: row[0],
-        value: row[1],
-      };
-    });
+  //   let result: SettingsResult[] = [];
+  //   const itemValuesAndType = settingValues.map((row, idx) => {
+  //     return {
+  //       type: items[idx].type,
+  //       key: row[0],
+  //       value: row[1],
+  //     };
+  //   });
 
-    for (const item of itemValuesAndType) {
-      result = [...result, { item: item.key as SettingsSheetItem['name'], value: item.value }];
-    }
-    return result;
-  }
+  //   for (const item of itemValuesAndType) {
+  //     result = [...result, { item: item.key as SettingsSheetItem['name'], value: item.value }];
+  //   }
+  //   return result;
+  // }
 }

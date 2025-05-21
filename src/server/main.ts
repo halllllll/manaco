@@ -1,4 +1,10 @@
-import type { DashboardDTO, InitAppDTO, SpreadsheetValidateDTO } from '@/shared/types/dto';
+import type {
+  DashboardDTO,
+  InitAppDTO,
+  SettingsDTO,
+  SpreadsheetValidateDTO,
+} from '@/shared/types/dto';
+import type { AppSettings } from '@/shared/types/settings';
 import type { User } from '@/shared/types/user';
 import {
   LEARNING_ACTIVITY_SHEET_HEADERS,
@@ -10,7 +16,7 @@ import {
   ss,
 } from './Const';
 import { customMenu1, initAppMenu, openDialog } from './Menu/Menu';
-import { getUser, getUserActivities, init } from './query';
+import { getSettings, getUser, getUserActivities, init } from './query';
 import {
   AppSettingSheetValidationTest,
   LearningLogSheetValidationTest,
@@ -73,6 +79,11 @@ const validateAll = (): SpreadsheetValidateDTO => {
     !resultValidateActivitySheet.isValid ||
     !resultValidateSettingsSheet.isValid
   ) {
+    console.error('Validation failed');
+    console.error(resultValidateUserSheet);
+    console.error(resultValidateActivitySheet);
+    console.error(resultValidateSettingsSheet);
+
     throw new Error(
       `Validation failed: \n
       ${resultValidateUserSheet.messages.join('\n')}\n${resultValidateActivitySheet.messages.join('\n')}\n${resultValidateSettingsSheet.messages.join('\n')}`,
@@ -94,6 +105,52 @@ const initApp = (): InitAppDTO => {
   } catch (e) {
     const err = e as Error;
     console.error(err);
+    return {
+      success: false,
+      message: `Error: ${err.name}: ${err.message}`,
+    };
+  }
+};
+
+const getSettingsData = (): SettingsDTO => {
+  try {
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    const sheet = ss.getSheetByName(SETTINGS_SHEET_NAME)!;
+    const data = getSettings(sheet);
+    console.info('getSeetingsData');
+    console.log(data);
+    const settings = data.reduce((o, item) => {
+      const { item: label, value } = item;
+      switch (label) {
+        case '点数下限':
+          o.scoreMin = value as number;
+          break;
+        case '点数上限':
+          o.scoreMax = value as number;
+          break;
+        case '制限時間（秒）':
+          o.timeLimit = value as number;
+          break;
+        case 'きもち表示':
+          o.showMood = value as boolean;
+          break;
+        case 'メモ表示':
+          o.showMemo = value as boolean;
+          break;
+        default:
+          break;
+      }
+      return o;
+    }, {} as AppSettings);
+    console.info('getSeetingsData');
+    console.log(settings);
+    return {
+      data: settings,
+      success: true,
+    };
+  } catch (e) {
+    console.error(e);
+    const err = e as Error;
     return {
       success: false,
       message: `Error: ${err.name}: ${err.message}`,
@@ -149,6 +206,8 @@ global._test_app_setting_sheet = AppSettingSheetValidationTest;
 
 global.validateAll = validateAll;
 global.initApp = initApp;
+
+global.getSettingsData = getSettingsData;
 
 // Exposed to Frontend API
 export {
