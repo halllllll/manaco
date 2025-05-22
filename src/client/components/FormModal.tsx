@@ -9,7 +9,7 @@ export const FormModal: FC<{
   // TODO: 現状仮実装
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
-  const [score, setScore] = useState(0);
+  const [score, setScore] = useState<number | null>(null);
   const today = new Date().toISOString().split('T')[0];
   return (
     <div>
@@ -260,11 +260,15 @@ export const FormModal: FC<{
                 </span>
               </label>
               <div className="flex flex-col gap-2">
-                <div className="text-center">
+                <div className="text-center inline-block">
                   <input
                     type="number"
-                    className="font-bold text-5xl text-primary focus:border border-base-300 rounded-lg w-48 text-center"
-                    value={score}
+                    className={`${score ? 'font-bold text-5xl' : 'placeholder:text-base text-md'} text-primary focus:rounded-lg focus:border-b-base-100 border-base-300  w-48 border-b-primary border-b-2 text-center outline-none h-18 align-bottom`}
+                    value={score || ''}
+                    placeholder="タップして入力"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setScore(e.target.value ? Number.parseInt(e.target.value) : null);
+                    }}
                     required
                   />
                   <span className="text-lg"> 点</span>
