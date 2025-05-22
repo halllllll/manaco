@@ -1,4 +1,4 @@
-import type { CSSProperties, FC, FormEvent } from 'react';
+import { type CSSProperties, type FC, type FormEvent, useState } from 'react';
 import { moodOptions } from '../App';
 
 export const FormModal: FC<{
@@ -6,11 +6,15 @@ export const FormModal: FC<{
   handleSubmitPost: (e: FormEvent) => void;
   setIsModalOpen: (_: boolean) => void;
 }> = ({ isModalOpen, handleSubmitPost, setIsModalOpen }) => {
+  // TODO: 現状仮実装
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+  const [score, setScore] = useState(0);
   const today = new Date().toISOString().split('T')[0];
   return (
     <div>
       <dialog id="post_modal" className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
-        <div className="modal-box bg-base-100 max-w-3xl">
+        <div className="modal-box bg-base-100 max-w-2xl">
           <h3 className="font-bold text-2xl mb-6 text-center text-primary">
             今日の学習を記録しよう！
           </h3>
@@ -41,7 +45,7 @@ export const FormModal: FC<{
                 <button
                   type="button"
                   popoverTarget="date-popover"
-                  className="input input-border"
+                  className="input input-border text-xl"
                   id="target-date-btn"
                   // style="anchorName:--target-date" // anchorpositioning関係はエディタ上では現状のルール,環境およびツールチェインだとエラーになる
                   style={{ anchorName: '--target-date' } as CSSProperties}
@@ -161,32 +165,74 @@ export const FormModal: FC<{
                 </span>
               </label>
               <div className="flex gap-4">
-                <div className="w-1/2">
-                  <select
-                    className="select select-bordered w-full"
-                    id="study_time"
-                    defaultValue="30"
-                  >
-                    <option value="15">15分</option>
-                    <option value="30">30分</option>
-                    <option value="45">45分</option>
-                    <option value="60">1時間</option>
-                    <option value="90">1時間30分</option>
-                    <option value="120">2時間</option>
-                    <option value="150">2時間30分</option>
-                    <option value="180">3時間以上</option>
-                  </select>
-                </div>
-                <div className="w-1/2">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="range"
-                      min="15"
-                      max="180"
-                      defaultValue="30"
-                      step="15"
-                      className="range range-primary range-sm"
-                    />
+                <div className="flex lg:flex-row flex-col lg: justify-around gap-4 items-center w-full">
+                  <div className="flex flex-col items-center">
+                    <span className="text-sm mb-1">分</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        className="btn btn-outline btn-sm bg-neutral text-neutral-content"
+                        onClick={() => setMinutes(Math.max(minutes - 10, 0))}
+                      >
+                        <span className="i-lucide-chevrons-left" />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-outline btn-sm"
+                        onClick={() => setMinutes(Math.max(minutes - 1, 0))}
+                      >
+                        <span className="i-lucide-chevron-left" />
+                      </button>
+                      <div className="mx-2  text-center text-2xl font-semibold w-10">{minutes}</div>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline"
+                        onClick={() => setMinutes(minutes + 1)}
+                      >
+                        <span className="i-lucide-chevron-right" />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline bg-neutral text-neutral-content"
+                        onClick={() => setMinutes(minutes + 10)}
+                      >
+                        <span className="i-lucide-chevrons-right" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-sm mb-1">秒</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        className="btn btn-outline btn-sm bg-neutral text-neutral-content"
+                        onClick={() => setSeconds(Math.max(seconds - 10, 0))}
+                      >
+                        <span className="i-lucide-chevrons-left" />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-outline btn-sm"
+                        onClick={() => setSeconds(Math.max(seconds - 1, 0))}
+                      >
+                        <span className="i-lucide-chevron-left" />
+                      </button>
+                      <div className="mx-2  text-center text-2xl font-semibold w-10">{seconds}</div>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline"
+                        onClick={() => setSeconds(seconds + 1)}
+                      >
+                        <span className="i-lucide-chevron-right" />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline bg-neutral text-neutral-content"
+                        onClick={() => setSeconds(seconds + 10)}
+                      >
+                        <span className="i-lucide-chevrons-right" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -214,62 +260,14 @@ export const FormModal: FC<{
                 </span>
               </label>
               <div className="flex flex-col gap-2">
-                <div className="grid grid-cols-5 gap-2">
-                  <input
-                    type="radio"
-                    name="score"
-                    value="20"
-                    className="btn btn-xs"
-                    aria-label="20点"
-                  />
-                  <input
-                    type="radio"
-                    name="score"
-                    value="40"
-                    className="btn btn-xs"
-                    aria-label="40点"
-                  />
-                  <input
-                    type="radio"
-                    name="score"
-                    value="60"
-                    className="btn btn-xs"
-                    aria-label="60点"
-                  />
-                  <input
-                    type="radio"
-                    name="score"
-                    value="80"
-                    className="btn btn-xs"
-                    aria-label="80点"
-                  />
-                  <input
-                    type="radio"
-                    name="score"
-                    value="100"
-                    className="btn btn-xs btn-active"
-                    aria-label="100点"
-                    defaultChecked
-                  />
-                </div>
                 <div className="text-center">
-                  <span className="font-bold text-2xl text-primary">100</span>
+                  <input
+                    type="number"
+                    className="font-bold text-5xl text-primary focus:border border-base-300 rounded-lg w-48 text-center"
+                    value={score}
+                    required
+                  />
                   <span className="text-lg"> 点</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  defaultValue="100"
-                  step="5"
-                  className="range range-primary"
-                />
-                <div className="flex justify-between text-xs px-2">
-                  <span>0</span>
-                  <span>25</span>
-                  <span>50</span>
-                  <span>75</span>
-                  <span>100</span>
                 </div>
               </div>
             </div>
@@ -320,6 +318,48 @@ export const FormModal: FC<{
                 ))}
               </div>
             </div>
+            {/* コメント */}
+            <div className="form-control w-full mb-6">
+              <label className="label" htmlFor="comment">
+                <span className="label-text text-lg font-medium flex items-center gap-2">
+                  <title>{'comment'}</title>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                  >
+                    {
+                      '<!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->'
+                    }
+                    <g
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                    >
+                      <path d="M8 2v4m4-4v4m4-4v4" />
+                      <rect width="16" height="18" x="4" y="4" rx="2" />
+                      <path d="M8 10h6m-6 4h8m-8 4h5" />
+                    </g>{' '}
+                    <title>{'comment'}</title>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+                  </svg>
+                  メモ
+                </span>
+              </label>
+              <div>
+                <textarea
+                  className="textarea textarea-bordered h-24 w-full"
+                  placeholder="メモや感想"
+                  name="comment"
+                  id="comment"
+                  maxLength={200}
+                />
+              </div>
+            </div>
+            {/* 送信ボタン */}
             <div className="modal-action flex justify-center gap-4">
               <button
                 type="button"

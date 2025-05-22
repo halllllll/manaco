@@ -93,10 +93,11 @@ const App: FC = () => {
   // 投稿モーダル用のステート
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // フォーム送信処理
+  // フォーム送信処理 いったんテストでコメントアウト
   const handleSubmitPost = (e: FormEvent) => {
     e.preventDefault();
     console.log('投稿内容:');
+    console.log(e);
     // ここで実際の投稿処理（APIコールなど）
 
     // フォームリセットとモーダルを閉じる
@@ -107,8 +108,6 @@ const App: FC = () => {
     <>
       {/* 開発ツールを追加 */}
       {import.meta.env.DEV && <DevTools />}
-      {/** いったん動きをみるために開発ツールを本番環境で表示する TODO: あとで消す*/}
-
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Suspense>
           <AppLayout setIsModalOpen={setIsModalOpen} isModalOpen={isModalOpen} />
