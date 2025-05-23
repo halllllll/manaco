@@ -6,33 +6,25 @@ import { mockUserData } from './data';
 export const handlers = [
   // スプレッドシート名取得 API
   http.get(getMSWPath(API_ENDPOINTS.SHEET_NAME), async () => {
+    console.info('--- mock api: speradsheet name ---');
     await delay(800);
     const data = mockUserData[currentMockUserId];
     if (!data) {
       return HttpResponse.json('データなし');
     }
     return HttpResponse.json('（スプレッドシート名）');
-    // switch (data.id) {
-    //   case 'user1@sample.com':
-    //   case 'user2@sample.com':
-    //     return HttpResponse.json('（シート名）');
-    //   case 'admin@sample.com':
-    //     return HttpResponse.json('（シート名）');
-    //   case 'alien@sample.com':
-    //     return HttpResponse.json('（シート名）');
-    //   default:
-    // }
-    // return HttpResponse.json('開発環境のスプレッドシート');
   }),
 
   // スプレッドシートURL取得 API
   http.get(getMSWPath(API_ENDPOINTS.SHEET_URL), async () => {
+    console.info('--- mock api: speradsheet url ---');
     await delay(800);
     return HttpResponse.json('https://example.com/dev-spreadsheet');
   }),
 
   // アクセスしたときにdashboardに必要なデータをまとめて取得
   http.get(getMSWPath(API_ENDPOINTS.DASHBOARD), async () => {
+    console.info('--- mock api: dashboard ---');
     await delay(1400);
     // simulate fetch error
     if (Math.random() > 0.9) {
@@ -44,6 +36,24 @@ export const handlers = [
     }
 
     return HttpResponse.json(data);
+  }),
+
+  // ヘルスチェック API
+  http.get(getMSWPath(API_ENDPOINTS.HEALTH), async () => {
+    console.info('--- mock api: health check ---');
+    await delay(800);
+    const data = mockUserData[currentMockUserId];
+    if (!data) {
+      return HttpResponse.json('データなし');
+    }
+    return HttpResponse.json({
+      success: true,
+      message: 'OK',
+      data: {
+        user: data,
+        activities: data.activities,
+      },
+    });
   }),
 
   // // // 学習活動一覧取得 API
