@@ -3,7 +3,7 @@ const ss = SpreadsheetApp.getActive();
 export const SETTINGS_SHEET_NAME = 'アプリ設定';
 export const SETTINGS_SHEET_HEADERS: readonly string[] = ['設定項目', '値', '説明'] as const;
 
-export type SettingsItem = '点数下限' | '点数上限' | '制限時間（秒）' | 'きもち表示' | 'メモ表示';
+export type SettingsItem = '点数下限' | '点数上限' | 'きもち表示' | 'メモ表示';
 export type SettingsType = 'number' | 'boolean' | 'date';
 
 export type SettingsSheetItem = {
@@ -26,11 +26,6 @@ export const DefaultSettingsItemValue: {
     name: '点数上限',
     value: 100,
     desc: 'フォームで受け入れる点数の上限',
-  },
-  {
-    name: '制限時間（秒）',
-    value: 60,
-    desc: 'フォームで受け入れる時間の上限',
   },
   {
     name: 'きもち表示',
@@ -57,11 +52,6 @@ export const SETTINGS_SHEET_LABEL: readonly SettingsSheetItem[] = [
   {
     name: '点数上限',
     rowAt: 3,
-    type: 'number',
-  },
-  {
-    name: '制限時間（秒）',
-    rowAt: 4,
     type: 'number',
   },
   {

@@ -123,9 +123,6 @@ const getSettingsData = (): SettingsDTO => {
         case '点数上限':
           o.scoreMax = value as number;
           break;
-        case '制限時間（秒）':
-          o.timeLimit = value as number;
-          break;
         case 'きもち表示':
           o.showMood = value as boolean;
           break;

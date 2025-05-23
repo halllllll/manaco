@@ -127,11 +127,6 @@ const AppSettingSheetValidationTest = () => {
       type: 'number',
     },
     {
-      rowAt: 4,
-      name: '制限時間（秒）',
-      type: 'number',
-    },
-    {
       rowAt: 5,
       name: 'きもち表示',
       type: 'boolean',
