@@ -9,6 +9,7 @@ export const mockUserData: Record<string, User & { activities: LearningActivity[
     id: 'user1@sample.com',
     name: '開発太郎',
     belonging: '3年1組',
+    role: 'student',
     activities: [
       {
         score: 34,
@@ -43,13 +44,14 @@ export const mockUserData: Record<string, User & { activities: LearningActivity[
     id: 'user2@sample.com',
     name: '（dev）未投稿ユーザー',
     belonging: '3年2組',
+    role: 'student',
     activities: [],
   },
   'dev-user-3': {
     id: 'admin@sample.com',
     name: '管理者次郎',
     belonging: '職員室',
-
+    role: 'teacher',
     activities: [
       {
         score: 92,
@@ -309,6 +311,7 @@ export const mockUserData: Record<string, User & { activities: LearningActivity[
     id: 'alien@sample.com',
     name: '',
     belonging: '',
+    role: 'student',
     activities: [],
   },
 };

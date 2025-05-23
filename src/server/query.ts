@@ -24,6 +24,7 @@ const getUsers = (): User[] => {
       id: row[0] ?? '',
       name: row[1] ?? '',
       belonging: row[2] ?? '',
+      role: row[3] ?? 'student',
     };
     users = [...users, user];
   }

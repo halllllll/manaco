@@ -25,6 +25,7 @@ const StudentSheetValidationTest = () => {
     'アカウントID',
     '名前',
     '所属（任意）',
+    'role',
   ]);
   console.info(result2);
   if (result2.isValid) {
