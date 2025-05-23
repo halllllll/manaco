@@ -1,0 +1,38 @@
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'node:path';
+import { defineConfig } from 'vite';
+import { viteSingleFile } from 'vite-plugin-singlefile';
+import tsconfigPaths from 'vite-tsconfig-paths';
+
+const menuRoot = resolve(__dirname, 'src/server/Menu');
+
+export default defineConfig({
+  plugins: [
+    react(),
+    tsconfigPaths(),
+    viteSingleFile({
+      useRecommendedBuildConfig: false,
+    }),
+    tailwindcss(),
+  ],
+  build: {
+    outDir: 'dist',
+    modulePreload: false,
+    emptyOutDir: false,
+    rollupOptions: {
+      input: {
+        // The key will be the output filename (e.g., index.html, menu.html)
+        // index: resolve(__dirname, 'index.html'), // Main application
+        menu: resolve(menuRoot, 'menu.html'), // Custom menu HTML
+      },
+      output: {
+        entryFileNames: '[name].js',
+        chunkFileNames: '[name].js',
+        assetFileNames: '[name].[ext]',
+        // This prevents nested folder structures in output
+        // preserveModules: false
+      },
+    },
+  },
+});
