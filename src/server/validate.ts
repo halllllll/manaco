@@ -67,7 +67,7 @@ export class SheetValidator {
     if (missingHeaders.length > 0) {
       return {
         isValid: false,
-        messages: [`Missing headers in ${sheetName}}`],
+        messages: [`Missing headers in ${sheetName} : ${missingHeaders.join(', ')}`],
 
         details: {
           missingHeaders,
@@ -147,7 +147,9 @@ export class SheetValidator {
     if (!isValid) {
       return {
         isValid: false,
-        messages: [`${sheetName}シートの値が不正です`],
+        messages: [
+          `${sheetName}シートの値が不正です : ${items.map((item) => item.name).join(', ')}`,
+        ],
         details: {
           itemValuesAndType,
         },

@@ -5,7 +5,7 @@ import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 export const DashboardAPI = {
   // ダッシュボードデータ取得
-  getDashboard: async (): Promise<User & { activities: LearningActivity[] }> => {
+  getDashboard: async (): Promise<(User & { activities: LearningActivity[] }) | null> => {
     if (isGASEnvironment()) {
       const ret = await serverFunctions.getDashboard();
       if (ret.success) {

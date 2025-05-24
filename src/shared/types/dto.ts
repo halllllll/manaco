@@ -14,10 +14,11 @@ type BaseDTO<T> =
       data: T;
     };
 
-export type DashboardDTO = BaseDTO<User & { activities: LearningActivity[] }>;
+export type DashboardDTO = BaseDTO<(User & { activities: LearningActivity[] }) | null>;
 
 export type SettingsDTO = BaseDTO<AppSettings>;
 
-export type SpreadsheetValidateDTO = BaseDTO<Omit<ValidationResult, keyof ValidationResult> | null>;
+// export type SpreadsheetValidateDTO = BaseDTO<Omit<ValidationResult, keyof ValidationResult> | null>;
+export type SpreadsheetValidateDTO = BaseDTO<ValidationResult | null>;
 
 export type InitAppDTO = BaseDTO<null>;

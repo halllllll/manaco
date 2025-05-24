@@ -1,7 +1,7 @@
 import { delay, http, HttpResponse } from 'msw';
 import { API_ENDPOINTS, getMSWPath } from '../api/endpoint';
 import { currentMockUserId } from './browser';
-import { mockUserData } from './data';
+import { mockHealthCheckData, mockUserData } from './data';
 
 export const handlers = [
   // スプレッドシート名取得 API
@@ -41,19 +41,15 @@ export const handlers = [
   // ヘルスチェック API
   http.get(getMSWPath(API_ENDPOINTS.HEALTH), async () => {
     console.info('--- mock api: health check ---');
-    await delay(800);
-    const data = mockUserData[currentMockUserId];
+    await delay(2000);
+    // const data = mockUserData[currentMockUserId];
+    const data = mockHealthCheckData['1'];
+    console.log('mockHealthCheckData');
+    console.dir(data);
     if (!data) {
       return HttpResponse.json('データなし');
     }
-    return HttpResponse.json({
-      success: true,
-      message: 'OK',
-      data: {
-        user: data,
-        activities: data.activities,
-      },
-    });
+    return HttpResponse.json(data);
   }),
 
   // // // 学習活動一覧取得 API

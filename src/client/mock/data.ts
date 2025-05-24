@@ -1,3 +1,4 @@
+import type { ValidationResult } from '@/server/validate';
 import type { LearningActivity } from '@/shared/types/activity';
 import type { User } from '@shared/types/user';
 
@@ -313,5 +314,25 @@ export const mockUserData: Record<string, User & { activities: LearningActivity[
     belonging: '',
     role: 'student',
     activities: [],
+  },
+};
+
+// health check用のデータ
+export const mockHealthCheckData: Record<string, ValidationResult> = {
+  '1': {
+    isValid: false,
+    messages: ['スプレッドシートが見つかりません。'],
+    details: {
+      sheetName: '（スプレッドシート名）',
+      sheetId: '（スプレッドシートID）',
+      sheetUrl: '（スプレッドシートURL）',
+      sheetRange: '（スプレッドシートの範囲）',
+      sheetHeaders: ['（スプレッドシートのヘッダー）'],
+    },
+  },
+  '2': {
+    isValid: true,
+    messages: ['スプレッドシートが見つかりました。'],
+    data: [[]],
   },
 };

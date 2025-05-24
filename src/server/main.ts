@@ -25,9 +25,15 @@ import {
 import { SheetValidator } from './validate';
 
 export const doGet = (): GoogleAppsScript.HTML.HtmlOutput => {
+  console.log('validation check');
+  const validateReuslt = validateAll();
+  console.log(validateReuslt);
+  if (!validateReuslt.success) {
+    return HtmlService.createHtmlOutputFromFile('panic.html');
+  }
   return HtmlService.createHtmlOutputFromFile('index.html')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-    .setTitle(getSpreadSheetName() ?? 'Vite + React on GAS');
+    .setTitle(getSpreadSheetName() ?? 'manaco');
 };
 
 const onOpen = (e: GoogleAppsScript.Events.SheetsOnOpen): void => {
@@ -51,6 +57,7 @@ const getSpreadSheetUrl = (): string => {
 const getAccessUser = (): User | null => {
   const accessedUser = Session.getActiveUser();
   const email = accessedUser.getEmail();
+  console.log(`getAccessUser: ${email}`);
   return getUser(email);
 };
 /**
@@ -79,10 +86,19 @@ const validateAll = (): SpreadsheetValidateDTO => {
     console.error(resultValidateActivitySheet);
     console.error(resultValidateSettingsSheet);
 
-    throw new Error(
-      `Validation failed: \n
-      ${resultValidateUserSheet.messages.join('\n')}\n${resultValidateActivitySheet.messages.join('\n')}\n${resultValidateSettingsSheet.messages.join('\n')}`,
-    );
+    // throw new Error(
+    //   `Validation failed: \n
+    //   ${resultValidateUserSheet.messages.join('\n')}\n${resultValidateActivitySheet.messages.join('\n')}\n${resultValidateSettingsSheet.messages.join('\n')}`,
+    // );
+    return {
+      success: false,
+      message: 'Validation failed',
+      details: [
+        ...resultValidateUserSheet.messages,
+        ...resultValidateActivitySheet.messages,
+        ...resultValidateSettingsSheet.messages,
+      ].join('\n'),
+    };
   }
   return {
     success: true,
@@ -151,14 +167,19 @@ const getSettingsData = (): SettingsDTO => {
 };
 
 const getDashboard = (): DashboardDTO => {
+  console.log('おい!!!!!!!!!!!!!!1');
   try {
     const user = getAccessUser();
     if (!user) {
+      console.info('getDashboard: No user found');
       return {
-        success: false,
-        message: 'ユーザーが見つかりません',
+        success: true,
+        data: null,
       };
     }
+    console.info(
+      `getDashboard for user: ${user.id} (${user.name}) - ${user.belonging} : ${user.role}`,
+    );
     const activities = getUserActivities(user.id);
 
     return {
