@@ -17,13 +17,13 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { useDashboard } from './api/dashboard/hooks';
-import { useSheetName, useSheetUrl } from './api/sheet/hooks';
-import { ErrorFallback } from './components/ErrorFallback';
+import { useDashboard } from '../api/dashboard/hooks';
+import { useSheetName, useSheetUrl } from '../api/sheet/hooks';
+import { ErrorFallback } from '../components/ErrorFallback';
+import { Footer } from '../components/parts/footer';
+import { Header } from '../components/parts/header';
+import { DevTools } from '../devtool';
 import { FormModal } from './components/FormModal';
-import { Footer } from './components/parts/footer';
-import { Header } from './components/parts/header';
-import { DevTools } from './devtool';
 
 interface AppLayoutProps {
   setIsModalOpen: (isOpen: boolean) => void;

@@ -27,11 +27,19 @@ import { SheetValidator } from './validate';
 export const doGet = (): GoogleAppsScript.HTML.HtmlOutput => {
   console.log('validation check');
   const validateReuslt = validateAll();
-  console.log(validateReuslt);
-  if (!validateReuslt.success) {
+  const user = getAccessUser();
+  if (!validateReuslt.success || !user) {
     return HtmlService.createHtmlOutputFromFile('panic.html');
   }
-  return HtmlService.createHtmlOutputFromFile('index.html')
+  console.log('user:');
+  console.log(user);
+  if (user.role !== 'teacher') {
+    return HtmlService.createHtmlOutputFromFile('index.html')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+      .setTitle(getSpreadSheetName() ?? 'manaco');
+  }
+  console.log('yes! teacher');
+  return HtmlService.createHtmlOutputFromFile('teacher.html')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setTitle(getSpreadSheetName() ?? 'manaco');
 };
@@ -167,7 +175,6 @@ const getSettingsData = (): SettingsDTO => {
 };
 
 const getDashboard = (): DashboardDTO => {
-  console.log('おい!!!!!!!!!!!!!!1');
   try {
     const user = getAccessUser();
     if (!user) {

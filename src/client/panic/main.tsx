@@ -77,7 +77,7 @@ enableMocking().then(() => {
       <SWRConfig
         value={{
           refreshInterval: 0,
-          dedupingInterval: 10000,
+          dedupingInterval: 45000,
           revalidateOnFocus: false,
           revalidateOnReconnect: false,
           shouldRetryOnError: false,

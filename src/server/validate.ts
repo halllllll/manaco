@@ -100,6 +100,14 @@ export class SheetValidator {
 
     const settingValues = sheet.getDataRange().getValues().slice(1);
 
+    // 全然余裕の大きさなのでSheets APIを使わずに直接取得
+    // const settingValues = (
+    //   Sheets.Spreadsheets?.Values?.get(
+    //     sheet.getParent().getId(),
+    //     `${sheetName}!A:${columnToA1(sheet.getLastColumn())}`,
+    //   ).values ?? sheet.getDataRange().getValues()
+    // ).slice(1);
+
     const itemNames = settingValues.map((row) => row[0]);
 
     if (

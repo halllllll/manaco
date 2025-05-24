@@ -12,6 +12,7 @@ import {
   USER_SHEET_NAME,
   ss,
 } from './Const';
+import { columnToA1 } from './funcs';
 
 const getUsers = (): User[] => {
   const sheet = ss.getSheetByName(USER_SHEET_NAME);
@@ -23,8 +24,8 @@ const getUsers = (): User[] => {
     const user: User = {
       id: row[0] ?? '',
       name: row[1] ?? '',
-      belonging: row[2] ?? '',
-      role: row[3] ?? 'student',
+      role: row[2] ?? 'student',
+      belonging: row[3] ?? '',
     };
     users = [...users, user];
   }
@@ -34,8 +35,20 @@ const getUsers = (): User[] => {
 
 const getActivityLogs = (): LearningActivity[] => {
   const sheet = ss.getSheetByName(LEARNING_ACTIVITY_SHEET_NAME);
-  // biome-ignore lint/style/noNonNullAssertion: <explanation>
-  const values = sheet!.getDataRange().getValues();
+  // const values = sheet!.getDataRange().getValues();
+  const values =
+    Sheets.Spreadsheets?.Values?.get(
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      sheet!
+        .getParent()
+        .getId(),
+      `${LEARNING_ACTIVITY_SHEET_NAME}!A:${
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        columnToA1(sheet!.getLastColumn())
+      }`,
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    ).values ?? sheet!.getDataRange().getValues();
+
   const body = values.slice(1);
   let activities: LearningActivity[] = [];
   for (const row of body) {
