@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { SWRConfig } from 'swr';
 import App from './App';
 
 async function enableMocking() {
@@ -16,7 +17,19 @@ async function enableMocking() {
 enableMocking().then(() => {
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
-      <App />
+      <SWRConfig
+        value={{
+          refreshInterval: 0,
+          dedupingInterval: 10000,
+          revalidateOnFocus: true,
+          revalidateOnReconnect: false,
+          shouldRetryOnError: false,
+          errorRetryCount: 3,
+          errorRetryInterval: 0,
+        }}
+      >
+        <App />
+      </SWRConfig>
     </React.StrictMode>,
   );
 });

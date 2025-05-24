@@ -70,8 +70,8 @@ export const USER_SHEET_NAME = '児童情報';
 export const USER_SHEET_HEADERS: readonly string[] = [
   'アカウントID',
   '名前',
-  '所属（任意）',
   'role',
+  '所属（任意）',
 ] as const;
 
 export const LEARNING_ACTIVITY_SHEET_NAME = '学習ログ';
