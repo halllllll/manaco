@@ -22,6 +22,7 @@ import { useSheetName, useSheetUrl } from './api/sheet/hooks';
 import { ErrorFallback } from './components/ErrorFallback';
 import { FormModal } from './components/FormModal';
 import { Footer } from './components/parts/footer';
+import { Header } from './components/parts/header';
 import { DevTools } from './devtool';
 
 interface AppLayoutProps {
@@ -43,7 +44,7 @@ const AppLayout: FC<AppLayoutProps> = ({ setIsModalOpen, isModalOpen: _isModalOp
   const { data: sheetName } = useSheetName();
 
   // ユーザーの状態を確認
-  const isRegistered = data?.id && data?.name && data?.belonging;
+  const isRegistered = data?.id && data?.name;
   const hasActivities = data?.activities && data.activities.length > 0;
 
   return (
@@ -122,38 +123,6 @@ const App: FC = () => {
   );
 };
 export default App;
-
-const Header: FC = () => {
-  const { data: title, isLoading: isSheetLoading } = useSheetName();
-  const { data: user, isLoading: isDashboardLoading } = useDashboard();
-  return (
-    <header className="p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg rounded-b-lg max-h-24">
-      <div className="container mx-auto flex justify-between items-center gap-2">
-        <h1 className="text-3xl font-bold">
-          {isSheetLoading || isDashboardLoading ? (
-            <>
-              <span className="m-2">よみこみちゅう</span>
-              <span className="loading loading-spinner loading-md" />
-            </>
-          ) : (
-            title
-          )}
-        </h1>
-        {user?.name && (
-          <div className="flex flex-col items-end">
-            <div className="flex flex-row items-center gap-2">
-              {user?.belonging && (
-                <div className="badge badge-outline badge-lg">{user.belonging}</div>
-              )}
-              <div className="text-lg font-semibold">{`${user.name} さん`}</div>
-            </div>
-            <div>{`${user?.id}`}</div>
-          </div>
-        )}
-      </div>
-    </header>
-  );
-};
 
 const EmptyDashboard: FC<{ openModal: () => void }> = ({ openModal }) => {
   return (
