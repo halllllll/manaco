@@ -1,4 +1,5 @@
-export type UserRole = 'teacher' | 'student';
+export const USER_ROLES = ['teacher', 'student'] as const;
+export type UserRole = (typeof USER_ROLES)[number];
 
 export type User = {
   id: string;

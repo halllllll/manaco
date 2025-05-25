@@ -1,5 +1,5 @@
 import type { LearningActivity } from '@/shared/types/activity';
-import type { User } from '@/shared/types/user';
+import { USER_ROLES, type User } from '@/shared/types/user';
 import {
   DefaultSettingsItemValue,
   LEARNING_ACTIVITY_SHEET_HEADERS,
@@ -132,7 +132,12 @@ export const init = () => {
     .setBorder(true, true, true, true, true, true, '#FF9AAA', SpreadsheetApp.BorderStyle.SOLID)
     .setBackground('#FFD1DC');
   userSheet.setColumnWidths(1, USER_SHEET_HEADERS.length, 100);
-
+  // roleには入力規則
+  userSheet.getRange(2, 3, userSheet.getMaxRows() - 1, 1).setDataValidation(
+    SpreadsheetApp.newDataValidation()
+      .requireValueInList([...USER_ROLES], true)
+      .build(),
+  );
   // Set headers for ACTIVITY sheet
   activitySheet
     .getRange(1, 1, 1, LEARNING_ACTIVITY_SHEET_HEADERS.length)
