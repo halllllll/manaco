@@ -176,7 +176,7 @@ export const FormModal: FC<FormModalProps> = ({
             </div>
 
             {/* 学習時間 */}
-            <div className="form-control w-full mb-4">
+            {/* <div className="form-control w-full mb-4">
               <label className="label" htmlFor="study_time">
                 <span className="label-text text-lg font-medium flex items-center gap-2">
                   <svg
@@ -204,14 +204,14 @@ export const FormModal: FC<FormModalProps> = ({
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        className="btn btn-outline btn-sm bg-neutral text-neutral-content"
+                        className="btn btn-outline btn-md bg-neutral text-neutral-content"
                         onClick={() => setMinutes(Math.max(minutes - 10, 0))}
                       >
                         <span className="i-lucide-chevrons-left" />
                       </button>
                       <button
                         type="button"
-                        className="btn btn-outline btn-sm"
+                        className="btn btn-outline btn-md"
                         onClick={() => setMinutes(Math.max(minutes - 1, 0))}
                       >
                         <span className="i-lucide-chevron-left" />
@@ -219,14 +219,14 @@ export const FormModal: FC<FormModalProps> = ({
                       <div className="mx-2  text-center text-2xl font-semibold w-10">{minutes}</div>
                       <button
                         type="button"
-                        className="btn btn-sm btn-outline"
+                        className="btn btn-md btn-outline"
                         onClick={() => setMinutes(minutes + 1)}
                       >
                         <span className="i-lucide-chevron-right" />
                       </button>
                       <button
                         type="button"
-                        className="btn btn-sm btn-outline bg-neutral text-neutral-content"
+                        className="btn btn-md btn-outline bg-neutral text-neutral-content"
                         onClick={() => setMinutes(minutes + 10)}
                       >
                         <span className="i-lucide-chevrons-right" />
@@ -238,14 +238,14 @@ export const FormModal: FC<FormModalProps> = ({
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        className="btn btn-outline btn-sm bg-neutral text-neutral-content"
+                        className="btn btn-outline btn-md bg-neutral text-neutral-content"
                         onClick={() => setSeconds(Math.max(seconds - 10, 0))}
                       >
                         <span className="i-lucide-chevrons-left" />
                       </button>
                       <button
                         type="button"
-                        className="btn btn-outline btn-sm"
+                        className="btn btn-outline btn-md"
                         onClick={() => setSeconds(Math.max(seconds - 1, 0))}
                       >
                         <span className="i-lucide-chevron-left" />
@@ -253,14 +253,14 @@ export const FormModal: FC<FormModalProps> = ({
                       <div className="mx-2  text-center text-2xl font-semibold w-10">{seconds}</div>
                       <button
                         type="button"
-                        className="btn btn-sm btn-outline"
+                        className="btn btn-md btn-outline"
                         onClick={() => setSeconds(seconds + 1)}
                       >
                         <span className="i-lucide-chevron-right" />
                       </button>
                       <button
                         type="button"
-                        className="btn btn-sm btn-outline bg-neutral text-neutral-content"
+                        className="btn btn-md btn-outline bg-neutral text-neutral-content"
                         onClick={() => setSeconds(seconds + 10)}
                       >
                         <span className="i-lucide-chevrons-right" />
@@ -269,8 +269,152 @@ export const FormModal: FC<FormModalProps> = ({
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
+            {/* 学習時間 */}
+            <div className="form-control w-full mb-6">
+              <label className="label" htmlFor="study_time">
+                <span className="label-text text-lg font-medium flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <title>{'clock'}</title>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  どれくらい勉強した？
+                </span>
+              </label>
 
+              <div className="rounded-lg p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* 分の設定 */}
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="text-center">
+                      <span className="text-lg font-medium text-base-content/70 uppercase tracking-wide">
+                        分
+                      </span>
+                      <div className="text-4xl font-bold text-secondary mt-1">{minutes}</div>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                        onClick={() => setMinutes(Math.max(minutes - 10, 0))}
+                        title="10分減らす"
+                      >
+                        <span className="i-lucide-chevrons-left text-xs" />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                        onClick={() => setMinutes(Math.max(minutes - 1, 0))}
+                        title="1分減らす"
+                      >
+                        <span className="i-lucide-chevron-left text-xs" />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                        onClick={() => setMinutes(minutes + 1)}
+                        title="1分増やす"
+                      >
+                        <span className="i-lucide-chevron-right text-xs" />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                        onClick={() => setMinutes(minutes + 10)}
+                        title="10分増やす"
+                      >
+                        <span className="i-lucide-chevrons-right text-xs" />
+                      </button>
+                    </div>
+
+                    {/* クイック設定ボタン */}
+                    <div className="flex gap-1 flex-wrap justify-center">
+                      {[15, 30, 60, 90].map((min) => (
+                        <button
+                          key={min}
+                          type="button"
+                          className="btn btn-xs btn-ghost hover:btn-secondary"
+                          onClick={() => setMinutes(min)}
+                        >
+                          {min}分
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 秒の設定 */}
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="text-center">
+                      <span className="text-lg font-medium text-base-content/70 uppercase tracking-wide">
+                        秒
+                      </span>
+                      <div className="text-4xl font-bold text-secondary mt-1">{seconds}</div>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                        onClick={() => setSeconds(Math.max(seconds - 10, 0))}
+                        title="10秒減らす"
+                      >
+                        <span className="i-lucide-chevrons-left text-xs" />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                        onClick={() => setSeconds(Math.max(seconds - 1, 0))}
+                        title="1秒減らす"
+                      >
+                        <span className="i-lucide-chevron-left text-xs" />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                        onClick={() => setSeconds(seconds + 1)}
+                        title="1秒増やす"
+                      >
+                        <span className="i-lucide-chevron-right text-xs" />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                        onClick={() => setSeconds(seconds + 10)}
+                        title="10秒増やす"
+                      >
+                        <span className="i-lucide-chevrons-right text-xs" />
+                      </button>
+                    </div>
+
+                    {/* クイック設定ボタン */}
+                    <div className="flex gap-1 flex-wrap justify-center">
+                      {[15, 30, 45].map((sec) => (
+                        <button
+                          key={sec}
+                          type="button"
+                          className="btn btn-xs btn-ghost hover:btn-secondary"
+                          onClick={() => setSeconds(sec)}
+                        >
+                          {sec}秒
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             {/* 点数 */}
             <div className="form-control w-full mb-6">
               <label className="label" htmlFor="score">
