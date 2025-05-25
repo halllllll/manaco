@@ -11,7 +11,7 @@ import {
 import { SheetValidator } from '../validate';
 
 const StudentSheetValidationTest = () => {
-  console.log('-- 児童情報シート -- ');
+  console.log('-- ユーザー情報シート -- ');
   console.info('正しい情報');
   const result1 = SheetValidator.getAndValidateHeaders<User[]>(USER_SHEET_NAME, [
     ...USER_SHEET_HEADERS,
@@ -57,7 +57,7 @@ const LearningLogSheetValidationTest = () => {
     throw new Error(result1.messages.join('\n'));
   }
   console.info('シート名が異なる');
-  const result2 = SheetValidator.getAndValidateHeaders('児童情報', [
+  const result2 = SheetValidator.getAndValidateHeaders('ユーザー情報', [
     ...LEARNING_ACTIVITY_SHEET_HEADERS,
   ]);
   console.info(result2);
@@ -91,7 +91,7 @@ const AppSettingSheetValidationTest = () => {
     throw new Error(result1.messages.join('\n'));
   }
   console.info('シート名が異なる');
-  const result2 = SheetValidator.getAndValidateHeaders('児童情報', [...SETTINGS_SHEET_HEADERS]);
+  const result2 = SheetValidator.getAndValidateHeaders('ユーザー情報', [...SETTINGS_SHEET_HEADERS]);
   console.info(result2);
   if (result2.isValid) {
     throw new Error(result2.messages.join('\n'));

@@ -66,7 +66,7 @@ export const SETTINGS_SHEET_LABEL: readonly SettingsSheetItem[] = [
   },
 ] as const;
 
-export const USER_SHEET_NAME = '児童情報';
+export const USER_SHEET_NAME = 'ユーザー情報';
 export const USER_SHEET_HEADERS: readonly string[] = [
   'アカウントID',
   '名前',
