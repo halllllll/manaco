@@ -53,10 +53,10 @@ const getActivityLogs = (): LearningActivity[] => {
   let activities: LearningActivity[] = [];
   for (const row of body) {
     const activity: LearningActivity = {
-      activityDate: row[1] ?? '',
-      userId: row[2] ?? '',
-      score: row[3] ?? '',
-      duration: row[4] ?? '',
+      userId: row[1],
+      activityDate: row[2],
+      score: Number.parseInt(row[3]), // rechartで表示するために明示的に数値変換（フロント側ではうまく変換できなかった）
+      duration: Number.parseInt(row[4]), // rechartで表示するために明示的に数値変換
       mood: row[5],
       memo: row[6],
     };
@@ -74,7 +74,11 @@ export const getUser = (userId: string): User | null => {
 
 export const getUserActivities = (userId: string): LearningActivity[] => {
   const activities = getActivityLogs();
-  const userActivities = activities.filter((activity) => activity.userId === userId);
+  console.log('全部取得した');
+  console.log(activities);
+  const userActivities = activities.filter((activity) => activity.userId.trim() === userId.trim());
+  console.log('フィルタリングした');
+  console.log(userActivities);
   return userActivities;
 };
 

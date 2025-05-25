@@ -21,7 +21,7 @@ enableMocking().then(() => {
         value={{
           refreshInterval: 0,
           dedupingInterval: 45000,
-          revalidateOnFocus: true,
+          revalidateOnFocus: false,
           revalidateOnReconnect: false,
           shouldRetryOnError: false,
           errorRetryCount: 3,

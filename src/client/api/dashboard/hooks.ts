@@ -7,7 +7,5 @@ export const useDashboard = () => {
     API_ENDPOINTS.DASHBOARD,
     DashboardAPI.getDashboard,
   );
-  console.log('user dashboard data:', data);
-  console.log(data);
   return { data, error, isLoading, mutate };
 };
