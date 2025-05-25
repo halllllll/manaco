@@ -1,16 +1,48 @@
-import { type CSSProperties, type FC, type FormEvent, useState } from 'react';
-import { moodOptions } from '../App';
+import { MOOD_OPTIONS } from '@/shared/constants/mood';
+import type { CSSProperties, FC, FormEvent } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import type { ModalProps } from '../types/props';
 
-export const FormModal: FC<{
-  isModalOpen: boolean;
+interface FormModalProps extends ModalProps {
   handleSubmitPost: (e: FormEvent) => void;
-  setIsModalOpen: (_: boolean) => void;
-}> = ({ isModalOpen, handleSubmitPost, setIsModalOpen }) => {
-  // TODO: 現状仮実装
+}
+
+export const FormModal: FC<FormModalProps> = ({
+  isModalOpen,
+  handleSubmitPost,
+  setIsModalOpen,
+}) => {
+  // フォーム状態管理
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [score, setScore] = useState<number | null>(null);
-  const today = new Date().toISOString().split('T')[0];
+  const [_selectedMood, setSelectedMood] = useState<string>('');
+
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+  // フォームリセット
+  const resetForm = useCallback(() => {
+    setMinutes(0);
+    setSeconds(0);
+    setScore(null);
+    setSelectedMood('');
+  }, []);
+
+  // モーダルを閉じる
+  const handleClose = useCallback(() => {
+    setIsModalOpen(false);
+    resetForm();
+  }, [setIsModalOpen, resetForm]);
+
+  // フォーム送信
+  const handleSubmit = useCallback(
+    (e: FormEvent) => {
+      handleSubmitPost(e);
+      resetForm();
+    },
+    [handleSubmitPost, resetForm],
+  );
+
   return (
     <div>
       <dialog id="post_modal" className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
@@ -18,7 +50,7 @@ export const FormModal: FC<{
           <h3 className="font-bold text-2xl mb-6 text-center text-primary">
             今日の学習を記録しよう！
           </h3>
-          <form onSubmit={handleSubmitPost}>
+          <form onSubmit={handleSubmit}>
             {/* 日付選択 */}
             <div className="form-control w-full mb-4">
               <label className="label" htmlFor="target-date-btn">
@@ -142,6 +174,7 @@ export const FormModal: FC<{
                 </div>
               </div>
             </div>
+
             {/* 学習時間 */}
             <div className="form-control w-full mb-4">
               <label className="label" htmlFor="study_time">
@@ -237,6 +270,7 @@ export const FormModal: FC<{
                 </div>
               </div>
             </div>
+
             {/* 点数 */}
             <div className="form-control w-full mb-6">
               <label className="label" htmlFor="score">
@@ -275,6 +309,7 @@ export const FormModal: FC<{
                 </div>
               </div>
             </div>
+
             {/* 気分 (オプション) */}
             <div className="form-control w-full mb-6">
               <label className="label" htmlFor="mood">
@@ -298,8 +333,9 @@ export const FormModal: FC<{
                 </span>
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {moodOptions.map((option) => (
-                  <div
+                {MOOD_OPTIONS.map((option) => (
+                  <button
+                    type="button"
                     key={option.value}
                     className={`card ${option.color} shadow-sm hover:shadow-md transition-all cursor-pointer`}
                   >
@@ -318,10 +354,11 @@ export const FormModal: FC<{
                         {option.label}
                       </label>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
+
             {/* コメント */}
             <div className="form-control w-full mb-6">
               <label className="label" htmlFor="comment">
@@ -365,11 +402,7 @@ export const FormModal: FC<{
             </div>
             {/* 送信ボタン */}
             <div className="modal-action flex justify-center gap-4">
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => setIsModalOpen(false)}
-              >
+              <button type="button" className="btn btn-outline" onClick={handleClose}>
                 キャンセル
               </button>
               <button type="submit" className="btn btn-primary btn-lg gap-2">
@@ -395,7 +428,7 @@ export const FormModal: FC<{
         </div>
         {/* モーダルの背景をクリックしても閉じられるようにする */}
         <form method="dialog" className="modal-backdrop">
-          <button type={'button'} onClick={() => setIsModalOpen(false)}>
+          <button type="button" onClick={handleClose}>
             閉じる
           </button>
         </form>
