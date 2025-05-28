@@ -1,4 +1,5 @@
 import type { ValidationResult } from '@/server/validate';
+import type { UserWithActivities } from '@/shared/types/user';
 import type { LearningActivity } from './activity';
 import type { AppSettings } from './settings';
 import type { User } from './user';
@@ -14,7 +15,7 @@ type BaseDTO<T> =
       data: T;
     };
 
-export type DashboardDTO = BaseDTO<(User & { activities: LearningActivity[] }) | null>;
+export type DashboardDTO = BaseDTO<UserWithActivities | null>;
 
 export type SettingsDTO = BaseDTO<AppSettings>;
 

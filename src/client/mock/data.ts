@@ -1,12 +1,12 @@
 import type { ValidationResult } from '@/server/validate';
 import type { LearningActivity } from '@/shared/types/activity';
 import type { AppSettings } from '@/shared/types/settings';
-import type { User } from '@shared/types/user';
+import type { User, UserWithActivities } from '@shared/types/user';
 
 // 開発用ユーザープロファイル
 // ユーザー取得するときにsuccess=trueが前提のダミーデータ
 // DashboardDTOのdata部分のみ
-export const mockUserData: Record<string, User & { activities: LearningActivity[] }> = {
+export const mockUserData: Record<string, UserWithActivities> = {
   'dev-user-1': {
     id: 'user1@sample.com',
     name: '開発太郎',

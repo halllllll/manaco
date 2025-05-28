@@ -1,5 +1,6 @@
 import { useDashboard } from '@/client/api/dashboard/hooks';
 import { useSheetName, useSheetUrl } from '@/client/api/sheet/hooks';
+import type { UserWithActivities } from '@/shared/types/user';
 import { useMemo } from 'react';
 
 export interface UserState {
@@ -7,7 +8,7 @@ export interface UserState {
   error: Error | null;
   isRegistered: boolean;
   hasActivities: boolean;
-  userData: any;
+  userData: UserWithActivities | null | undefined;
   sheetName: string | undefined;
   sheetUrl: string | undefined;
 }

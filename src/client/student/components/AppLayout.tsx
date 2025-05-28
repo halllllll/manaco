@@ -31,7 +31,7 @@ export const AppLayout: FC<AppLayoutProps> = ({ setIsModalOpen, isModalOpen: _is
       );
     }
 
-    if (!isRegistered) {
+    if (!userData || !isRegistered) {
       return (
         <UnregisteredView
           sheetName={sheetName ?? '取得できませんでした'}

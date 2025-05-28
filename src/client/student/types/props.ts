@@ -1,9 +1,5 @@
 import type { LearningActivity } from '@/shared/types/activity';
-import type { User } from '@/shared/types/user';
-
-export interface UserWithActivities extends User {
-  activities: LearningActivity[];
-}
+import type { UserWithActivities } from '@/shared/types/user';
 
 export interface AppLayoutProps {
   setIsModalOpen: (isOpen: boolean) => void;

@@ -1,11 +1,10 @@
-import type { LearningActivity } from '@/shared/types/activity';
-import type { User } from '@/shared/types/user';
+import type { UserWithActivities } from '@/shared/types/user';
 import { API_ENDPOINTS, getMSWPath } from '../endpoint';
 import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 export const DashboardAPI = {
   // ダッシュボードデータ取得
-  getDashboard: async (): Promise<(User & { activities: LearningActivity[] }) | null> => {
+  getDashboard: async (): Promise<UserWithActivities | null> => {
     if (isGASEnvironment()) {
       const ret = await serverFunctions.getDashboard();
       if (ret.success) {
