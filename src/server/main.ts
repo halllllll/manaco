@@ -28,17 +28,14 @@ export const doGet = (): GoogleAppsScript.HTML.HtmlOutput => {
   console.log('validation check');
   const validateReuslt = validateAll();
   const user = getAccessUser();
-  if (!validateReuslt.success || !user) {
+  if (!validateReuslt.success) {
     return HtmlService.createHtmlOutputFromFile('panic.html');
   }
-  console.log('user:');
-  console.log(user);
-  if (user.role !== 'teacher') {
+  if (user?.role !== 'teacher') {
     return HtmlService.createHtmlOutputFromFile('index.html')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setTitle(getSpreadSheetName() ?? 'manaco');
   }
-  console.log('yes! teacher');
   return HtmlService.createHtmlOutputFromFile('teacher.html')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setTitle(getSpreadSheetName() ?? 'manaco');
@@ -65,8 +62,11 @@ const getSpreadSheetUrl = (): string => {
 const getAccessUser = (): User | null => {
   const accessedUser = Session.getActiveUser();
   const email = accessedUser.getEmail();
-  console.log(`getAccessUser: ${email}`);
-  return getUser(email);
+  const user = getUser(email);
+  if (!user) {
+    console.warn(`No user found for email: ${email}`);
+  }
+  return user;
 };
 /**
  * アプリの状態が正しく機能するかをSheetValidatorクラスで検証する
@@ -136,8 +136,6 @@ const getSettingsData = (): SettingsDTO => {
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
     const sheet = ss.getSheetByName(SETTINGS_SHEET_NAME)!;
     const data = getSettings(sheet);
-    console.info('getSeetingsData');
-    console.log(data);
     const settings = data.reduce((o, item) => {
       const { item: label, value } = item;
       switch (label) {
@@ -158,8 +156,6 @@ const getSettingsData = (): SettingsDTO => {
       }
       return o;
     }, {} as AppSettings);
-    console.info('getSeetingsData');
-    console.log(settings);
     return {
       data: settings,
       success: true,

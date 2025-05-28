@@ -14,10 +14,25 @@ import {
 } from './Const';
 import { columnToA1 } from './funcs';
 
+/**
+ * 登録されている全ユーザーを取得
+ * roleは安全側に倒してsturdentがデフォルト（たぶん意味ないけど）
+ * @returns
+ */
 const getUsers = (): User[] => {
   const sheet = ss.getSheetByName(USER_SHEET_NAME);
-  // biome-ignore lint/style/noNonNullAssertion: <explanation>
-  const values = sheet!.getDataRange().getValues();
+  const values =
+    Sheets.Spreadsheets?.Values?.get(
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      sheet!
+        .getParent()
+        .getId(),
+      `${USER_SHEET_NAME}!A:${
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        columnToA1(sheet!.getLastColumn())
+      }`,
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    ).values ?? sheet!.getDataRange().getValues();
   const body = values.slice(1);
   let users: User[] = [];
   for (const row of body) {
@@ -35,7 +50,6 @@ const getUsers = (): User[] => {
 
 const getActivityLogs = (): LearningActivity[] => {
   const sheet = ss.getSheetByName(LEARNING_ACTIVITY_SHEET_NAME);
-  // const values = sheet!.getDataRange().getValues();
   const values =
     Sheets.Spreadsheets?.Values?.get(
       // biome-ignore lint/style/noNonNullAssertion: <explanation>
@@ -74,8 +88,6 @@ export const getUser = (userId: string): User | null => {
 
 export const getUserActivities = (userId: string): LearningActivity[] => {
   const activities = getActivityLogs();
-  console.log('全部取得した');
-  console.log(activities);
   const userActivities = activities.filter((activity) => activity.userId.trim() === userId.trim());
   console.log('フィルタリングした');
   console.log(userActivities);
