@@ -304,7 +304,7 @@ export const FormModal: FC<FormModalProps> = ({
                       <div className="text-4xl font-bold text-secondary mt-1">{minutes}</div>
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-4">
                       <button
                         type="button"
                         className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
@@ -363,7 +363,7 @@ export const FormModal: FC<FormModalProps> = ({
                       <div className="text-4xl font-bold text-secondary mt-1">{seconds}</div>
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-4">
                       <button
                         type="button"
                         className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
@@ -441,7 +441,7 @@ export const FormModal: FC<FormModalProps> = ({
                 <div className="text-center inline-block">
                   <input
                     type="number"
-                    className={`${score ? 'font-bold text-5xl' : 'placeholder:text-base text-md'} text-primary focus:rounded-lg focus:border-b-base-100 border-base-300  w-48 border-b-primary border-b-2 text-center outline-none h-18 align-bottom`}
+                    className={`${score ? 'text-5xl' : 'placeholder:text-base text-md'} text-primary focus:rounded-lg focus:border-b-base-100 border-base-300  w-48 border-b-primary border-b-2 text-center outline-none h-18 align-bottom font-bold`}
                     value={score || ''}
                     placeholder="タップして入力"
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
