@@ -89,8 +89,6 @@ export const getUser = (userId: string): User | null => {
 export const getUserActivities = (userId: string): LearningActivity[] => {
   const activities = getActivityLogs();
   const userActivities = activities.filter((activity) => activity.userId.trim() === userId.trim());
-  console.log('フィルタリングした');
-  console.log(userActivities);
   return userActivities;
 };
 

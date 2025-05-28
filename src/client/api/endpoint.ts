@@ -4,6 +4,7 @@ export const API_ENDPOINTS = {
   DASHBOARD: 'dashboard',
   LEARNING_ACTIVITIES: 'learning-activities',
   HEALTH: 'health',
+  SETTINGS: 'settings',
 } as const;
 
 export type ApiEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS];

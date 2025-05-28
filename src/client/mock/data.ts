@@ -1,10 +1,11 @@
 import type { ValidationResult } from '@/server/validate';
 import type { LearningActivity } from '@/shared/types/activity';
+import type { AppSettings } from '@/shared/types/settings';
 import type { User } from '@shared/types/user';
 
-// export type MockUserId = "user1@sample.com" | "user2@sample.com" | "admin@sample.com" | "alien@sample.com"
-
 // 開発用ユーザープロファイル
+// ユーザー取得するときにsuccess=trueが前提のダミーデータ
+// DashboardDTOのdata部分のみ
 export const mockUserData: Record<string, User & { activities: LearningActivity[] }> = {
   'dev-user-1': {
     id: 'user1@sample.com',
@@ -334,5 +335,27 @@ export const mockHealthCheckData: Record<string, ValidationResult> = {
     isValid: true,
     messages: ['スプレッドシートが見つかりました。'],
     data: [[]],
+  },
+};
+
+// アプリ設定データ
+export const mockAppSettingsData: Record<string, AppSettings> = {
+  '1': {
+    scoreMax: 100,
+    scoreMin: 0,
+    showMood: true,
+    showMemo: true,
+  },
+  '2': {
+    scoreMax: 100,
+    scoreMin: 0,
+    showMood: false,
+    showMemo: false,
+  },
+  '3': {
+    scoreMax: 15,
+    scoreMin: 0,
+    showMood: true,
+    showMemo: false,
   },
 };
