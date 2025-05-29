@@ -5,10 +5,18 @@ import { getScoreStyle } from '@/shared/utils/score';
 import { type FC, useState } from 'react';
 import type { LearningLogSectionProps } from '../types/props';
 
+import { useSettings } from '@/client/api/settings/hook';
+
 /**
  * 学習記録セクションコンポーネント
  */
 export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) => {
+  // appsettings
+  const { data, error, _isLoading } = useSettings();
+  if (error) {
+    throw new Error(`Failed to fetch settings: ${error.name} - ${error.message}`);
+  }
+
   const [selectedActivity, setSelectedActivity] = useState<LearningActivity | null>(null);
 
   return (
@@ -43,9 +51,11 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
                 <th className="hidden md:table-cell sticky top-0 bg-base-100 text-end">
                   かかった時間
                 </th>
-                <th className="hidden md:table-cell sticky top-0 bg-base-100 text-center">
-                  きもち
-                </th>
+                {data?.showMood && (
+                  <th className="hidden md:table-cell sticky top-0 bg-base-100 text-center">
+                    きもち
+                  </th>
+                )}
                 <th className="sticky top-0 bg-base-100">{''}</th>
               </tr>
             </thead>
@@ -71,14 +81,16 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
                   <td className="text-end hidden md:table-cell">
                     {formatDuration(activity.duration)}
                   </td>
-                  <td className="text-center hidden md:table-cell">
-                    <span
-                      className="text-xl"
-                      title={MOOD_OPTIONS.find((m) => m.value === activity.mood)?.label}
-                    >
-                      {getMoodEmoji(activity.mood)}
-                    </span>
-                  </td>
+                  {data?.showMood && (
+                    <td className="text-center hidden md:table-cell">
+                      <span
+                        className="text-xl"
+                        title={MOOD_OPTIONS.find((m) => m.value === activity.mood)?.label}
+                      >
+                        {getMoodEmoji(activity.mood)}
+                      </span>
+                    </td>
+                  )}
                   <td>
                     <button
                       type="button"

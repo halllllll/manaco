@@ -55,9 +55,9 @@ export const handlers = [
   // 設定データ取得 API
   http.get(getMSWPath(API_ENDPOINTS.SETTINGS), async () => {
     console.info('--- mock api: settings ---');
-    await delay(800);
+    await delay(3000);
 
-    const data = mockAppSettingsData['1'];
+    const data = mockAppSettingsData['2'];
 
     if (!data) {
       return HttpResponse.json('データなし');

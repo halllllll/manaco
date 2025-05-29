@@ -1,11 +1,12 @@
-import useSWR, { preload } from 'swr';
+import useSWR from 'swr';
 import { API_ENDPOINTS } from '../endpoint';
 import { SheetApp } from './sheet';
 
 // Individual hooks for specific data pieces
 
-preload(API_ENDPOINTS.SHEET_NAME, SheetApp.getSpreadsheetName);
-preload(API_ENDPOINTS.SHEET_URL, SheetApp.getSheetUrl);
+// コンポーネントで使わないと意味なかった
+// preload(API_ENDPOINTS.SHEET_NAME, SheetApp.getSpreadsheetName);
+// preload(API_ENDPOINTS.SHEET_URL, SheetApp.getSheetUrl);
 
 export const useSheetName = () => {
   const { data, error, isLoading } = useSWR<string>(

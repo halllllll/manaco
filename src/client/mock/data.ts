@@ -1,7 +1,6 @@
 import type { ValidationResult } from '@/server/validate';
-import type { LearningActivity } from '@/shared/types/activity';
 import type { AppSettings } from '@/shared/types/settings';
-import type { User, UserWithActivities } from '@shared/types/user';
+import type { UserWithActivities } from '@shared/types/user';
 
 // 開発用ユーザープロファイル
 // ユーザー取得するときにsuccess=trueが前提のダミーデータ
@@ -357,5 +356,11 @@ export const mockAppSettingsData: Record<string, AppSettings> = {
     scoreMin: 0,
     showMood: true,
     showMemo: false,
+  },
+  '4': {
+    scoreMax: 50,
+    scoreMin: 10,
+    showMood: false,
+    showMemo: true,
   },
 };
