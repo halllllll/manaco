@@ -1,5 +1,6 @@
 import { Footer } from '@/client/components/parts/footer';
 import { Header } from '@/client/components/parts/header';
+
 import type { FC } from 'react';
 import { useUserState } from '../hooks/useUserState';
 import type { AppLayoutProps } from '../types/props';
@@ -23,7 +24,7 @@ export const AppLayout: FC<AppLayoutProps> = ({ setIsModalOpen, isModalOpen: _is
 
     if (error) {
       return (
-        <div className="alert alert-error">
+        <div className="alert alert-error/40">
           <div>
             <span>Error: {error.message}</span>
           </div>

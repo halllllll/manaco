@@ -1,5 +1,6 @@
 import { useSettings } from '@/client/api/settings/hook';
 import { MOOD_OPTIONS } from '@/shared/constants/mood';
+import { useForm } from '@tanstack/react-form';
 import type { CSSProperties, FC, FormEvent } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import type { ModalProps } from '../types/props';
@@ -11,14 +12,25 @@ interface FormModalProps extends ModalProps {
 
 export const FormModal: FC<FormModalProps> = ({
   isModalOpen,
-  handleSubmitPost,
+  handleSubmitPost: _a,
   setIsModalOpen,
 }) => {
   // settings
-  const { data, error, isLoading } = useSettings();
-  if (error) {
-    throw new Error(`Failed to fetch settings: ${error.name} - ${error.message}`);
+  const { data: settingsData, error: settingsError, isLoading: settingsIsLoading } = useSettings();
+  if (settingsError) {
+    throw new Error(`Failed to fetch settings: ${settingsError.name} - ${settingsError.message}`);
   }
+  // tanstack form
+  const form = useForm({
+    defaultValues: {
+      'target-date-btn': new Date().toISOString().split('T')[0],
+    },
+    onSubmit: async (values) => {
+      console.log('Form submitted with values:', values.value);
+      setIsModalOpen(false);
+      resetForm();
+    },
+  });
 
   // フォーム状態管理
   const [minutes, setMinutes] = useState(0);
@@ -42,14 +54,14 @@ export const FormModal: FC<FormModalProps> = ({
     resetForm();
   }, [setIsModalOpen, resetForm]);
 
-  // フォーム送信
-  const handleSubmit = useCallback(
-    (e: FormEvent) => {
-      handleSubmitPost(e);
-      resetForm();
-    },
-    [handleSubmitPost, resetForm],
-  );
+  // // フォーム送信
+  // const handleSubmit = useCallback(
+  //   (e: FormEvent) => {
+  //     handleSubmitPost(e);
+  //     resetForm();
+  //   },
+  //   [handleSubmitPost, resetForm],
+  // );
 
   return (
     <div>
@@ -58,9 +70,9 @@ export const FormModal: FC<FormModalProps> = ({
           <h3 className="font-bold text-2xl mb-6 text-center text-primary">
             今日の学習を記録しよう！
           </h3>
-          {isLoading ? (
+          {settingsIsLoading ? (
             <FormModalSkeleton />
-          ) : !data ? (
+          ) : !settingsData ? (
             <>
               <div className="text-center text-red-500 font-bold mb-4">
                 設定の取得に失敗しました。
@@ -68,129 +80,148 @@ export const FormModal: FC<FormModalProps> = ({
               </div>
             </>
           ) : (
-            <form onSubmit={handleSubmit}>
+            <form
+              onSubmit={(e: FormEvent) => {
+                console.log('Form submitted');
+                e.preventDefault();
+                e.stopPropagation();
+                form.handleSubmit();
+              }}
+            >
               {/* 日付選択 */}
               <div className="form-control w-full mb-4">
-                <label className="label" htmlFor="target-date-btn">
-                  <span className="label-text text-lg font-medium flex items-center gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <title>{'calendar'}</title>
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    どの日に勉強した？
-                  </span>
-                </label>
-                <div>
-                  <button
-                    type="button"
-                    popoverTarget="date-popover"
-                    className="input input-border text-xl"
-                    id="target-date-btn"
-                    // style="anchorName:--target-date" // anchorpositioning関係はエディタ上では現状のルール,環境およびツールチェインだとエラーになる
-                    style={{ anchorName: '--target-date' } as CSSProperties}
-                  >
-                    {today}
-                  </button>
-                  <div
-                    popover="auto"
-                    id="date-popover"
-                    className="dropdown bg-base-100 rounded-box shadow-lg max-w-xl w-full"
-                    // style="positionAnchor:--target-date" // anchorpositioning関係はエディタ上では現状のルール,環境およびツールチェインだとエラーになる
-                    style={{ positionAnchor: '--target-date' } as CSSProperties}
-                  >
-                    <div className="card bg-base-100 shadow-md border border-base-200 w-full max-w-xl">
-                      <div className="card-body">
-                        <h2 className="card-title text-xl flex items-center gap-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6 text-accent"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <title>{'calendar'}</title>
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
-                          </svg>
-                          カレンダー
-                        </h2>
-                        <calendar-date
-                          className="cally bg-base-100 shadow-none rounded-box w-full"
-                          isDateDisallowed={(date) => {
-                            const disabledDates = ['2025-05-20', '2025-05-24'];
-                            return disabledDates.includes(date.toISOString().split('T')[0]);
-                          }}
-                          onchange={(e) => {
-                            const value = (e.target as HTMLInputElement).value;
-                            console.log(`value: ${value}`);
-                            const targetDateButton = document.getElementById('target-date-btn');
-                            if (targetDateButton) {
-                              targetDateButton.innerText = value;
-                            }
-                            // close popover
-                            const popover = document.getElementById('date-popover');
-                            if (popover && 'hidePopover' in popover) {
-                              (popover as HTMLElement).hidePopover();
-                            }
-                          }}
-                        >
+                <form.Field
+                  name="target-date-btn"
+                  // biome-ignore lint/correctness/noChildrenProp: <explanation>
+                  children={(field) => {
+                    return (
+                      <div>
+                        <label className="label" htmlFor={field.name}>
+                          <span className="label-text text-lg font-medium flex items-center gap-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <title>{'calendar'}</title>
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                            どの日に勉強した？
+                          </span>
+                        </label>
+                        <div>
                           <button
-                            type={'button'}
-                            slot={'previous'}
-                            aria-label={'previous'}
-                            className="btn btn-ghost btn-sm"
+                            type="button"
+                            name={field.name}
+                            popoverTarget="date-popover"
+                            className="input input-border text-xl"
+                            id={field.name}
+                            // style="anchorName:--target-date" // anchorpositioning関係はエディタ上では現状のルール,環境およびツールチェインだとエラーになる
+                            style={{ anchorName: '--target-date' } as CSSProperties}
                           >
-                            <span className="flex items-center">
-                              <svg
-                                className="fill-current size-4"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                              >
-                                <title>前の月</title>
-                                <path d="M15.75 19.5 8.25 12l7.5-7.5" />
-                              </svg>
-                              <span className="ml-1">前の月</span>
-                            </span>
+                            {today}
                           </button>
-                          <button
-                            type={'button'}
-                            slot={'next'}
-                            aria-label={'next'}
-                            className="btn btn-ghost btn-sm"
+                          <div
+                            popover="auto"
+                            id="date-popover"
+                            className="dropdown bg-base-100 rounded-box shadow-lg max-w-xl w-full"
+                            // style="positionAnchor:--target-date" // anchorpositioning関係はエディタ上では現状のルール,環境およびツールチェインだとエラーになる
+                            style={{ positionAnchor: '--target-date' } as CSSProperties}
                           >
-                            <span className="flex items-center">
-                              <span className="mr-1">次の月</span>
-                              <svg
-                                className="fill-current size-4"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                              >
-                                <title>次の月</title>
-                                <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                              </svg>
-                            </span>
-                          </button>
-                          <calendar-month />
-                        </calendar-date>
+                            <div className="card bg-base-100 shadow-md border border-base-200 w-full max-w-xl">
+                              <div className="card-body">
+                                <h2 className="card-title text-xl flex items-center gap-2">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-6 w-6 text-accent"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <title>{'calendar'}</title>
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    />
+                                  </svg>
+                                  カレンダー
+                                </h2>
+                                <calendar-date
+                                  className="cally bg-base-100 shadow-none rounded-box w-full"
+                                  isDateDisallowed={(date) => {
+                                    const disabledDates = ['2025-05-20', '2025-05-24'];
+                                    return disabledDates.includes(date.toISOString().split('T')[0]);
+                                  }}
+                                  onchange={(e) => {
+                                    const value = (e.target as HTMLInputElement).value;
+                                    console.log(`value: ${value}`);
+                                    const targetDateButton =
+                                      document.getElementById('target-date-btn');
+                                    if (targetDateButton) {
+                                      targetDateButton.innerText = value;
+                                    }
+                                    // close popover
+                                    const popover = document.getElementById('date-popover');
+                                    if (popover && 'hidePopover' in popover) {
+                                      (popover as HTMLElement).hidePopover();
+                                    }
+                                  }}
+                                >
+                                  <button
+                                    type={'button'}
+                                    slot={'previous'}
+                                    aria-label={'previous'}
+                                    className="btn btn-ghost btn-sm"
+                                  >
+                                    <span className="flex items-center">
+                                      <svg
+                                        className="fill-current size-4"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <title>前の月</title>
+                                        <path d="M15.75 19.5 8.25 12l7.5-7.5" />
+                                      </svg>
+                                      <span className="ml-1">前の月</span>
+                                    </span>
+                                  </button>
+                                  <button
+                                    type={'button'}
+                                    slot={'next'}
+                                    aria-label={'next'}
+                                    className="btn btn-ghost btn-sm"
+                                  >
+                                    <span className="flex items-center">
+                                      <span className="mr-1">次の月</span>
+                                      <svg
+                                        className="fill-current size-4"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <title>次の月</title>
+                                        <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                      </svg>
+                                    </span>
+                                  </button>
+                                  <calendar-month />
+                                </calendar-date>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
+                    );
+                  }}
+                />
               </div>
 
               {/* 学習時間 */}
@@ -464,8 +495,8 @@ export const FormModal: FC<FormModalProps> = ({
                       placeholder="タップして入力"
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const scoreValue = Math.min(
-                          Math.max(Number.parseInt(e.target.value), data.scoreMin ?? 0),
-                          data.scoreMax ?? 100,
+                          Math.max(Number.parseInt(e.target.value), settingsData.scoreMin ?? 0),
+                          settingsData.scoreMax ?? 100,
                         );
 
                         // setScore(e.target.value ? Number.parseInt(e.target.value) : null);
@@ -479,7 +510,7 @@ export const FormModal: FC<FormModalProps> = ({
               </div>
 
               {/* 気分 (オプション) */}
-              {data.showMood && (
+              {settingsData.showMood && (
                 <div className="form-control w-full mb-6">
                   <label className="label" htmlFor="mood">
                     <span className="label-text text-lg font-medium flex items-center gap-2">
@@ -530,7 +561,7 @@ export const FormModal: FC<FormModalProps> = ({
               )}
 
               {/* コメント */}
-              {data.showMemo && (
+              {settingsData.showMemo && (
                 <div className="form-control w-full mb-6">
                   <label className="label" htmlFor="comment">
                     <span className="label-text text-lg font-medium flex items-center gap-2">
