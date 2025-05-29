@@ -80,7 +80,7 @@ export const LEARNING_ACTIVITY_SHEET_HEADERS: readonly string[] = [
   'メールアドレス',
   '学習日',
   '点数',
-  'かかった時間',
+  'かかった時間（秒）',
   'きもち',
   'メモ',
 ] as const;
