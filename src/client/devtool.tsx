@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 
 // 開発環境でユーザーを切り替えるためのコンポーネント
 export const DevTools = () => {
+  if (!import.meta.env.DEV) return null;
+
   const [currentUser, setCurrentUser] = useState(() => {
     return localStorage.getItem('dev-user-id') || 'dev-user-1';
   });
@@ -20,8 +22,6 @@ export const DevTools = () => {
     // MSWにユーザー変更を通知
     window.postMessage({ type: 'MSW_SET_USER', userId: currentUser }, '*');
   }, [currentUser]);
-
-  // if (!import.meta.env.DEV) return null;
 
   return (
     <div className="flex justify-end top-4 right-4 z-50 gap-2 bg-pink-400">
