@@ -3,6 +3,7 @@ import type {
   InitAppDTO,
   SettingsDTO,
   SpreadsheetValidateDTO,
+  UserDTO,
 } from '@/shared/types/dto';
 import type { AppSettings } from '@/shared/types/settings';
 import type { User } from '@/shared/types/user';
@@ -16,7 +17,9 @@ import {
   ss,
 } from './Const';
 import { customMenu1, initAppMenu, openDialog } from './Menu/Menu';
-import { getSettings, getUser, getUserActivities, init } from './query';
+
+import { getSettings, getUserActivities, getUserById, init } from './query';
+
 import {
   AppSettingSheetValidationTest,
   LearningLogSheetValidationTest,
@@ -62,12 +65,37 @@ const getSpreadSheetUrl = (): string => {
 const getAccessUser = (): User | null => {
   const accessedUser = Session.getActiveUser();
   const email = accessedUser.getEmail();
-  const user = getUser(email);
+  const user = getUserById(email);
   if (!user) {
     console.warn(`No user found for email: ${email}`);
   }
   return user;
 };
+
+// 外部から読んで使う用
+const getUser = (): UserDTO => {
+  try {
+    const user = getAccessUser();
+    if (!user) {
+      return {
+        success: false,
+        message: 'No user found',
+      };
+    }
+    return {
+      success: true,
+      data: user,
+    };
+  } catch (e) {
+    console.error(e);
+    const err = e as Error;
+    return {
+      success: false,
+      message: `Error: ${err.name}: ${err.message}`,
+    };
+  }
+};
+
 /**
  * アプリの状態が正しく機能するかをSheetValidatorクラスで検証する
  * 各シートの名前とそれに対応する（正しくアプリが動くことを前提とした、想定としている）ヘッダの検証
@@ -219,10 +247,12 @@ global._test_student_sheet = StudentSheetValidationTest;
 global._test_learning_log_sheet = LearningLogSheetValidationTest;
 global._test_app_setting_sheet = AppSettingSheetValidationTest;
 
+global._getUser = getUser;
+
 global.validateAll = validateAll;
 global.initApp = initApp;
 
 global.getSettingsData = getSettingsData;
 
 // Exposed to Frontend API
-export { getDashboard, getSpreadSheetName, getSpreadSheetUrl, initApp, validateAll };
+export { getDashboard, getSpreadSheetName, getSpreadSheetUrl, getUser, initApp, validateAll };

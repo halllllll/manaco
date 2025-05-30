@@ -12,7 +12,7 @@ import { useSettings } from '@/client/api/settings/hook';
  */
 export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) => {
   // appsettings
-  const { data, error, _isLoading } = useSettings();
+  const { data, error, isLoading } = useSettings();
   if (error) {
     throw new Error(`Failed to fetch settings: ${error.name} - ${error.message}`);
   }
