@@ -3,7 +3,7 @@ import type { UserWithActivities } from '@/shared/types/user';
 import type { AppSettings } from './settings';
 import type { User } from './user';
 
-type BaseDTO<T> =
+type BaseResponse<T> =
   | {
       success: false;
       message: string;
@@ -14,13 +14,13 @@ type BaseDTO<T> =
       data: T;
     };
 
-export type DashboardDTO = BaseDTO<UserWithActivities | null>;
+export type DashboardDTO = BaseResponse<UserWithActivities | null>;
 
-export type SettingsDTO = BaseDTO<AppSettings>;
+export type SettingsDTO = BaseResponse<AppSettings>;
 
-// export type SpreadsheetValidateDTO = BaseDTO<Omit<ValidationResult, keyof ValidationResult> | null>;
-export type SpreadsheetValidateDTO = BaseDTO<ValidationResult | null>;
+// export type SpreadsheetValidateDTO = BaseResponse<Omit<ValidationResult, keyof ValidationResult> | null>;
+export type SpreadsheetValidateDTO = BaseResponse<ValidationResult | null>;
 
-export type UserDTO = BaseDTO<User | null>;
+export type UserDTO = BaseResponse<User | null>;
 
-export type InitAppDTO = BaseDTO<null>;
+export type InitAppDTO = BaseResponse<null>;
