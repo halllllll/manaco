@@ -48,7 +48,7 @@ const getUsers = (): User[] => {
   return users;
 };
 
-const getActivityLogs = (): LearningActivity[] => {
+const getActivityLogs = (): (LearningActivity & { userId: string })[] => {
   const sheet = ss.getSheetByName(LEARNING_ACTIVITY_SHEET_NAME);
   const values =
     Sheets.Spreadsheets?.Values?.get(
@@ -64,9 +64,9 @@ const getActivityLogs = (): LearningActivity[] => {
     ).values ?? sheet!.getDataRange().getValues();
 
   const body = values.slice(1);
-  let activities: LearningActivity[] = [];
+  let activities: (LearningActivity & { userId: string })[] = [];
   for (const row of body) {
-    const activity: LearningActivity = {
+    const activity: LearningActivity & { userId: string } = {
       userId: row[1],
       activityDate: row[2],
       score: Number.parseInt(row[3]), // rechartで表示するために明示的に数値変換（フロント側ではうまく変換できなかった）
@@ -80,7 +80,7 @@ const getActivityLogs = (): LearningActivity[] => {
   return activities;
 };
 
-export const getUser = (userId: string): User | null => {
+export const getUserById = (userId: string): User | null => {
   const users = getUsers();
   const user = users.find((user) => user.id === userId);
   return user ?? null;

@@ -1,6 +1,9 @@
 import { delay, http, HttpResponse } from 'msw';
+
+import type { LearningActivity } from '@/shared/types/activity';
 import { API_ENDPOINTS, getMSWPath } from '../api/endpoint';
 import { currentMockUserId } from './browser';
+
 import { mockAppSettingsData, mockHealthCheckData, mockUserData } from './data';
 
 export const handlers = [
@@ -57,12 +60,34 @@ export const handlers = [
     console.info('--- mock api: settings ---');
     await delay(3000);
 
-    const data = mockAppSettingsData['2'];
+    const data = mockAppSettingsData['1'];
 
     if (!data) {
       return HttpResponse.json('データなし');
     }
     return HttpResponse.json(data);
+  }),
+
+  // post activity
+  http.post(getMSWPath(API_ENDPOINTS.SAVE_ACTIVITY), async ({ request: req }) => {
+    console.info('--- mock api: save activity ---');
+    await delay(1200);
+
+    // const newActivity = (await req.json()) as { id: string; name: string; date: string };
+    const newActivity: LearningActivity = (await req.json()) as LearningActivity;
+    console.log('新規学習活動:', newActivity);
+    return HttpResponse.json(newActivity);
+  }),
+
+  // user
+  http.get(getMSWPath(API_ENDPOINTS.USER), async () => {
+    console.info('--- mock api: user ---');
+    await delay(800);
+    const user = mockUserData[currentMockUserId];
+    if (!user) {
+      return HttpResponse.json('データなし');
+    }
+    return HttpResponse.json(user);
   }),
 
   // // // 学習活動一覧取得 API

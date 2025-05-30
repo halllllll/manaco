@@ -1,6 +1,21 @@
 import type { Mood } from './mood';
 
+// export interface StudyTimeInput {
+//   hour: number;
+//   minute: number;
+//   second: number;
+// }
+
 export interface LearningActivity {
+  activityDate: string;
+  // studyTime: StudyTimeInput;
+  duration: number; // 秒単位
+  score: number;
+  mood?: Mood;
+  memo?: string;
+}
+
+export interface LearningActivityRequest {
   // timestamp: string; TODO: Apps Script側でつける
   score: number;
   duration: number;
