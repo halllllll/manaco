@@ -4,15 +4,15 @@ import { type ToastType, useToast } from '../../context/ToastConterxt';
 const getAlertClass = (type: ToastType): string => {
   switch (type) {
     case 'info':
-      return 'alert-info';
+      return 'alert-info text-neutral-content';
     case 'success':
-      return 'alert-success';
+      return 'alert-success text-neutral-content';
     case 'error':
-      return 'alert-error';
+      return 'alert-error text-neutral-content';
     case 'warning':
-      return 'alert-warning';
+      return 'alert-warning text-neutral-content';
     default:
-      return 'alert-info';
+      return 'alert-info text-neutral-content';
   }
 };
 
@@ -24,12 +24,11 @@ export const Toast: FC = () => {
   }
 
   return (
-    // <div className="toast toast-top toast-center z-50">
-    <div className="toast toast-top toast-center fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
+    <div className="toast toast-top font-bold toast-center fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
       {toasts.map((toast) => (
         <div key={toast.id} className={`alert ${getAlertClass(toast.type)} z-50`}>
-          <div>
-            <span>{toast.message}</span>
+          <div className="text-lg flex-1">
+            <span>{`${toast.message}`}</span>
           </div>
           <div className="flex-none">
             <button
