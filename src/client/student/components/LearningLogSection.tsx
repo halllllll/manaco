@@ -1,7 +1,6 @@
 import { formatDate, formatDuration } from '@/shared/common/func';
 import { MOOD_OPTIONS, getMoodEmoji } from '@/shared/constants/mood';
 import type { LearningActivity } from '@/shared/types/activity';
-import { getScoreStyle } from '@/shared/utils/score';
 import { type FC, useState } from 'react';
 import type { LearningLogSectionProps } from '../types/props';
 
@@ -77,7 +76,7 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
                 >
                   <td>{formatDate(activity.activityDate)}</td>
                   <td className="text-end">
-                    <span className={`${getScoreStyle(activity.score)}`}>{activity.score}点</span>
+                    <span className={''}>{activity.score}点</span>
                   </td>
                   <td className="text-end hidden md:table-cell">
                     {formatDuration(activity.duration)}
@@ -152,7 +151,7 @@ const ActivityDetailModal: FC<{
               <div className="stats shadow">
                 <div className="stat">
                   <div className="stat-title">今回の点数</div>
-                  <div className={`stat-value ${getScoreStyle(selectedActivity.score)}`}>
+                  <div className={'stat-value text-success'}>
                     {selectedActivity.score}
                     <span className="text-xs">点</span>
                   </div>
