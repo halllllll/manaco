@@ -48,12 +48,36 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
             }}
           >
             <XAxis dataKey="activityDate" />
-            <YAxis yAxisId="bar" dataKey={'duration'} orientation={'right'} />
             <YAxis
+              label={{
+                value: 'かかった時間（秒）',
+                position: 'insideRight',
+                style: {
+                  writingMode: 'vertical-rl',
+                  textAnchor: 'middle',
+                  // fontSize: 16,
+                  fill: '#333',
+                },
+              }}
+              dataKey={'duration'}
+              orientation={'right'}
+              yAxisId="bar"
+            />
+            <YAxis
+              label={{
+                value: '点数',
+                position: 'insideLeft',
+                style: {
+                  writingMode: 'vertical-rl',
+                  textAnchor: 'middle',
+                  // fontSize: 16,
+                  fill: '#333',
+                },
+              }}
               dataKey={'score'}
               domain={['dataMin -10', 'datamax']}
-              yAxisId={'line'}
               orientation={'left'}
+              yAxisId={'line'}
             />
             <Bar
               yAxisId={'bar'}
@@ -80,7 +104,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
                   const { x, y, value } = props;
                   const numValue = value !== undefined ? Number(value) : 0;
                   const numY = y !== undefined ? Number(y) : 0;
-                  const yPos = numValue > 90 ? numY + 20 : numY - 10;
+                  const yPos = numValue > 90 ? numY - 20 : numY + 20;
                   return (
                     <text x={x} y={yPos} fontSize={16} textAnchor="middle" className="text-primary">
                       {value}
