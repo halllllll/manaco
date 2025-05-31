@@ -24,7 +24,8 @@ export const Toast: FC = () => {
   }
 
   return (
-    <div className="toast toast-top font-bold toast-center fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
+    // <div className="toast toast-center toast-middle font-bold fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
+    <div className="toast toast-center font-bold pointer-events-none left-1/2 z-[9999] fixed top-[10vh]">
       {toasts.map((toast) => (
         <div key={toast.id} className={`alert ${getAlertClass(toast.type)} z-50`}>
           <div className="text-lg flex-1">
