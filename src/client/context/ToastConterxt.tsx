@@ -33,11 +33,10 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const addToast = useCallback((type: ToastType, message: string, duration = 5000) => {
-    const id = Math.random().toString(36).substr(2, 9);
+    const id = Math.random().toString(36).slice(2, 9); // Generate a random ID for the toast
     const newToast: Toast = { id, type, message, duration };
 
     setToasts((prev) => [...prev, newToast]);
-    console.log('Adding toast:', newToast);
     if (duration > 0) {
       setTimeout(() => {
         removeToast(id);
