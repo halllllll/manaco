@@ -16,6 +16,8 @@ import type { GraphProps } from '../types/props';
  * 学習記録グラフコンポーネント
  */
 export const Graph: FC<GraphProps> = ({ activities }) => {
+  const maxScore = Math.max(...activities.map((a) => a.score));
+
   return (
     <div className="card bg-base-100 w-full shadow-md border border-base-200">
       <div className="card-body">
@@ -75,7 +77,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
                 },
               }}
               dataKey={'score'}
-              domain={['dataMin -10', 'datamax']}
+              domain={['dataMin -10', 'dataMax']}
               orientation={'left'}
               yAxisId={'line'}
             />
@@ -104,7 +106,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
                   const { x, y, value } = props;
                   const numValue = value !== undefined ? Number(value) : 0;
                   const numY = y !== undefined ? Number(y) : 0;
-                  const yPos = numValue > 90 ? numY - 20 : numY + 20;
+                  const yPos = numValue >= maxScore - 10 ? numY + 20 : numY - 20;
                   return (
                     <text x={x} y={yPos} fontSize={16} textAnchor="middle" className="text-primary">
                       {value}
