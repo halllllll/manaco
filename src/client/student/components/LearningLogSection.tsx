@@ -16,6 +16,7 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
   if (error) {
     throw new Error(`Failed to fetch settings: ${error.name} - ${error.message}`);
   }
+  const orderedActivities = activities.sort((a, b) => b.activityDate.localeCompare(a.activityDate));
 
   const [selectedActivity, setSelectedActivity] = useState<LearningActivity | null>(null);
 
@@ -60,7 +61,7 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
               </tr>
             </thead>
             <tbody>
-              {activities.map((activity) => (
+              {orderedActivities.map((activity) => (
                 <tr
                   key={activity.activityDate}
                   className="hover cursor-pointer"
