@@ -15,7 +15,9 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
   if (error) {
     throw new Error(`Failed to fetch settings: ${error.name} - ${error.message}`);
   }
-  const orderedActivities = activities.sort((a, b) => b.activityDate.localeCompare(a.activityDate));
+  const orderedActivities = activities.toSorted((a, b) =>
+    b.activityDate.localeCompare(a.activityDate),
+  );
 
   const [selectedActivity, setSelectedActivity] = useState<LearningActivity | null>(null);
 

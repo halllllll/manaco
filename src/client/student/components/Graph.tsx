@@ -17,6 +17,9 @@ import type { GraphProps } from '../types/props';
  */
 export const Graph: FC<GraphProps> = ({ activities }) => {
   const maxScore = Math.max(...activities.map((a) => a.score));
+  const orderedActivities = activities.toSorted((a, b) =>
+    a.activityDate.localeCompare(b.activityDate),
+  );
 
   return (
     <div className="card bg-base-100 w-full shadow-md border border-base-200">
@@ -41,7 +44,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
         </h2>
         <ResponsiveContainer width={'95%'} height={300}>
           <ComposedChart
-            data={activities}
+            data={orderedActivities}
             margin={{
               top: 5,
               right: 5,
