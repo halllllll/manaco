@@ -663,11 +663,14 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
                             // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
                             <div
                               key={option.value}
-                              onClick={() => field.handleChange(option.value)}
+                              onClick={() =>
+                                field.state.value === option.value
+                                  ? field.handleChange('')
+                                  : field.handleChange(option.value)
+                              }
                               className={`relative card ${option.color} ${field.state.value === option.value ? 'ring-4 ring-primary ring-offset-2 scale-105' : ''} shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer transform hover:scale-102 active:scale-95`}
                             >
                               <div className="flex card-body items-center text-center p-2">
-                                {/* <div className="text-4xl mb-2">{getMoodEmoji(option.value)}</div> */}
                                 <div className="text-4xl mb-2">{option.emoji}</div>
                                 <div className="text-xl font-bold">{option.label}</div>
 
