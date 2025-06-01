@@ -2,15 +2,16 @@ import type { Mood } from '../types/mood';
 
 export interface MoodOption {
   value: Mood;
+  icon?: string;
   label: string;
   color: string;
 }
 
 export const MOOD_OPTIONS: MoodOption[] = [
-  { value: 'happy', label: '😄 たのしかった！', color: 'bg-success/20' },
-  { value: 'normal', label: '😊 ふつう', color: 'bg-info/20' },
-  { value: 'tired', label: '😓 つかれた', color: 'bg-warning/20' },
-  { value: 'hard', label: '🤔 むずかしかった', color: 'bg-error/20' },
+  { value: 'happy', icon: '😄', label: 'たのしかった！', color: 'bg-success/20' },
+  { value: 'normal', icon: '😊', label: 'ふつう', color: 'bg-info/20' },
+  { value: 'tired', icon: '😓', label: 'つかれた', color: 'bg-warning/20' },
+  { value: 'hard', icon: '🤔', label: 'むずかしかった', color: 'bg-error/20' },
 ] as const;
 
 /**

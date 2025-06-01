@@ -1,5 +1,5 @@
 import { formatDate, formatDuration } from '@/shared/common/func';
-import { MOOD_OPTIONS, getMoodEmoji } from '@/shared/constants/mood';
+import { MOOD_OPTIONS, getMoodEmoji, getMoodLabel } from '@/shared/constants/mood';
 import type { LearningActivity } from '@/shared/types/activity';
 import { type FC, useState } from 'react';
 import type { LearningLogSectionProps } from '../types/props';
@@ -311,7 +311,8 @@ const ActivityDetailModal: FC<{
                   このときの気持ち
                 </div>
                 <div className="flex items-center gap-3 bg-white/50 p-3 rounded-lg">
-                  <span className="text-4xl">{getMoodEmoji(selectedActivity.mood)}</span>
+                  <span className="text-2xl">{`${getMoodEmoji(selectedActivity.mood)}`}</span>
+                  <span className="text-lg">{`${getMoodLabel(selectedActivity.mood)}`}</span>
                   <div>
                     <span className="text-lg font-medium">
                       {
@@ -398,21 +399,3 @@ const ActivityDetailModal: FC<{
     </dialog>
   );
 };
-
-// /**
-//  * 気分に応じたメッセージを取得
-//  */
-// const getMoodMessage = (mood: string): string => {
-//   switch (mood) {
-//     case 'happy':
-//       return '楽しく勉強できると、頭にも入りやすいよ！';
-//     case 'normal':
-//       return '落ち着いて勉強できると、理解が深まるよ！';
-//     case 'tired':
-//       return '疲れたときは休憩も大切だよ！';
-//     case 'frustrated':
-//       return 'むずかしいときは先生や友だちに聞いてみよう！';
-//     default:
-//       return '自分の気持ちを知ることも大切だね！';
-//   }
-// };
