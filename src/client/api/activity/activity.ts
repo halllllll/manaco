@@ -1,9 +1,10 @@
 import type { LearningActivityRequest } from '@/shared/types/activity';
+import type { UserActivityDTO } from '@/shared/types/dto';
 import { API_ENDPOINTS, getMSWPath } from '../endpoint';
 import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 export const ActivityAPI = {
-  postActivity: async (data: LearningActivityRequest) => {
+  postActivity: async (data: LearningActivityRequest): Promise<UserActivityDTO> => {
     if (isGASEnvironment()) {
       const ret = await serverFunctions.setActivity(data);
       return ret;

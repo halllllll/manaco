@@ -66,20 +66,23 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
         };
         const res = await postActivity(data);
         console.info(`TODO: resultの結果で成否判定 ${res}`);
-        updateActivities({
-          activityDate: values.value['target-date-btn'],
-          duration:
-            values.value.study_time.hour * 3600 +
-            values.value.study_time.minutes * 60 +
-            values.value.study_time.seconds,
-          memo: values.value.memo,
-          mood: values.value.mood as Mood,
-          score: values.value.score,
-        });
-        // ]);
-        addToast('success', '保存しました！学習をふりかえろう！', 3000);
-        setIsModalOpen(false);
-        form.reset();
+        if (!res.success) {
+          addToast('error', `学習記録の保存に失敗しました: ${res.message}`, 10000);
+        } else {
+          updateActivities({
+            activityDate: values.value['target-date-btn'],
+            duration:
+              values.value.study_time.hour * 3600 +
+              values.value.study_time.minutes * 60 +
+              values.value.study_time.seconds,
+            memo: values.value.memo,
+            mood: values.value.mood as Mood,
+            score: values.value.score,
+          });
+          addToast('success', '保存しました！学習をふりかえろう！');
+          setIsModalOpen(false);
+          form.reset();
+        }
       } catch (e) {
         const err = e as Error;
         addToast('error', `学習記録の保存に失敗しました: ${err.name} - ${err.message}`);

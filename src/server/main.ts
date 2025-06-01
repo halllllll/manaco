@@ -3,6 +3,7 @@ import type {
   InitAppDTO,
   SettingsDTO,
   SpreadsheetValidateDTO,
+  UserActivityDTO,
   UserDTO,
 } from '@/shared/types/dto';
 import type { AppSettings } from '@/shared/types/settings';
@@ -199,15 +200,22 @@ const getSettingsData = (): SettingsDTO => {
   }
 };
 
-// とりあえずstringを返す
-// TODO: ちゃんとしたレスポンスを作る。成功か否かだけでいいかも
-const setActivity = (data: LearningActivityRequest): string => {
-  console.info('setActivity called with:', data);
-  console.log(data);
+const setActivity = (data: LearningActivityRequest): UserActivityDTO => {
+  console.info(`setActivity called with: ${JSON.stringify(data)}`);
 
   const ret = saveActivity(data);
+  if (!ret.ok) {
+    console.error(`Failed to save activity: ${ret.message}`);
+    return {
+      success: false,
+      message: `Error: ${ret.message}`,
+    };
+  }
 
-  return ret;
+  return {
+    success: true,
+    data: null,
+  };
 };
 
 const getDashboard = (): DashboardDTO => {
@@ -255,7 +263,9 @@ global.setActivity = setActivity; // 学習活動の登録
 global.getSpreadSheetName = getSpreadSheetName; // 同上
 global.getSpreadSheetUrl = getSpreadSheetUrl;
 
-global.getDashboard = getDashboard; // TODO: あとで実装する
+global.getDashboard = getDashboard;
+
+global.setActivity = setActivity;
 
 global._test_student_sheet = StudentSheetValidationTest;
 global._test_learning_log_sheet = LearningLogSheetValidationTest;
@@ -269,4 +279,12 @@ global.initApp = initApp;
 global.getSettingsData = getSettingsData;
 
 // Exposed to Frontend API
-export { getDashboard, getSpreadSheetName, getSpreadSheetUrl, getUser, initApp, validateAll };
+export {
+  getDashboard,
+  getSpreadSheetName,
+  getSpreadSheetUrl,
+  getUser,
+  initApp,
+  setActivity,
+  validateAll,
+};

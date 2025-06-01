@@ -1,9 +1,9 @@
 import { delay, http, HttpResponse } from 'msw';
 
-import type { LearningActivity } from '@/shared/types/activity';
 import { API_ENDPOINTS, getMSWPath } from '../api/endpoint';
 import { currentMockUserId } from './browser';
 
+import type { UserActivityDTO } from '@/shared/types/dto';
 import { mockAppSettingsData, mockHealthCheckData, mockUserData } from './data';
 
 export const handlers = [
@@ -73,10 +73,18 @@ export const handlers = [
     console.info('--- mock api: save activity ---');
     await delay(1200);
 
-    // const newActivity = (await req.json()) as { id: string; name: string; date: string };
-    const newActivity: LearningActivity = (await req.json()) as LearningActivity;
-
-    return HttpResponse.json(newActivity);
+    // const newActivity: LearningActivity = (await req.json()) as LearningActivity; リクエストボディをそのまま返す
+    if (Math.random() < 0.9) {
+      console.info('Mock: Activity saved successfully');
+      const result: UserActivityDTO = { success: true, data: null };
+      return HttpResponse.json(result, { status: 201 });
+    }
+    console.info('Mock: Failed to save activity');
+    const result: UserActivityDTO = {
+      success: false,
+      message: 'Mock error: Failed to save activity',
+    };
+    return HttpResponse.json(result, { status: 500 });
   }),
 
   // user

@@ -94,11 +94,38 @@ export const getUserActivities = (userId: string): LearningActivity[] => {
 /**
  * save activity to the learning activity sheet
  */
-export const saveActivity = (activity: LearningActivityRequest): string => {
-  // とりあえず受け取れたかだけの確認、反映はあとでやる
-  console.info('saveActivity called with:', activity);
+export const saveActivity = (
+  activity: LearningActivityRequest,
+): { ok: boolean; message: string } => {
+  // spreadsheetを排他制御するために、ロックを取得
+  const lock = LockService.getScriptLock();
 
-  return 'yes!';
+  // ロックを取得するまで待機
+  lock.waitLock(30000); // 30秒待機
+  // ロックを取得できたら、ロックを解放するまで他のスクリプトは実行できない
+  try {
+    const sheet = ss.getSheetByName(LEARNING_ACTIVITY_SHEET_NAME);
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    sheet!.appendRow([
+      Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm:ss'),
+      activity.userId,
+      activity.activityDate,
+      activity.score,
+      activity.duration,
+      activity.mood,
+      activity.memo,
+    ]);
+  } catch (e) {
+    const err = e as Error;
+    console.error('Error while saving activity:', err);
+
+    return { ok: false, message: `${err.name}: ${err.message}` };
+  } finally {
+    // ロックを解放
+    lock.releaseLock();
+  }
+
+  return { ok: true, message: 'Activity saved successfully' };
 };
 
 /**

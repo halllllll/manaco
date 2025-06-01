@@ -24,3 +24,6 @@ export type SpreadsheetValidateDTO = BaseResponse<ValidationResult | null>;
 export type UserDTO = BaseResponse<User | null>;
 
 export type InitAppDTO = BaseResponse<null>;
+
+// 成功可否だけわかればいいのでデータを含まない
+export type UserActivityDTO = BaseResponse<null>;
