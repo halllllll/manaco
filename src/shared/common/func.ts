@@ -12,22 +12,6 @@ export const formatDate = (dateStr: string) => {
 export const formatDuration = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-  if (minutes === 0) return `${seconds}秒`;
-  return `${minutes}分${remainingSeconds > 0 ? ` ${remainingSeconds}秒` : ''}`;
+  if (minutes === 0) return `${seconds} 秒`;
+  return `${minutes} 分 ${remainingSeconds > 0 ? ` ${remainingSeconds} 秒` : ''}`;
 };
-
-// export const transformFormDataToRequest = (
-//   formData: LearningActivityFormData,
-// ): Omit<LearningActivityRequest, 'userId'> => {
-//   // idはapiに投げるときにつけることにする
-//   const totalSeconds =
-//     formData.studyTime.hour * 3600 + formData.studyTime.minute * 60 + formData.studyTime.second;
-
-//   return {
-//     activityDate: formData.targetDate,
-//     duration: totalSeconds,
-//     score: formData.score,
-//     mood: formData.mood || undefined,
-//     memo: formData.memo || undefined,
-//   };
-// };

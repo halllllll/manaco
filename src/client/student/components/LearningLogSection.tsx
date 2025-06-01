@@ -282,7 +282,7 @@ const ActivityDetailModal: FC<{
                     </svg>
                     かかった時間
                   </div>
-                  <div className="stat-value text-info text-lg">
+                  <div className="stat-value text-info text-3xl">
                     {formatDuration(selectedActivity.duration)}
                   </div>
                 </div>
