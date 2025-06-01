@@ -18,7 +18,8 @@ import {
 } from './Const';
 import { customMenu1, initAppMenu, openDialog } from './Menu/Menu';
 
-import { getSettings, getUserActivities, getUserById, init } from './query';
+import type { LearningActivityRequest } from '@/shared/types/activity';
+import { getSettings, getUserActivities, getUserById, init, saveActivity } from './query';
 
 import {
   AppSettingSheetValidationTest,
@@ -198,6 +199,17 @@ const getSettingsData = (): SettingsDTO => {
   }
 };
 
+// とりあえずstringを返す
+// TODO: ちゃんとしたレスポンスを作る。成功か否かだけでいいかも
+const setActivity = (data: LearningActivityRequest): string => {
+  console.info('setActivity called with:', data);
+  console.log(data);
+
+  const ret = saveActivity(data);
+
+  return ret;
+};
+
 const getDashboard = (): DashboardDTO => {
   try {
     const user = getAccessUser();
@@ -238,6 +250,8 @@ global.openDialog_ = openDialog;
 global.customMenu1_ = customMenu1;
 global.initAppMenu_ = initAppMenu;
 
+global.setActivity = setActivity; // 学習活動の登録
+
 global.getSpreadSheetName = getSpreadSheetName; // 同上
 global.getSpreadSheetUrl = getSpreadSheetUrl;
 
@@ -247,7 +261,7 @@ global._test_student_sheet = StudentSheetValidationTest;
 global._test_learning_log_sheet = LearningLogSheetValidationTest;
 global._test_app_setting_sheet = AppSettingSheetValidationTest;
 
-global._getUser = getUser;
+global.getUser = getUser;
 
 global.validateAll = validateAll;
 global.initApp = initApp;

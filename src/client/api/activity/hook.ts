@@ -7,11 +7,11 @@ import { ActivityAPI } from './activity';
 export const useActivityPost = () => {
   const { trigger, data, error, isMutating } = useSWRMutation(
     API_ENDPOINTS.SAVE_ACTIVITY,
-    (_key: string, { arg: postData }: { arg: LearningActivity & { userId: string } }) => {
+    async (_key: string, { arg: postData }: { arg: LearningActivity & { userId: string } }) => {
       const data: LearningActivityRequest = {
         ...postData,
       };
-      ActivityAPI.postActivity(data);
+      return await ActivityAPI.postActivity(data);
     },
     {
       onError: (err) => {

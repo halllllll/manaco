@@ -1,4 +1,4 @@
-import type { LearningActivity } from '@/shared/types/activity';
+import type { LearningActivity, LearningActivityRequest } from '@/shared/types/activity';
 import { USER_ROLES, type User } from '@/shared/types/user';
 import {
   DefaultSettingsItemValue,
@@ -17,7 +17,6 @@ import { columnToA1 } from './funcs';
 /**
  * 登録されている全ユーザーを取得
  * roleは安全側に倒してsturdentがデフォルト（たぶん意味ないけど）
- * @returns
  */
 const getUsers = (): User[] => {
   const sheet = ss.getSheetByName(USER_SHEET_NAME);
@@ -90,6 +89,16 @@ export const getUserActivities = (userId: string): LearningActivity[] => {
   const activities = getActivityLogs();
   const userActivities = activities.filter((activity) => activity.userId.trim() === userId.trim());
   return userActivities;
+};
+
+/**
+ * save activity to the learning activity sheet
+ */
+export const saveActivity = (activity: LearningActivityRequest): string => {
+  // とりあえず受け取れたかだけの確認、反映はあとでやる
+  console.info('saveActivity called with:', activity);
+
+  return 'yes!';
 };
 
 /**

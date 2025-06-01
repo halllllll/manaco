@@ -2,16 +2,16 @@ import type { Mood } from '../types/mood';
 
 export interface MoodOption {
   value: Mood;
-  icon?: string;
+  emoji: string;
   label: string;
   color: string;
 }
 
 export const MOOD_OPTIONS: MoodOption[] = [
-  { value: 'happy', icon: '😄', label: 'たのしかった！', color: 'bg-success/20' },
-  { value: 'normal', icon: '😊', label: 'ふつう', color: 'bg-info/20' },
-  { value: 'tired', icon: '😓', label: 'つかれた', color: 'bg-warning/20' },
-  { value: 'hard', icon: '🤔', label: 'むずかしかった', color: 'bg-error/20' },
+  { value: 'happy', emoji: '😄', label: 'たのしかった！', color: 'bg-success/20' },
+  { value: 'normal', emoji: '😊', label: 'ふつう', color: 'bg-info/20' },
+  { value: 'tired', emoji: '😓', label: 'つかれた', color: 'bg-warning/20' },
+  { value: 'hard', emoji: '🤔', label: 'むずかしかった', color: 'bg-error/20' },
 ] as const;
 
 /**
@@ -20,14 +20,14 @@ export const MOOD_OPTIONS: MoodOption[] = [
 export const getMoodEmoji = (mood?: string): string => {
   if (!mood) return '';
   const moodOption = MOOD_OPTIONS.find((option) => option.value === mood);
-  return moodOption ? moodOption.label.split(' ')[0] : '';
+  return moodOption ? moodOption.emoji : '';
 };
 
 /**
- * ムードのラベルを取得（絵文字を除く）
+ * ムードのラベルを取得
  */
 export const getMoodLabel = (mood?: string): string => {
   if (!mood) return '';
   const moodOption = MOOD_OPTIONS.find((option) => option.value === mood);
-  return moodOption ? moodOption.label.split(' ')[1] : '';
+  return moodOption ? moodOption.label : '';
 };

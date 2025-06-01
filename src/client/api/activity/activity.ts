@@ -1,14 +1,16 @@
 import type { LearningActivityRequest } from '@/shared/types/activity';
 import { API_ENDPOINTS, getMSWPath } from '../endpoint';
+import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 export const ActivityAPI = {
   postActivity: async (data: LearningActivityRequest) => {
-    console.log('aho~~~~~~~');
-    console.log(data);
+    if (isGASEnvironment()) {
+      const ret = await serverFunctions.setActivity(data);
+      return ret;
+    }
     if (data === undefined) {
       throw new Error('Data is undefined');
     }
-    console.log(`mock api: ${getMSWPath(API_ENDPOINTS.SAVE_ACTIVITY)}`);
     const response = await fetch(getMSWPath(API_ENDPOINTS.SAVE_ACTIVITY), {
       method: 'POST',
       headers: {
@@ -16,6 +18,7 @@ export const ActivityAPI = {
       },
       body: JSON.stringify(data),
     });
-    return response.json();
+    const res = response.clone();
+    return res.json();
   },
 };

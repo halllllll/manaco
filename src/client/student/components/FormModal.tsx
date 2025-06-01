@@ -10,25 +10,24 @@ import type { ModalProps } from '../types/props';
 
 import { FormModalSkeleton } from './FormModalSkeleton';
 
+import { useDashboard } from '@/client/api/dashboard/hooks';
+import { useGetUser } from '@/client/api/user/hook';
 import type { Mood } from '@/shared/types/mood';
 
-interface FormModalProps extends ModalProps {
-  handleSubmitPost: (e: FormEvent) => void;
-}
-
-export const FormModal: FC<FormModalProps> = ({
-  isModalOpen,
-  handleSubmitPost: _a,
-  setIsModalOpen,
-}) => {
+export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
   // settings
   const { data: settingsData, error: settingsError, isLoading: settingsIsLoading } = useSettings();
   if (settingsError) {
     throw new Error(`Failed to fetch settings: ${settingsError.name} - ${settingsError.message}`);
   }
+  // dashboard (for update activity data)
+  const { data: dashboardData, updateActivities } = useDashboard();
 
-  // api
-  const { postActivity, data, error, isPosting } = useActivityPost();
+  // post api
+  const { postActivity, error: postActivityError, isPosting } = useActivityPost();
+
+  // user
+  const { data: userData } = useGetUser();
 
   // toast
   const { addToast } = useToast();
@@ -50,18 +49,34 @@ export const FormModal: FC<FormModalProps> = ({
       // TODO: validation and transformation
       console.log('Form submitted with values:', values.value);
       try {
+        if (!userData) {
+          throw new Error('User data is not available');
+        }
         const data: LearningActivity & { userId: string } = {
-          ...values.value,
-          mood: values.value.mood as Mood,
+          // ...values.value,
+          activityDate: values.value['target-date-btn'],
           duration:
             values.value.study_time.hour * 3600 +
             values.value.study_time.minutes * 60 +
             values.value.study_time.seconds,
-          activityDate: values.value['target-date-btn'],
-          userId: '1', // 仮のユーザーID, 実際は認証情報から取得する
+          memo: values.value.memo,
+          mood: values.value.mood as Mood,
+          score: values.value.score,
+          userId: userData.id,
         };
-        const a = await postActivity(data); // userIdは仮で1を指定
-        console.log('Activity posted:', a);
+        const res = await postActivity(data);
+        console.info(`TODO: resultの結果で成否判定 ${res}`);
+        updateActivities({
+          activityDate: values.value['target-date-btn'],
+          duration:
+            values.value.study_time.hour * 3600 +
+            values.value.study_time.minutes * 60 +
+            values.value.study_time.seconds,
+          memo: values.value.memo,
+          mood: values.value.mood as Mood,
+          score: values.value.score,
+        });
+        // ]);
         addToast('success', '保存しました！学習をふりかえろう！', 3000);
         setIsModalOpen(false);
         form.reset();
@@ -98,13 +113,21 @@ export const FormModal: FC<FormModalProps> = ({
             </>
           ) : (
             <form
+              className="relative"
               onSubmit={(e: FormEvent) => {
-                console.log('Form submitted');
                 e.preventDefault();
-                e.stopPropagation();
+                // e.stopPropagation();
                 form.handleSubmit();
               }}
             >
+              {isPosting && (
+                <div className="absolute inset-0 backdrop-blur-[4px] z-50 flex items-center justify-center">
+                  <div className="bg-base-100 shadow-xl rounded-xl p-6 flex flex-col items-center gap-3">
+                    <div className="loading loading-spinner loading-xl text-primary" />
+                    <p className="text-4xl font-medium text-base-content">送信中...</p>
+                  </div>
+                </div>
+              )}
               {/* 日付選択 */}
               <div className="form-control w-full mb-4">
                 <form.Field
@@ -173,14 +196,21 @@ export const FormModal: FC<FormModalProps> = ({
                                   カレンダー
                                 </h2>
                                 <calendar-date
-                                  className="cally bg-base-100 shadow-none rounded-box w-full"
+                                  className="cally bg-base-100 p-2 shadow-none rounded-box w-full font-bold"
+                                  value={field.state.value}
+                                  formatWeekday="short"
+                                  showOutsideDays={true}
                                   isDateDisallowed={(date) => {
-                                    const disabledDates = ['2025-05-20', '2025-05-24'];
+                                    const disabledDates =
+                                      dashboardData?.activities.map(
+                                        (activity) => activity.activityDate,
+                                      ) || [];
                                     return disabledDates.includes(date.toISOString().split('T')[0]);
                                   }}
                                   onchange={(e) => {
                                     const value = (e.target as HTMLInputElement).value;
                                     console.log(`value: ${value}`);
+                                    field.handleChange(value);
                                     const targetDateButton =
                                       document.getElementById('target-date-btn');
                                     if (targetDateButton) {
@@ -197,7 +227,7 @@ export const FormModal: FC<FormModalProps> = ({
                                     type={'button'}
                                     slot={'previous'}
                                     aria-label={'previous'}
-                                    className="btn btn-ghost btn-sm"
+                                    className="btn btn-ghost btn-md btn-outline"
                                   >
                                     <span className="flex items-center">
                                       <svg
@@ -215,7 +245,7 @@ export const FormModal: FC<FormModalProps> = ({
                                     type={'button'}
                                     slot={'next'}
                                     aria-label={'next'}
-                                    className="btn btn-ghost btn-sm"
+                                    className="btn btn-ghost btn-md btn-outline"
                                   >
                                     <span className="flex items-center">
                                       <span className="mr-1">次の月</span>
@@ -240,7 +270,6 @@ export const FormModal: FC<FormModalProps> = ({
                   }}
                 />
               </div>
-
               {/* 学習時間 */}
               {/* <div className="form-control w-full mb-4">
               <label className="label" htmlFor="study_time">
@@ -580,7 +609,6 @@ export const FormModal: FC<FormModalProps> = ({
                   );
                 }}
               />
-
               {/* 気分 (オプション) */}
               {settingsData.showMood && (
                 <form.Field
@@ -611,27 +639,68 @@ export const FormModal: FC<FormModalProps> = ({
                         </label>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                           {MOOD_OPTIONS.map((option: MoodOption) => (
-                            <button
-                              type="button"
+                            // <button
+                            //   type="button"
+                            //   key={option.value}
+                            //   className={`card ${option.color} shadow-sm hover:shadow-md transition-all cursor-pointer`}
+                            // >
+                            //   <div className="card-body items-center text-center p-3">
+                            //     <input
+                            //       type="radio"
+                            //       name={field.name}
+                            //       value={option.value}
+
+                            //       className="radio radio-primary hidden"
+                            //       id={`mood_${option.value}`}
+                            //     />
+                            //     <label
+                            //       htmlFor={`mood_${option.value}`}
+                            //       className="cursor-pointer text-xl font-bold"
+                            //     >
+                            //       {option.label}
+                            //     </label>
+                            //   </div>
+                            // </button>
+                            // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+                            <div
                               key={option.value}
-                              className={`card ${option.color} shadow-sm hover:shadow-md transition-all cursor-pointer`}
+                              onClick={() => field.handleChange(option.value)}
+                              className={`relative card ${option.color} ${field.state.value === option.value ? 'ring-4 ring-primary ring-offset-2 scale-105' : ''} shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer transform hover:scale-102 active:scale-95`}
                             >
-                              <div className="card-body items-center text-center p-3">
+                              <div className="flex card-body items-center text-center p-2">
+                                {/* <div className="text-4xl mb-2">{getMoodEmoji(option.value)}</div> */}
+                                <div className="text-4xl mb-2">{option.emoji}</div>
+                                <div className="text-xl font-bold">{option.label}</div>
+
+                                {field.state.value === option.value && (
+                                  <div className="absolute -top-2 -right-2 bg-primary text-primary-content rounded-full p-1 shadow-md ">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-4 w-4"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <title>{'check'}</title>
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                  </div>
+                                )}
+
                                 <input
                                   type="radio"
                                   name={field.name}
                                   value={option.value}
-                                  className="radio radio-primary hidden"
+                                  checked={field.state.value === option.value}
+                                  onChange={() => field.handleChange(option.value)}
+                                  className="hidden"
                                   id={`mood_${option.value}`}
                                 />
-                                <label
-                                  htmlFor={`mood_${option.value}`}
-                                  className="cursor-pointer text-xl font-bold"
-                                >
-                                  {option.label}
-                                </label>
                               </div>
-                            </button>
+                            </div>
                           ))}
                         </div>
                       </div>
@@ -639,7 +708,6 @@ export const FormModal: FC<FormModalProps> = ({
                   }}
                 />
               )}
-
               {/* コメント */}
               {settingsData.showMemo && (
                 <form.Field
@@ -696,27 +764,44 @@ export const FormModal: FC<FormModalProps> = ({
               )}
               {/* 送信ボタン */}
               <div className="modal-action flex justify-center gap-4">
-                <button type="button" className="btn btn-outline" onClick={handleClose}>
-                  キャンセル
-                </button>
-                <button type="submit" className="btn btn-primary btn-lg gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <title>{'check'}</title>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  記録する
-                </button>
+                <form.Subscribe
+                  selector={(state) => [state.canSubmit, state.isSubmitting]}
+                  // biome-ignore lint/correctness/noChildrenProp: <explanation>
+                  children={([canSubmit, isSubmitting]) => (
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={handleClose}
+                        disabled={isSubmitting}
+                      >
+                        キャンセル
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn btn-primary btn-lg gap-2"
+                        disabled={!canSubmit}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <title>{'check'}</title>
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        {isSubmitting ? '送信中...' : '記録する'}
+                      </button>
+                    </>
+                  )}
+                />
               </div>
             </form>
           )}

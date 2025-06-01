@@ -31,7 +31,7 @@ export interface UnregisteredViewProps {
 }
 
 export interface GraphProps {
-  activities: Omit<LearningActivity, 'userId'>[];
+  activities: LearningActivity[];
 }
 
 export interface LearningLogSectionProps {

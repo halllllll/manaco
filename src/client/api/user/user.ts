@@ -10,6 +10,7 @@ export const UserAPI = {
       if (ret.success) {
         return ret.data;
       }
+
       throw new Error(`${ret.message}${ret.details ? ` - ${ret.details}` : ''}`);
     }
 

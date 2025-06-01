@@ -75,7 +75,7 @@ export const handlers = [
 
     // const newActivity = (await req.json()) as { id: string; name: string; date: string };
     const newActivity: LearningActivity = (await req.json()) as LearningActivity;
-    console.log('新規学習活動:', newActivity);
+
     return HttpResponse.json(newActivity);
   }),
 
