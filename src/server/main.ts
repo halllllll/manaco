@@ -119,15 +119,10 @@ const validateAll = (): SpreadsheetValidateDTO => {
     !resultValidateActivitySheet.isValid ||
     !resultValidateSettingsSheet.isValid
   ) {
-    console.error('Validation failed');
-    console.error(resultValidateUserSheet);
-    console.error(resultValidateActivitySheet);
-    console.error(resultValidateSettingsSheet);
+    console.error(
+      `Validation failed:\nuser sheet: ${resultValidateUserSheet}:\nactivity sheet: ${resultValidateActivitySheet}\nsetting sheet: ${resultValidateSettingsSheet}`,
+    );
 
-    // throw new Error(
-    //   `Validation failed: \n
-    //   ${resultValidateUserSheet.messages.join('\n')}\n${resultValidateActivitySheet.messages.join('\n')}\n${resultValidateSettingsSheet.messages.join('\n')}`,
-    // );
     return {
       success: false,
       message: 'Validation failed',
