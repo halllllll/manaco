@@ -34,10 +34,10 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
         <ComposedChart
           data={data}
           margin={{
-            top: 5,
-            right: 5,
-            left: 5,
-            bottom: -5,
+            top: 20, // Increased top margin
+            right: 30, // Increased right margin for YAxis label
+            left: 20, // Increased left margin for YAxis label
+            bottom: 20, // Changed to positive and increased bottom margin
           }}
         >
           <XAxis dataKey="activityDate" />
@@ -118,18 +118,18 @@ MemoizedGraphChart.displayName = 'MemoizedGraphChart';
 export const Graph: FC<GraphProps> = ({ activities }) => {
   const orderedActivities = useMemo(() => {
     return activities.toSorted((a, b) => a.activityDate.localeCompare(b.activityDate));
-  }, [activities]);
+  }, [activities]); // Simplified dependency array
 
   const maxScore = useMemo(() => {
     if (activities.length === 0) {
       return 0;
     }
     return Math.max(...activities.map((a) => a.score));
-  }, [activities]);
+  }, [activities]); // Simplified dependency array
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const chartRef = useRef<HTMLDivElement>(null);
-  const modalContentRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<HTMLDivElement>(null); // For the main card graph
+  const modalContentRef = useRef<HTMLDivElement>(null); // For capturing modal content
   const { addToast } = useToast();
   const { userData } = useUserState();
   const userStats = useUserStats(activities);
@@ -265,7 +265,11 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
           <h3 className="font-bold text-xl mb-4 flex-shrink-0">学習記録グラフ（拡大表示）</h3>
 
           {/* Graph Area */}
-          <div className="flex-grow-[3] relative min-h-0" ref={chartRef}>
+          {/* This div will grow to take up designated space, min-h-0 is important for flex children that might overflow */}
+          <div className="flex-grow-[3] relative min-h-0">
+            {' '}
+            {/* Removed ref={chartRef} from here */}
+            {/* GraphChart's ResponsiveContainer will use 100% of this parent's dimensions */}
             <MemoizedGraphChart
               data={orderedActivities}
               maxScore={maxScore}
