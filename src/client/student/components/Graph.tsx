@@ -236,17 +236,18 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
       <dialog className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
         {/* This is the element that will be captured for the image */}
         <div
-          className="modal-box max-w-full w-11/12 max-h-screen h-6/7 flex flex-col overflow-y-auto"
+          className="modal-box max-w-full w-11/12 max-h-screen h-22/23 flex flex-col overflow-y-auto"
           ref={modalContentRef}
         >
-          <h3 className="font-bold text-xl mb-4 flex-shrink-0">これまでの記録</h3>
+          <h4 className="font-bold text-lg mb-3 text-primary-content flex-shrink-0">
+            {`${
+              // biome-ignore lint/style/noNonNullAssertion: <explanation>
+              userData!.name
+            } さんの学習記録`}
+          </h4>
 
-          {/* Graph Area */}
-          {/* This div will grow to take up designated space, min-h-0 is important for flex children that might overflow */}
-          <div className="flex-grow-[3] relative min-h-0">
-            {' '}
-            {/* Removed ref={chartRef} from here */}
-            {/* GraphChart's ResponsiveContainer will use 100% of this parent's dimensions */}
+          {/* Graph Area - Fixed minimum height to ensure visibility */}
+          <div className="h-[70dvh] max-h-3/5 mb-4">
             <MemoizedGraphChart
               data={orderedActivities}
               maxScore={maxScore}
@@ -255,38 +256,138 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
             />
           </div>
           {/* User Info and Stats Area */}
-          <div className="flex-grow-[1] p-4 border-t border-base-300 overflow-y-auto min-h-0">
-            <h4 className="font-bold text-lg mb-3 text-primary">
-              {`${
-                // biome-ignore lint/style/noNonNullAssertion: <explanation>
-                userData!.name
-              } さんの学習記録`}
-            </h4>
-            <div className="space-y-2 text-base">
-              <p>
-                <strong>学習時間:</strong> {(userStats.totalStudyTime / 60).toFixed(1)}分{' '}
-                <span className="text-xs">
-                  (約 {Math.floor(userStats.totalStudyTime / 3600)} 時間)
-                </span>
-              </p>
-              {/** 優れたUI/UXで、統計データをここに表示する。上部のグラフを圧迫しないよう注意してスタイリングする */}
-              {/* <p>
-                📝 <strong>がんばった回数:</strong> {userStats.totalActivities}回
-              </p>
-              <p>
-                🌟 <strong>平均点:</strong> {userStats.averageScore.toFixed(1)}点
-              </p>
-              <p>
-                ⏱️ <strong>合計時間:</strong> {(userStats.totalStudyTime / 60).toFixed(1)}分
-              </p>
-              <p>
-                🏆 <strong>最高得点:</strong> {userStats.bestScore}点
-              </p>
-              <p>
-                🎯 <strong>目標達成率:</strong> {userStats.completionRate}%{' '}
-                <span className="text-xs">(60点以上で達成)</span>
-              </p> */}
+          <div className="p-4 border-t border-base-300 overflow-y-auto">
+            {/* Stats cards with child-friendly design */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Basic Stats - Activity Count and Best Score */}
+              <div className="bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl p-4 shadow-sm border border-blue-200">
+                <h5 className="text-lg font-bold mb-3 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 mr-2 text-blue-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <title>がんばったこと</title>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                    />
+                  </svg>
+                  がんばったこと
+                </h5>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-blue-700">がんばった回数</span>
+                    <span className="text-xl font-bold text-blue-800">
+                      {userStats.totalActivities}回
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-blue-700">さいこうてんすう</span>
+                    <span className="text-xl font-bold text-blue-800">{userStats.bestScore}点</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Time and Average Stats */}
+              <div className="bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl p-4 shadow-sm border border-purple-200">
+                <h5 className="text-lg font-bold mb-3 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 mr-2 text-purple-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <title>べんきょうのきろく</title>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  べんきょうのきろく
+                </h5>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-purple-700">がくしゅうじかん</span>
+                    <span className="text-xl font-bold text-purple-800">
+                      {(userStats.totalStudyTime / 60).toFixed(0)}ふん
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-purple-700">へいきんてんすう</span>
+                    <div className="flex items-center">
+                      <span className="text-xl font-bold text-purple-800 mr-2">
+                        {userStats.averageScore.toFixed(1)}点
+                      </span>
+                      <div className="flex">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <svg
+                            key={i}
+                            xmlns="http://www.w3.org/2000/svg"
+                            className={`h-4 w-4 ${
+                              i < Math.round(userStats.averageScore / 20)
+                                ? 'text-yellow-500'
+                                : 'text-gray-300'
+                            }`}
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <title>評価</title>
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            {/* Learning Period - Full width */}
+            {orderedActivities.length > 0 && (
+              <div className="mt-4 bg-gradient-to-br from-green-100 to-green-50 rounded-xl p-4 shadow-sm border border-green-200">
+                <h5 className="text-lg font-bold mb-3 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 mr-2 text-green-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <title>学習期間</title>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  がくしゅうきかん
+                </h5>
+                <div className="flex items-center justify-center gap-4">
+                  <div className="bg-white rounded-lg p-3 text-center border border-green-200 flex-1">
+                    <div className="text-sm text-green-700 mb-1">はじめたひ</div>
+                    <div className="font-bold text-green-800">
+                      {orderedActivities[0].activityDate}
+                    </div>
+                  </div>
+                  <div className="text-green-600 font-bold text-xl">→</div>
+                  <div className="bg-white rounded-lg p-3 text-center border border-green-200 flex-1">
+                    <div className="text-sm text-green-700 mb-1">さいきんのひ</div>
+                    <div className="font-bold text-green-800">
+                      {orderedActivities[orderedActivities.length - 1].activityDate}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           {/* Modal Actions - pushed to the bottom */}
           <div className="modal-action mt-auto pt-4 flex-shrink-0">
