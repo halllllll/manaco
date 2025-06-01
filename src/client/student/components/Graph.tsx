@@ -1,7 +1,8 @@
 import { useToast } from '@/client/context/ToastConterxt';
+import type { LearningActivity } from '@/shared/types/activity'; // Added
 import * as htmlToImage from 'html-to-image';
 import type { FC } from 'react';
-import { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react'; // Added React, useMemo
 import {
   Bar,
   ComposedChart,
@@ -13,24 +14,125 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { useUserState } from '../hooks/useUserState'; // Added
-import { useUserStats } from '../hooks/useUserStats'; // Added
+import { useUserState } from '../hooks/useUserState';
+import { useUserStats } from '../hooks/useUserStats';
 import type { GraphProps } from '../types/props';
+
+// Define GraphChartProps interface
+interface GraphChartProps {
+  data: LearningActivity[];
+  maxScore: number;
+  height?: number | string;
+  width?: number | string;
+}
+
+// Define MemoizedGraphChart outside the Graph component and wrap with React.memo
+const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
+  ({ data, maxScore, height = 300, width = '95%' }) => {
+    return (
+      <ResponsiveContainer width={width} height={height}>
+        <ComposedChart
+          data={data}
+          margin={{
+            top: 5,
+            right: 5,
+            left: 5,
+            bottom: -5,
+          }}
+        >
+          <XAxis dataKey="activityDate" />
+          <YAxis
+            label={{
+              value: 'かかった時間（秒）',
+              position: 'insideRight',
+              style: {
+                writingMode: 'vertical-rl',
+                textAnchor: 'middle',
+                fill: '#333',
+              },
+            }}
+            dataKey={'duration'}
+            orientation={'right'}
+            yAxisId="bar"
+          />
+          <YAxis
+            label={{
+              value: '点数',
+              position: 'insideLeft',
+              style: {
+                writingMode: 'vertical-rl',
+                textAnchor: 'middle',
+                fill: '#333',
+              },
+            }}
+            dataKey={'score'}
+            domain={['dataMin -10', 'dataMax']}
+            orientation={'left'}
+            yAxisId={'line'}
+          />
+          <Bar
+            yAxisId={'bar'}
+            dataKey={'duration'}
+            fill="#82ca9d"
+            barSize={'30'}
+            name="かかった時間（秒）"
+          >
+            <LabelList />
+          </Bar>
+          <Line
+            type={'monotone'}
+            dataKey={'score'}
+            stroke="#8884d8"
+            strokeWidth={2}
+            activeDot={{ r: 8 }}
+            yAxisId={'line'}
+            name="点数"
+          >
+            <LabelList
+              position={'top'}
+              content={(props) => {
+                const { x, y, value } = props;
+                const numValue = value !== undefined ? Number(value) : 0;
+                const numY = y !== undefined ? Number(y) : 0;
+                const yPos = numValue >= maxScore - 10 ? numY + 20 : numY - 20;
+                return (
+                  <text x={x} y={yPos} fontSize={16} textAnchor="middle" className="text-primary">
+                    {value}
+                  </text>
+                );
+              }}
+            />
+          </Line>
+          <Tooltip />
+          <Legend />
+        </ComposedChart>
+      </ResponsiveContainer>
+    );
+  },
+);
+MemoizedGraphChart.displayName = 'MemoizedGraphChart';
 
 /**
  * 学習記録グラフコンポーネント
  */
 export const Graph: FC<GraphProps> = ({ activities }) => {
-  const maxScore = Math.max(...activities.map((a) => a.score));
-  const orderedActivities = activities.toSorted((a, b) =>
-    a.activityDate.localeCompare(b.activityDate),
-  );
+  const orderedActivities = useMemo(() => {
+    return activities.toSorted((a, b) => a.activityDate.localeCompare(b.activityDate));
+  }, [activities]);
+
+  const maxScore = useMemo(() => {
+    if (activities.length === 0) {
+      return 0;
+    }
+    return Math.max(...activities.map((a) => a.score));
+  }, [activities]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
-  const modalContentRef = useRef<HTMLDivElement>(null); // Ref for the modal content to capture
+  const modalContentRef = useRef<HTMLDivElement>(null);
   const { addToast } = useToast();
-  const { userData } = useUserState(); // Added
-  const userStats = useUserStats(activities); // Added
+  const { userData } = useUserState();
+  const userStats = useUserStats(activities);
 
   // グラフを画像として保存する関数
   const saveAsImage = async () => {
@@ -68,88 +170,6 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
       addToast('error', '画像の保存中にエラーが発生しました', 3000);
     }
   };
-
-  // グラフを表示するための共通コンポーネント
-  const GraphChart = ({ height = 300, width = '95%' }) => (
-    <ResponsiveContainer width={width} height={height}>
-      <ComposedChart
-        data={orderedActivities}
-        margin={{
-          top: 5,
-          right: 5,
-          left: 5,
-          bottom: -5,
-        }}
-      >
-        <XAxis dataKey="activityDate" />
-        <YAxis
-          label={{
-            value: 'かかった時間（秒）',
-            position: 'insideRight',
-            style: {
-              writingMode: 'vertical-rl',
-              textAnchor: 'middle',
-              fill: '#333',
-            },
-          }}
-          dataKey={'duration'}
-          orientation={'right'}
-          yAxisId="bar"
-        />
-        <YAxis
-          label={{
-            value: '点数',
-            position: 'insideLeft',
-            style: {
-              writingMode: 'vertical-rl',
-              textAnchor: 'middle',
-              fill: '#333',
-            },
-          }}
-          dataKey={'score'}
-          domain={['dataMin -10', 'dataMax']}
-          orientation={'left'}
-          yAxisId={'line'}
-        />
-        <Bar
-          yAxisId={'bar'}
-          dataKey={'duration'}
-          fill="#82ca9d"
-          barSize={'30'}
-          name="かかった時間（秒）"
-        >
-          <LabelList />
-        </Bar>
-
-        <Line
-          type={'monotone'}
-          dataKey={'score'}
-          stroke="#8884d8"
-          strokeWidth={2}
-          activeDot={{ r: 8 }}
-          yAxisId={'line'}
-          name="点数"
-        >
-          <LabelList
-            position={'top'}
-            content={(props) => {
-              const { x, y, value } = props;
-              const numValue = value !== undefined ? Number(value) : 0;
-              const numY = y !== undefined ? Number(y) : 0;
-              const yPos = numValue >= maxScore - 10 ? numY + 20 : numY - 20;
-              return (
-                <text x={x} y={yPos} fontSize={16} textAnchor="middle" className="text-primary">
-                  {value}
-                </text>
-              );
-            }}
-          />
-        </Line>
-        <Tooltip />
-        <Legend />
-      </ComposedChart>
-    </ResponsiveContainer>
-  );
 
   return (
     <>
@@ -230,7 +250,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
             </div>
           </div>
           <div ref={chartRef}>
-            <GraphChart />
+            <MemoizedGraphChart data={orderedActivities} maxScore={maxScore} />
           </div>
         </div>
       </div>
@@ -245,14 +265,15 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
           <h3 className="font-bold text-xl mb-4 flex-shrink-0">学習記録グラフ（拡大表示）</h3>
 
           {/* Graph Area */}
-          {/* This div will grow to take up designated space, min-h-0 is important for flex children that might overflow */}
           <div className="flex-grow-[3] relative min-h-0" ref={chartRef}>
-            {/* GraphChart's ResponsiveContainer will use 100% of this parent's dimensions */}
-            <GraphChart width="100%" height={undefined} />{' '}
-            {/* Corrected: height to undefined for default numeric value */}
+            <MemoizedGraphChart
+              data={orderedActivities}
+              maxScore={maxScore}
+              width="100%"
+              height="100%"
+            />
           </div>
           {/* User Info and Stats Area */}
-          {/* This div will take the remaining designated space, with scrolling if content overflows */}
           <div className="flex-grow-[1] p-4 border-t border-base-300 overflow-y-auto min-h-0">
             <h4 className="font-bold text-lg mb-3 text-primary">
               こんにちは、{userData?.name || 'がんばりや'}さん！
