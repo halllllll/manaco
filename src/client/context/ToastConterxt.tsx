@@ -32,7 +32,7 @@ interface ToastProviderProps {
 export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const addToast = useCallback((type: ToastType, message: string, duration = 5000) => {
+  const addToast = useCallback((type: ToastType, message: string, duration = 6000) => {
     const id = Math.random().toString(36).slice(2, 9); // Generate a random ID for the toast
     const newToast: Toast = { id, type, message, duration };
 
