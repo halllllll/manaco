@@ -46,8 +46,6 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
       memo: '',
     },
     onSubmit: async (values) => {
-      // TODO: validation and transformation
-      console.log('Form submitted with values:', values.value);
       try {
         if (!userData) {
           throw new Error('User data is not available');
@@ -65,7 +63,6 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
           userId: userData.id,
         };
         const res = await postActivity(data);
-        console.info(`TODO: resultの結果で成否判定 ${res}`);
         if (!res.success) {
           addToast('error', `学習記録の保存に失敗しました: ${res.message}`, 10000);
         } else {
@@ -212,7 +209,6 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
                                   }}
                                   onchange={(e) => {
                                     const value = (e.target as HTMLInputElement).value;
-                                    console.log(`value: ${value}`);
                                     field.handleChange(value);
                                     const targetDateButton =
                                       document.getElementById('target-date-btn');

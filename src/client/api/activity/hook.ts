@@ -16,6 +16,7 @@ export const useActivityPost = () => {
     {
       onError: (err) => {
         console.error('Error posting activity:', err);
+        throw err;
       },
     },
   );

@@ -47,8 +47,6 @@ export const handlers = [
     await delay(2000);
     // const data = mockUserData[currentMockUserId];
     const data = mockHealthCheckData['1'];
-    console.log('mockHealthCheckData');
-    console.dir(data);
     if (!data) {
       return HttpResponse.json('データなし');
     }
@@ -97,31 +95,4 @@ export const handlers = [
     }
     return HttpResponse.json(user);
   }),
-
-  // // // 学習活動一覧取得 API
-  // http.get('/mock/learning-activities', async () => {
-  //   await delay(1000);
-  //   const user = mockUsers[currentMockUserId];
-  //   if (!user) {
-  //     return HttpResponse.json('データなし');
-  //   }
-
-  //   return HttpResponse.json(mockActivities);
-  // }),
-
-  // // 学習活動追加 API
-  // http.post('/mock/learning-activities', async ({ request }) => {
-  //   const newActivity = (await request.json()) as LearningActivity;
-  //   console.log('新規学習活動:', newActivity);
-  //   await delay(1200);
-
-  //   return HttpResponse.json(
-  //     {
-  //       success: true,
-  //       message: '記録を保存しました',
-  //       id: `mock-${Date.now()}`,
-  //     },
-  //     { status: 201 },
-  //   );
-  // }),
 ];

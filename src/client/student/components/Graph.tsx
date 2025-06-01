@@ -165,9 +165,9 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
       link.href = dataUrl;
       link.click();
       addToast('success', 'グラフと情報を画像として保存しました', 3000);
-    } catch (error) {
-      console.error('画像のエクスポート中にエラーが発生しました:', error);
-      addToast('error', '画像の保存中にエラーが発生しました', 3000);
+    } catch (e) {
+      const err = e as Error;
+      addToast('error', `画像の保存中にエラーが発生しました\n${err.name} - ${err.message}`, 3000);
     }
   };
 
