@@ -59,7 +59,7 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
           </div>
         ) : (
           <div className="rounded-lg bg-base-200/30 p-2 shadow-inner">
-            <div className="overflow-x-auto max-h-[40vh] rounded-lg">
+            <div className="overflow-x-auto max-h-[300px] md:max-h-[50vh] min-h-full rounded-lg">
               <table className="table w-full">
                 <thead className="">
                   <tr className="">
