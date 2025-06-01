@@ -1,74 +1,42 @@
 import type { FC } from 'react';
 
 /**
- * ダッシュボードローディング時のスケルトンコンポーネント
+ * ダッシュボードローディング時のスケルトンコンポーネント (新レイアウト版)
  */
 export const DashboardSkeleton: FC = () => {
   return (
-    <div className="card bg-base-100 shadow-xl border border-base-200 w-full max-w-full mx-auto p-6 animate-pulse">
+    <div className="card bg-base-100 shadow-xl border border-base-200 w-full max-w-full mx-auto p-4 sm:p-6 animate-pulse space-y-4 sm:space-y-6">
       {/* ヘッダー部分のスケルトン */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="skeleton h-8 w-1/3" />
-        <div className="skeleton rounded-full h-12 w-12" />
+      <div className="flex justify-between items-center">
+        <div className="skeleton h-7 sm:h-8 w-1/2 sm:w-1/3" />
+        <div className="skeleton rounded-full h-10 w-10 sm:h-12 sm:w-12" />
       </div>
 
-      {/* グラフとデータ表示部分のスケルトン */}
+      {/* グラフと統計データ表示部分のスケルトン */}
       <div className="flex flex-col lg:flex-row gap-4">
         {/* グラフスケルトン */}
-        <div className="card bg-base-100 shadow-sm border border-base-200 w-full">
-          <div className="card-body">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="skeleton rounded-full h-6 w-6" />
-              <div className="skeleton h-6 w-1/4" />
+        <div className="card bg-base-200/50 shadow-sm border border-base-300/50 w-full lg:flex-1">
+          <div className="card-body p-3 sm:p-4">
+            <div className="flex justify-between items-center mb-3 sm:mb-4">
+              <div className="skeleton h-5 sm:h-6 w-3/5 sm:w-1/2" /> {/* Title: "これまでの記録" */}
+              <div className="skeleton h-7 sm:h-8 w-16 sm:w-20 rounded" /> {/* Button: "拡大" */}
             </div>
-
-            {/* グラフスケルトン */}
-            <div className="h-64 w-full">
-              <div className="flex h-full items-end justify-between px-2">
-                {Array.from({ length: 7 }, (_, i) => (
-                  <div
-                    // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                    key={i}
-                    className={`skeleton w-8 ${
-                      i % 4 === 0
-                        ? 'h-1/3'
-                        : i % 4 === 1
-                          ? 'h-2/3'
-                          : i % 4 === 2
-                            ? 'h-1/2'
-                            : 'h-3/4'
-                    }`}
-                  />
-                ))}
-              </div>
-              <div className="skeleton h-0.5 w-full mt-2" />
-              <div className="flex justify-between mt-2">
-                {Array.from({ length: 3 }, (_, i) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                  <div key={i} className="skeleton h-4 w-16" />
-                ))}
-              </div>
-            </div>
+            {/* Chart Area Placeholder */}
+            <div className="skeleton h-48 sm:h-56 w-full rounded" />
           </div>
         </div>
 
-        {/* ランキングスケルトン */}
-        <div className="card shadow-md lg:w-1/3 bg-base-100 border border-base-200">
-          <div className="card-body">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="skeleton rounded-full h-6 w-6" />
-              <div className="skeleton h-6 w-2/3" />
-            </div>
-
-            <div className="space-y-4">
-              {Array.from({ length: 2 }, (_, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                <div key={i}>
-                  <div className="flex items-center justify-between">
-                    <div className="skeleton h-6 w-1/3" />
-                    <div className="skeleton h-6 w-1/4" />
-                  </div>
-                  <div className="skeleton h-0.5 w-full mt-2" />
+        {/* 統計データ（トロフィー）スケルトン */}
+        <div className="card bg-base-200/50 shadow-sm border border-base-300/50 w-full lg:w-1/3">
+          <div className="card-body p-3 sm:p-4">
+            <div className="skeleton h-5 sm:h-6 w-3/4 sm:w-2/3 mb-3 sm:mb-4" />{' '}
+            {/* Title: "統計データ" */}
+            <div className="space-y-2 sm:space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton items
+                <div key={i} className="flex items-center gap-2">
+                  <div className="skeleton h-3 sm:h-4 w-1/3" />
+                  <div className="skeleton h-3 sm:h-4 w-2/3" />
                 </div>
               ))}
             </div>
@@ -77,47 +45,69 @@ export const DashboardSkeleton: FC = () => {
       </div>
 
       {/* 学習ログテーブルスケルトン */}
-      <div className="mt-6">
-        <div className="skeleton h-8 w-1/4 mb-4" />
-        <div className="overflow-x-auto">
-          <table className="table w-full">
-            <thead>
-              <tr>
-                {Array.from({ length: 4 }, (_, i) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                  <th key={i}>
-                    <div className="skeleton h-6 w-16" />
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from({ length: 3 }, (_, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                <tr key={i}>
-                  <td>
-                    <div className="skeleton h-6 w-24" />
-                  </td>
-                  <td>
-                    <div className="skeleton h-6 w-12" />
-                  </td>
-                  <td>
-                    <div className="skeleton h-6 w-16" />
-                  </td>
-                  <td>
-                    <div className="skeleton h-6 w-20" />
-                  </td>
+      <div className="card bg-base-200/50 shadow-sm border border-base-300/50 w-full">
+        <div className="card-body p-3 sm:p-4">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <div className="skeleton h-5 sm:h-6 w-2/5 sm:w-1/3" /> {/* Title: "学習履歴" */}
+            <div className="skeleton h-4 sm:h-5 w-10 sm:w-12 rounded" /> {/* Badge for count */}
+          </div>
+          <div className="overflow-x-auto">
+            <table className="table w-full table-xs sm:table-sm">
+              <thead>
+                <tr>
+                  <th className="p-1 sm:p-2">
+                    <div className="skeleton h-4 sm:h-5 w-20 sm:w-24" />
+                  </th>{' '}
+                  {/* 日付 */}
+                  <th className="p-1 sm:p-2">
+                    <div className="skeleton h-4 sm:h-5 w-12 sm:w-16" />
+                  </th>{' '}
+                  {/* 点数 */}
+                  <th className="hidden md:table-cell p-1 sm:p-2">
+                    <div className="skeleton h-4 sm:h-5 w-24 sm:w-28" />
+                  </th>{' '}
+                  {/* かかった時間 */}
+                  <th className="hidden md:table-cell p-1 sm:p-2">
+                    <div className="skeleton h-4 sm:h-5 w-16 sm:w-20" />
+                  </th>{' '}
+                  {/* きもち */}
+                  <th className="p-1 sm:p-2">
+                    <div className="skeleton h-4 sm:h-5 w-10 sm:w-12" />
+                  </th>{' '}
+                  {/* Actions */}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton items
+                  <tr key={i}>
+                    <td className="p-1 sm:p-2">
+                      <div className="skeleton h-3 sm:h-4 w-full" />
+                    </td>
+                    <td className="p-1 sm:p-2">
+                      <div className="skeleton h-3 sm:h-4 w-3/4" />
+                    </td>
+                    <td className="hidden md:table-cell p-1 sm:p-2">
+                      <div className="skeleton h-3 sm:h-4 w-full" />
+                    </td>
+                    <td className="hidden md:table-cell p-1 sm:p-2">
+                      <div className="skeleton h-3 sm:h-4 w-8 sm:w-10 mx-auto" />
+                    </td>
+                    <td className="p-1 sm:p-2">
+                      <div className="skeleton h-5 sm:h-6 w-5 sm:w-6 rounded-full mx-auto" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       {/* ローディングインジケーター */}
-      <div className="flex justify-center items-center mt-8 gap-2">
-        <div className="loading loading-spinner loading-md text-primary" />
-        <p className="text-base font-medium text-primary">データを読み込み中...</p>
+      <div className="flex justify-center items-center pt-2 sm:pt-4 gap-2">
+        <div className="loading loading-spinner loading-xs sm:loading-sm text-base-content/50" />
+        <p className="text-xs sm:text-sm font-medium text-base-content/50">データを読み込み中...</p>
       </div>
     </div>
   );
