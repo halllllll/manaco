@@ -1,4 +1,5 @@
 import { useToast } from '@/client/context/ToastConterxt';
+import * as htmlToImage from 'html-to-image';
 import type { FC } from 'react';
 import { useRef, useState } from 'react';
 import {
@@ -26,69 +27,45 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null); // Ref for the modal content to capture
   const { addToast } = useToast();
   const { userData } = useUserState(); // Added
   const userStats = useUserStats(activities); // Added
 
   // グラフを画像として保存する関数
-  const saveAsImage = () => {
+  const saveAsImage = async () => {
+    if (!modalContentRef.current) {
+      addToast('error', 'モーダルコンテンツが見つかりません', 3000);
+      return;
+    }
+
     try {
-      if (!chartRef.current) return;
-
-      const svgElement = chartRef.current.querySelector('svg');
-      if (!svgElement) {
-        addToast('error', 'グラフを見つけることができませんでした', 3000);
-        return;
-      }
-
-      // SVGをクローンして修正（テキストの表示など）
-      const clonedSvg = svgElement.cloneNode(true) as SVGElement;
-      clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-
-      // SVG文字列に変換
-      const svgString = new XMLSerializer().serializeToString(clonedSvg);
-
-      // Base64エンコード
-      const svgBase64 = btoa(unescape(encodeURIComponent(svgString)));
-
-      // SVG URLを作成
-      const svgUrl = `data:image/svg+xml;base64,${svgBase64}`;
-
-      // キャンバスに描画してPNG変換
-      const canvas = document.createElement('canvas');
-      const bbox = svgElement.getBoundingClientRect();
-      canvas.width = bbox.width;
-      canvas.height = bbox.height;
-
-      const context = canvas.getContext('2d');
-      if (!context) {
-        addToast('error', 'グラフの保存に失敗しました', 3000);
-        return;
-      }
-
-      // 背景色を設定（透明にしたい場合は不要）
-      context.fillStyle = '#FFFFFF';
-      context.fillRect(0, 0, canvas.width, canvas.height);
-
-      const image = new Image();
-      image.onload = () => {
-        context.drawImage(image, 0, 0);
-
-        // ダウンロード処理
-        const link = document.createElement('a');
-        link.download = `学習記録グラフ_${new Date().toISOString().split('T')[0]}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-
-        addToast('success', 'グラフを画像として保存しました', 3000);
+      // ボタンを除外するためのフィルター関数
+      const filter = (node: HTMLElement) => {
+        // モーダルアクションボタンを除外
+        if (node.classList?.contains('modal-action')) {
+          return false;
+        }
+        // フォームの閉じるボタンを除外
+        if (node.tagName === 'BUTTON' && node.parentElement?.classList.contains('modal-backdrop')) {
+          return false;
+        }
+        return true;
       };
-      image.onerror = () => {
-        addToast('error', '画像の変換に失敗しました', 3000);
-      };
-      image.src = svgUrl;
+
+      const dataUrl = await htmlToImage.toPng(modalContentRef.current, {
+        quality: 0.95,
+        backgroundColor: '#FFFFFF',
+        filter: filter, // フィルターを適用
+      });
+      const link = document.createElement('a');
+      link.download = `学習記録_${userData?.name || 'ユーザー'}_${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataUrl;
+      link.click();
+      addToast('success', 'グラフと情報を画像として保存しました', 3000);
     } catch (error) {
-      console.error('グラフの保存中にエラーが発生しました:', error);
-      addToast('error', 'グラフの保存中にエラーが発生しました', 3000);
+      console.error('画像のエクスポート中にエラーが発生しました:', error);
+      addToast('error', '画像の保存中にエラーが発生しました', 3000);
     }
   };
 
@@ -260,10 +237,13 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
 
       {/* 拡大表示用モーダル */}
       <dialog className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
-        <div className="modal-box max-w-full w-11/12 max-h-screen h-4/5 flex flex-col">
-          {' '}
-          {/* Outer box defines overall size, now a flex column */}
+        {/* This is the element that will be captured for the image */}
+        <div
+          className="modal-box max-w-full w-11/12 max-h-screen h-4/5 flex flex-col"
+          ref={modalContentRef}
+        >
           <h3 className="font-bold text-xl mb-4 flex-shrink-0">学習記録グラフ（拡大表示）</h3>
+
           {/* Graph Area */}
           {/* This div will grow to take up designated space, min-h-0 is important for flex children that might overflow */}
           <div className="flex-grow-[3] relative min-h-0" ref={chartRef}>

@@ -19,6 +19,7 @@
     "cally": "^0.8.0",
     "daisyui": "^5.0.35",
     "gas-client": "^1.2.1",
+    "html-to-image": "^1.11.13",
     "qrcode.react": "^4.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
