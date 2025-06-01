@@ -28,13 +28,13 @@ interface GraphChartProps {
 
 // Define MemoizedGraphChart outside the Graph component and wrap with React.memo
 const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
-  ({ data, maxScore, height = 300, width = '95%' }) => {
+  ({ data, maxScore, height = 300, width = '100%' }) => {
     return (
-      <ResponsiveContainer width={width} height={height}>
+      <ResponsiveContainer width={width} height={height} className={'min-h-2/3'}>
         <ComposedChart
           data={data}
           margin={{
-            top: 20, // Increased top margin
+            top: 50, // Increased top margin
             right: 30, // Increased right margin for YAxis label
             left: 20, // Increased left margin for YAxis label
             bottom: 20, // Changed to positive and increased bottom margin
@@ -224,29 +224,6 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
                 </svg>
                 拡大
               </button>
-              <button
-                type="button"
-                onClick={saveAsImage}
-                className="btn btn-sm btn-outline btn-accent"
-                title="グラフを画像として保存"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <title>画像として保存</title>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                  />
-                </svg>
-                保存
-              </button>
             </div>
           </div>
           <div ref={chartRef}>
@@ -259,10 +236,10 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
       <dialog className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
         {/* This is the element that will be captured for the image */}
         <div
-          className="modal-box max-w-full w-11/12 max-h-screen h-4/5 flex flex-col"
+          className="modal-box max-w-full w-11/12 max-h-screen h-6/7 flex flex-col overflow-y-auto"
           ref={modalContentRef}
         >
-          <h3 className="font-bold text-xl mb-4 flex-shrink-0">学習記録グラフ（拡大表示）</h3>
+          <h3 className="font-bold text-xl mb-4 flex-shrink-0">これまでの記録</h3>
 
           {/* Graph Area */}
           {/* This div will grow to take up designated space, min-h-0 is important for flex children that might overflow */}
@@ -280,10 +257,20 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
           {/* User Info and Stats Area */}
           <div className="flex-grow-[1] p-4 border-t border-base-300 overflow-y-auto min-h-0">
             <h4 className="font-bold text-lg mb-3 text-primary">
-              こんにちは、{userData?.name || 'がんばりや'}さん！
+              {`${
+                // biome-ignore lint/style/noNonNullAssertion: <explanation>
+                userData!.name
+              } さんの学習記録`}
             </h4>
             <div className="space-y-2 text-base">
               <p>
+                <strong>学習時間:</strong> {(userStats.totalStudyTime / 60).toFixed(1)}分{' '}
+                <span className="text-xs">
+                  (約 {Math.floor(userStats.totalStudyTime / 3600)} 時間)
+                </span>
+              </p>
+              {/** 優れたUI/UXで、統計データをここに表示する。上部のグラフを圧迫しないよう注意してスタイリングする */}
+              {/* <p>
                 📝 <strong>がんばった回数:</strong> {userStats.totalActivities}回
               </p>
               <p>
@@ -298,7 +285,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
               <p>
                 🎯 <strong>目標達成率:</strong> {userStats.completionRate}%{' '}
                 <span className="text-xs">(60点以上で達成)</span>
-              </p>
+              </p> */}
             </div>
           </div>
           {/* Modal Actions - pushed to the bottom */}
