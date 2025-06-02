@@ -1,5 +1,5 @@
 {
-  "peacock.remoteColor": "#54d697",
+  "peacock.remoteColor": "#d43e19",
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
@@ -37,23 +37,23 @@
     "editor.formatOnSave": true
   },
   "workbench.colorCustomizations": {
-    "activityBar.activeBackground": "#7de0b0",
-    "activityBar.background": "#7de0b0",
+    "activityBar.activeBackground": "#e85b38",
+    "activityBar.background": "#e85b38",
     "activityBar.foreground": "#15202b",
     "activityBar.inactiveForeground": "#15202b99",
-    "activityBarBadge.background": "#a165da",
+    "activityBarBadge.background": "#1ae543",
     "activityBarBadge.foreground": "#15202b",
-    "commandCenter.border": "#15202b99",
-    "sash.hoverBorder": "#7de0b0",
-    "statusBar.background": "#54d697",
-    "statusBar.foreground": "#15202b",
-    "statusBarItem.hoverBackground": "#30c77e",
-    "statusBarItem.remoteBackground": "#54d697",
-    "statusBarItem.remoteForeground": "#15202b",
-    "titleBar.activeBackground": "#54d697",
-    "titleBar.activeForeground": "#15202b",
-    "titleBar.inactiveBackground": "#54d69799",
-    "titleBar.inactiveForeground": "#15202b99"
+    "commandCenter.border": "#e7e7e799",
+    "sash.hoverBorder": "#e85b38",
+    "statusBar.background": "#d43e19",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#e85b38",
+    "statusBarItem.remoteBackground": "#d43e19",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "titleBar.activeBackground": "#d43e19",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#d43e1999",
+    "titleBar.inactiveForeground": "#e7e7e799"
   },
   "github.copilot.chat.codeGeneration.instructions": [
     {
