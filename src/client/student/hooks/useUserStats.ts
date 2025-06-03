@@ -7,19 +7,15 @@ export interface ActivityRecord {
 }
 
 export interface UserStats {
-  totalActivities: number;
   averageScore: number;
-  bestScore: number;
-  totalStudyTime: number;
   averageStudyTime: number;
+  bestScore: number;
   bestTime: number;
+  fastestTimeRecords: ActivityRecord[];
   recentActivities: LearningActivity[];
   topScoreRecords: ActivityRecord[];
-  fastestTimeRecords: ActivityRecord[];
-  completionRate: number;
-  scoreImprovement: number;
-  consistencyScore: number;
-  streakCount: number;
+  totalActivities: number;
+  totalStudyTime: number;
 }
 
 /**
@@ -29,19 +25,15 @@ export const useUserStats = (activities: LearningActivity[]): UserStats => {
   return useMemo(() => {
     if (!activities || activities.length === 0) {
       return {
-        totalActivities: 0,
         averageScore: 0,
-        bestScore: 0,
-        totalStudyTime: 0,
         averageStudyTime: 0,
+        bestScore: 0,
         bestTime: 0,
+        fastestTimeRecords: [],
         recentActivities: [],
         topScoreRecords: [],
-        fastestTimeRecords: [],
-        completionRate: 0,
-        scoreImprovement: 0,
-        consistencyScore: 0,
-        streakCount: 0,
+        totalActivities: 0,
+        totalStudyTime: 0,
       };
     }
 
@@ -74,53 +66,16 @@ export const useUserStats = (activities: LearningActivity[]): UserStats => {
       .slice(0, 3)
       .map((activity, index) => ({ activity, rank: index + 1 }));
 
-    // 完了率（合格点を60点と仮定）
-    const passedActivities = activities.filter((a) => a.score >= 60).length;
-    const completionRate = Math.round((passedActivities / totalActivities) * 100);
-
-    // スコア向上度（最初の5回と最後の5回の平均を比較）
-    let scoreImprovement = 0;
-    if (totalActivities >= 10) {
-      const firstFive = activities.slice(0, 5);
-      const lastFive = activities.slice(-5);
-      const firstAvg = firstFive.reduce((sum, a) => sum + a.score, 0) / 5;
-      const lastAvg = lastFive.reduce((sum, a) => sum + a.score, 0) / 5;
-      scoreImprovement = Math.round(lastAvg - firstAvg);
-    }
-
-    // 一貫性スコア（標準偏差から計算、低いほど一貫している）
-    const variance =
-      scores.reduce((sum, score) => sum + (score - averageScore) ** 2, 0) / totalActivities;
-    const standardDeviation = Math.sqrt(variance);
-    const consistencyScore = Math.max(0, Math.round(100 - standardDeviation));
-
-    // 連続成功回数（合格点60点以上の連続回数）
-    let streakCount = 0;
-    const toSortededByDate = [...activities].toSorted(
-      (a, b) => new Date(b.activityDate).getTime() - new Date(a.activityDate).getTime(),
-    );
-    for (const activity of toSortededByDate) {
-      if (activity.score >= 60) {
-        streakCount++;
-      } else {
-        break;
-      }
-    }
-
     return {
-      totalActivities,
       averageScore,
-      bestScore,
-      totalStudyTime,
       averageStudyTime,
+      bestScore,
       bestTime,
+      fastestTimeRecords,
       recentActivities,
       topScoreRecords,
-      fastestTimeRecords,
-      completionRate,
-      scoreImprovement,
-      consistencyScore,
-      streakCount,
+      totalActivities,
+      totalStudyTime,
     };
   }, [activities]);
 };
