@@ -36,6 +36,11 @@
   "[typescriptreact]": {
     "editor.formatOnSave": true
   },
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": "./daisyui.md"
+    }
+  ],
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#e85b38",
     "activityBar.background": "#e85b38",
@@ -54,10 +59,5 @@
     "titleBar.activeForeground": "#e7e7e7",
     "titleBar.inactiveBackground": "#d43e1999",
     "titleBar.inactiveForeground": "#e7e7e799"
-  },
-  "github.copilot.chat.codeGeneration.instructions": [
-    {
-      "file": "./daisyui.md"
-    }
-  ]
+  }
 }
