@@ -14,9 +14,9 @@ export const LearningRecordButton: FC<LearningRecordButtonProps> = ({
 
     switch (variant) {
       case 'fixed':
-        return `${baseClasses} btn-xl fixed bottom-8 right-8 shadow-lg rounded-full text-xl animate-pulse`;
+        return `${baseClasses} z-30 btn-xl fixed bottom-8 right-8 shadow-lg rounded-full text-xl animate-pulse`;
       case 'inline':
-        return `${baseClasses} btn-xl animate-bounce`;
+        return `${baseClasses} z-30 btn-xl animate-bounce`;
       default:
         return baseClasses;
     }
