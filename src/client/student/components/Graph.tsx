@@ -22,13 +22,14 @@ import type { GraphProps } from '../types/props';
 interface GraphChartProps {
   data: LearningActivity[];
   maxScore: number;
-  height?: number | string;
+  height: number | string;
   width?: number | string;
 }
 
 // Define MemoizedGraphChart outside the Graph component and wrap with React.memo
 const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
-  ({ data, maxScore, height = 300, width = '100%' }) => {
+  // よくわからないがheightが固定
+  ({ data, maxScore, width = '100%', height = 300 }) => {
     // データ数に応じた動的なbarSizeとmarginの計算
     const getOptimalBarConfig = (dataLength: number) => {
       if (dataLength <= 5) {
@@ -46,7 +47,6 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
       return { barSize: 12, bottomMargin: 60 };
     };
     const { barSize, bottomMargin } = getOptimalBarConfig(data.length);
-
     return (
       <ResponsiveContainer width={width} height={height} className="">
         <ComposedChart
@@ -292,12 +292,14 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
           </h4>
 
           {/* Graph Area - Fixed minimum height to ensure visibility */}
-          <div className="h-[70dvh] max-h-3/5 mb-4">
+          {/* <div className="h-[70dvh] max-h-3/5 mb-4"> */}
+          <div className="mb-4">
             <MemoizedGraphChart
               data={orderedActivities}
               maxScore={maxScore}
               width="100%"
-              height="100%"
+              // height="40%"
+              height={300}
             />
           </div>
           {/* User Info and Stats Area */}

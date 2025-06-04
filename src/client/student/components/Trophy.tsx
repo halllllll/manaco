@@ -36,54 +36,79 @@ export const Trophy: FC<{ activities: UserDashboardProps['userData']['activities
           </svg>
           統計データ
         </h2>
-        <div className="overflow-x-auto">
-          <table className="table border border-base-content/5">
-            <tbody>
-              <p>なにがしかの統計データをここに表示する予定</p>
-              <ol className="list-decimal pl-6">
-                <li>点数top3とか</li>
-                <li>時間top3とか</li>
-                <li>学習時間の合計とか</li>
-                <li>学習回数の合計とか</li>
-                <li>学習した日数とか</li>
+        <div className="flex flex-col gap-4 overflow-y-auto max-h-[300px] md:max-h-[30vh]">
+          {/* 成績履歴 */}
+          <div className="bg-base-100 p-3 rounded-lg border border-base-300">
+            <h3 className="font-bold text-sm mb-2">学習履歴</h3>
+            <div className="overflow-y-auto max-h-[120px] pr-1">
+              <ul className="space-y-1 text-sm">
                 {orderedActivities.map((activity, index) => (
-                  <li key={index}>
-                    {activity.activityDate} - {activity.score}点, {activity.duration}秒
+                  <li key={index} className="flex justify-between border-b border-base-300 pb-1">
+                    <span>{activity.activityDate}</span>
+                    <span className="font-semibold">
+                      {activity.score}点 ({activity.duration}秒)
+                    </span>
                   </li>
                 ))}
-              </ol>
-              {/* <tr className="hover bg-warning/10">
-                <th className="text-nowrap">
-                  <div className="badge badge-warning gap-2">1位</div>
-                  <span className="ml-2">最高得点！</span>
-                </th>
-                <td className="font-bold text-lg">{stats.bestScore}点</td>
-                <td>
-                  {stats.recentActivities.find((a) => a.score === stats.bestScore)?.activityDate ||
-                    '-'}
-                </td>
-              </tr>
-              <tr className="hover bg-info/10">
-                <th className="text-nowrap">
-                  <div className="badge badge-info gap-2">2位</div>
-                  <span className="ml-2">最速回答！</span>
-                </th>
-                <td className="font-bold text-lg">{formatDuration(stats.bestTime)}</td>
-                <td>
-                  {stats.recentActivities.find((a) => a.duration === stats.bestTime)
-                    ?.activityDate || '-'}
-                </td>
-              </tr>
-              <tr className="hover bg-success/10">
-                <th className="text-nowrap">
-                  <div className="badge badge-success gap-2">3位</div>
-                  <span className="ml-2">総学習時間！</span>
-                </th>
-                <td className="font-bold text-lg">{formatDuration(stats.totalStudyTime)}</td>
-                <td>{stats.totalActivities}回分</td>
-              </tr> */}
-            </tbody>
-          </table>
+              </ul>
+            </div>
+          </div>
+
+          {/* 統計表示 */}
+          <div className="bg-base-100 border border-base-300 p-3 rounded-lg">
+            <h3 className="font-bold text-sm mb-2">ハイライト</h3>
+            <div className="overflow-x-auto">
+              <table className="table table-sm  bg-base-100 w-full">
+                <tbody>
+                  <tr className="hover:bg-warning/20">
+                    <td className="text-nowrap">
+                      <div className="badge badge-warning gap-1 text-xs">TOP</div>
+                      <span className="ml-1 text-sm">最高得点</span>
+                    </td>
+                    <td className="font-bold text-right">
+                      {Math.max(...orderedActivities.map((a) => a.score))}点
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-info/20">
+                    <td className="text-nowrap">
+                      <div className="badge badge-info gap-1 text-xs">BEST</div>
+                      <span className="ml-1 text-sm">最速回答</span>
+                    </td>
+                    <td className="font-bold text-right">
+                      {Math.min(...orderedActivities.map((a) => a.duration))}秒
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-success/20">
+                    <td className="text-nowrap">
+                      <div className="badge badge-success gap-1 text-xs">TOTAL</div>
+                      <span className="ml-1 text-sm">学習回数</span>
+                    </td>
+                    <td className="font-bold text-right">{orderedActivities.length}回</td>
+                  </tr>
+                  <tr className="hover:bg-primary/20">
+                    <td className="text-nowrap">
+                      <div className="badge badge-primary gap-1 text-xs">SUM</div>
+                      <span className="ml-1 text-sm">総学習時間</span>
+                    </td>
+                    <td className="font-bold text-right">
+                      {orderedActivities.reduce((total, a) => total + a.duration, 0)}秒
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* 将来の拡張用コメント */}
+          {/* <div className="bg-base-200 p-3 rounded-lg text-sm">
+            <h3 className="font-bold text-sm mb-2">その他の統計</h3>
+            <p>今後の予定:</p>
+            <ol className="list-decimal pl-6">
+              <li>点数top3</li>
+              <li>時間top3</li>
+              <li>学習した日数</li>
+            </ol>
+          </div> */}
         </div>
       </div>
     </div>
