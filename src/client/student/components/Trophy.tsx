@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { type FC, useMemo } from 'react';
 import { useUserStats } from '../hooks/useUserStats';
 import type { UserDashboardProps } from '../types/props';
 
@@ -8,7 +8,12 @@ import type { UserDashboardProps } from '../types/props';
 export const Trophy: FC<{ activities: UserDashboardProps['userData']['activities'] }> = ({
   activities,
 }) => {
-  const _stats = useUserStats(activities);
+  const orderedActivities = useMemo(() => {
+    return activities.toSorted((a, b) => {
+      return a.activityDate.localeCompare(b.activityDate);
+    });
+  }, [activities]);
+  const _stats = useUserStats(orderedActivities);
 
   return (
     <div className="card shadow-md lg:w-1/3 bg-base-100 border border-base-200">
@@ -41,6 +46,11 @@ export const Trophy: FC<{ activities: UserDashboardProps['userData']['activities
                 <li>学習時間の合計とか</li>
                 <li>学習回数の合計とか</li>
                 <li>学習した日数とか</li>
+                {orderedActivities.map((activity, index) => (
+                  <li key={index}>
+                    {activity.activityDate} - {activity.score}点, {activity.duration}秒
+                  </li>
+                ))}
               </ol>
               {/* <tr className="hover bg-warning/10">
                 <th className="text-nowrap">

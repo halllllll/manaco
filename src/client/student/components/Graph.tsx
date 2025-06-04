@@ -29,6 +29,24 @@ interface GraphChartProps {
 // Define MemoizedGraphChart outside the Graph component and wrap with React.memo
 const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
   ({ data, maxScore, height = 300, width = '100%' }) => {
+    // データ数に応じた動的なbarSizeとmarginの計算
+    const getOptimalBarConfig = (dataLength: number) => {
+      if (dataLength <= 5) {
+        return { barSize: 40, bottomMargin: 20 };
+      }
+      if (dataLength <= 10) {
+        return { barSize: 25, bottomMargin: 30 };
+      }
+      if (dataLength <= 20) {
+        return { barSize: 20, bottomMargin: 40 };
+      }
+      if (dataLength <= 30) {
+        return { barSize: 15, bottomMargin: 50 };
+      }
+      return { barSize: 12, bottomMargin: 60 };
+    };
+    const { barSize, bottomMargin } = getOptimalBarConfig(data.length);
+
     return (
       <ResponsiveContainer width={width} height={height} className={'min-h-2/3'}>
         <ComposedChart
@@ -40,10 +58,21 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
             bottom: 20, // Changed to positive and increased bottom margin
           }}
         >
-          <XAxis dataKey="activityDate" />
+          <XAxis
+            dataKey="activityDate"
+            tickFormatter={(date) => {
+              const dateObj = new Date(date);
+              if (Number.isNaN(dateObj.getTime())) {
+                return date;
+              }
+              return `${dateObj.getMonth() + 1}月${dateObj.getDate()}日`;
+            }}
+            angle={-30}
+            dy={5}
+          />
           <YAxis
             label={{
-              value: 'かかった時間（秒）',
+              value: 'かかった時間（分:秒）',
               position: 'insideRight',
               style: {
                 writingMode: 'vertical-rl',
@@ -54,6 +83,15 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
             dataKey={'duration'}
             orientation={'right'}
             yAxisId="bar"
+            tickFormatter={(value) => {
+              if (Number.isNaN(value)) {
+                return value;
+              }
+              const numValue = Number.parseInt(value);
+              const minutes = Math.floor(numValue / 60);
+              const seconds = numValue % 60;
+              return `${minutes}:${seconds}`;
+            }}
           />
           <YAxis
             label={{
@@ -74,7 +112,7 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
             yAxisId={'bar'}
             dataKey={'duration'}
             fill="#82ca9d"
-            barSize={'30'}
+            barSize={barSize}
             name="かかった時間（秒）"
           >
             <LabelList />
@@ -104,7 +142,13 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
             />
           </Line>
           <Tooltip />
-          <Legend />
+          <Legend
+            verticalAlign="top"
+            align="center"
+            wrapperStyle={{ paddingRight: 20, paddingTop: 0 }}
+            iconSize={16}
+            // iconType="circle"
+          />
         </ComposedChart>
       </ResponsiveContainer>
     );
