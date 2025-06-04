@@ -48,13 +48,13 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
     const { barSize, bottomMargin } = getOptimalBarConfig(data.length);
 
     return (
-      <ResponsiveContainer width={width} height={height} className={'min-h-2/3'}>
+      <ResponsiveContainer width={width} height={height} className="">
         <ComposedChart
           data={data}
           margin={{
-            top: 50, // Increased top margin
-            right: 30, // Increased right margin for YAxis label
-            left: 20, // Increased left margin for YAxis label
+            top: 20, // Increased top margin
+            right: 50, // Increased right margin for YAxis label
+            left: 10, // Increased left margin for YAxis label
             bottom: 20, // Changed to positive and increased bottom margin
           }}
         >
@@ -72,8 +72,9 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
           />
           <YAxis
             label={{
-              value: 'かかった時間（分:秒）',
-              position: 'insideRight',
+              value: 'かかった時間',
+              position: 'right',
+              offset: 30,
               style: {
                 writingMode: 'vertical-rl',
                 textAnchor: 'middle',
@@ -90,7 +91,7 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
               const numValue = Number.parseInt(value);
               const minutes = Math.floor(numValue / 60);
               const seconds = numValue % 60;
-              return `${minutes}:${seconds}`;
+              return `${minutes ? `${minutes}分` : ''}${seconds ? `${seconds}秒` : ''}`;
             }}
           />
           <YAxis
@@ -145,7 +146,7 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
           <Legend
             verticalAlign="top"
             align="center"
-            wrapperStyle={{ paddingRight: 20, paddingTop: 0 }}
+            wrapperStyle={{ paddingRight: 0, paddingTop: 0, paddingBottom: 14 }}
             iconSize={16}
             // iconType="circle"
           />
