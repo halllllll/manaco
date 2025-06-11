@@ -22,7 +22,7 @@ import type { GraphProps } from '../types/props';
 interface GraphChartProps {
   data: LearningActivity[];
   maxScore: number;
-  height: number | string;
+  height?: number | string;
   width?: number | string;
 }
 
