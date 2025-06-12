@@ -9,6 +9,5 @@ export interface LearningActivity {
 }
 
 export interface LearningActivityRequest extends LearningActivity {
-  // timestamp: string; TODO: Apps Script側でつける
   userId: string; // Apps Script側でやるとAPI呼び出しのオーバーヘッドがあるので
 }
