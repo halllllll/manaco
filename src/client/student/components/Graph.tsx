@@ -1,3 +1,4 @@
+import { useSettings } from '@/client/api/settings/hook';
 import { useToast } from '@/client/context/ToastConterxt';
 import type { LearningActivity } from '@/shared/types/activity'; // Added
 import * as htmlToImage from 'html-to-image';
@@ -22,6 +23,7 @@ import type { GraphProps } from '../types/props';
 interface GraphChartProps {
   data: LearningActivity[];
   maxScore: number;
+  isShowScore: boolean | undefined;
   height?: number | string;
   width?: number | string;
 }
@@ -29,7 +31,7 @@ interface GraphChartProps {
 // Define MemoizedGraphChart outside the Graph component and wrap with React.memo
 const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
   // よくわからないがheightが固定
-  ({ data, maxScore, width = '100%', height = 300 }) => {
+  ({ data, maxScore, isShowScore, width = '100%', height = 300 }) => {
     // データ数に応じた動的なbarSizeとmarginの計算
     const getOptimalBarConfig = (dataLength: number) => {
       if (dataLength <= 5) {
@@ -47,6 +49,7 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
       return { barSize: 12, bottomMargin: 60 };
     };
     const { barSize, bottomMargin } = getOptimalBarConfig(data.length);
+
     return (
       <ResponsiveContainer width={width} height={height} className="">
         <ComposedChart
@@ -94,6 +97,16 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
               return `${minutes ? `${minutes}分` : ''}${seconds ? `${seconds}秒` : ''}`;
             }}
           />
+
+          <Bar
+            yAxisId={'bar'}
+            dataKey={'duration'}
+            fill="#82ca9d"
+            barSize={barSize}
+            name="かかった時間（秒）"
+          >
+            <LabelList />
+          </Bar>
           <YAxis
             label={{
               value: '点数',
@@ -104,44 +117,42 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
                 fill: '#333',
               },
             }}
-            dataKey={'score'}
+            // YAxisとLineをまとめてくくれなかったので、苦肉の策で個別で不要な部分を不可視化
+            dataKey={isShowScore ? 'score' : ''}
             domain={['dataMin -10', 'dataMax']}
             orientation={'left'}
             yAxisId={'line'}
           />
-          <Bar
-            yAxisId={'bar'}
-            dataKey={'duration'}
-            fill="#82ca9d"
-            barSize={barSize}
-            name="かかった時間（秒）"
-          >
-            <LabelList />
-          </Bar>
-          <Line
-            type={'monotone'}
-            dataKey={'score'}
-            stroke="#8884d8"
-            strokeWidth={2}
-            activeDot={{ r: 8 }}
-            yAxisId={'line'}
-            name="点数"
-          >
-            <LabelList
-              position={'top'}
-              content={(props) => {
-                const { x, y, value } = props;
-                const numValue = value !== undefined ? Number(value) : 0;
-                const numY = y !== undefined ? Number(y) : 0;
-                const yPos = numValue >= maxScore - 10 ? numY + 20 : numY - 20;
-                return (
-                  <text x={x} y={yPos} fontSize={16} textAnchor="middle" className="text-primary">
-                    {value}
-                  </text>
-                );
-              }}
-            />
-          </Line>
+          {/**
+           * YAxisとLineをまとめてくくれなかったので、苦肉の策で個別で不要な部分を不可視化
+           */}
+          {isShowScore && (
+            <Line
+              type={'monotone'}
+              dataKey={'score'}
+              stroke="#8884d8"
+              strokeWidth={2}
+              activeDot={{ r: 8 }}
+              yAxisId={'line'}
+              name="点数"
+            >
+              <LabelList
+                position={'top'}
+                content={(props) => {
+                  const { x, y, value } = props;
+                  const numValue = value !== undefined ? Number(value) : 0;
+                  const numY = y !== undefined ? Number(y) : 0;
+                  const yPos = numValue >= maxScore - 10 ? numY + 20 : numY - 20;
+                  return (
+                    <text x={x} y={yPos} fontSize={16} textAnchor="middle" className="text-primary">
+                      {value}
+                    </text>
+                  );
+                }}
+              />
+            </Line>
+          )}
+
           <Tooltip />
           <Legend
             verticalAlign="top"
@@ -178,6 +189,9 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
   const { addToast } = useToast();
   const { userData } = useUserState();
   const userStats = useUserStats(activities);
+
+  // settings
+  const { data: settingsData, error: settingsError, isLoading: settingsIsLoading } = useSettings();
 
   // グラフを画像として保存する関数
   const saveAsImage = async () => {
@@ -272,7 +286,11 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
             </div>
           </div>
           <div ref={chartRef}>
-            <MemoizedGraphChart data={orderedActivities} maxScore={maxScore} />
+            <MemoizedGraphChart
+              data={orderedActivities}
+              maxScore={maxScore}
+              isShowScore={settingsData?.showScore}
+            />
           </div>
         </div>
       </div>
@@ -297,6 +315,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
             <MemoizedGraphChart
               data={orderedActivities}
               maxScore={maxScore}
+              isShowScore={settingsData?.showScore}
               width="100%"
               // height="40%"
               height={300}
@@ -333,10 +352,14 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
                       {userStats.totalActivities}回
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-blue-700">さいこうてんすう</span>
-                    <span className="text-xl font-bold text-blue-800">{userStats.bestScore}点</span>
-                  </div>
+                  {settingsData?.showScore && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-blue-700">さいこうてんすう</span>
+                      <span className="text-xl font-bold text-blue-800">
+                        {userStats.bestScore}点
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -369,14 +392,16 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
                       `}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-purple-700">へいきんてんすう</span>
-                    <div className="flex items-center">
-                      <span className="text-xl font-bold text-purple-800">
-                        {`${userStats.averageScore.toFixed(1)} 点`}
-                      </span>
+                  {settingsData?.showScore && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-purple-700">へいきんてんすう</span>
+                      <div className="flex items-center">
+                        <span className="text-xl font-bold text-purple-800">
+                          {`${userStats.averageScore.toFixed(1)} 点`}
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>

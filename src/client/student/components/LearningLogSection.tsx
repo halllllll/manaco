@@ -15,6 +15,7 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
   if (error) {
     throw new Error(`Failed to fetch settings: ${error.name} - ${error.message}`);
   }
+
   const orderedActivities = activities.toSorted((a, b) =>
     b.activityDate.localeCompare(a.activityDate),
   );
@@ -63,16 +64,19 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
               <table className="table w-full">
                 <thead className="">
                   <tr className="">
+                    {/** 日付 */}
                     <th className="sticky top-0 bg-base-100 text-primary-content rounded-tl-lg font-bold z-10 shadow-sm">
                       日付
                     </th>
+                    {/** 点数 */}
                     <th className="sticky top-0 bg-base-100 text-primary-content text-end font-bold z-10 shadow-sm">
-                      点数
+                      <span className={`${!data?.showScore ? 'opacity-0' : ''}`}>点数</span>
                     </th>
+                    {/** 学習時間 */}
                     <th className="hidden md:table-cell sticky top-0 bg-base-100 text-primary-content text-end font-bold z-10 shadow-sm">
-                      かかった時間
+                      学習時間
                     </th>
-
+                    {/** きもち */}
                     <th className="hidden md:table-cell sticky top-0 bg-base-100 text-primary-content text-center font-bold z-10 w-32 shadow-sm">
                       <span className={`${!data?.showMood ? 'opacity-0' : ''}`}>きもち</span>
                     </th>
@@ -96,6 +100,7 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
                       tabIndex={0}
                       aria-label={`View details for ${formatDate(activity.activityDate)}`}
                     >
+                      {/** 日付 */}
                       <td className="font-medium">
                         <div className="flex items-center gap-2">
                           <svg
@@ -116,16 +121,20 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
                           {formatDate(activity.activityDate)}
                         </div>
                       </td>
+                      {/** 点数 */}
                       <td className="text-end">
-                        <div className="flex items-center justify-end">
-                          <span
-                            className="badge badge-lg border-primary  px-3 py-3"
-                            title={`${activity.score}点`}
-                          >
-                            {activity.score}点
-                          </span>
-                        </div>
+                        {data?.showScore && (
+                          <div className="flex items-center justify-end">
+                            <span
+                              className="badge badge-lg border-primary  px-3 py-3"
+                              title={`${activity.score}点`}
+                            >
+                              {activity.score}点
+                            </span>
+                          </div>
+                        )}
                       </td>
+                      {/** 学習時間 */}
                       <td className="text-end hidden md:table-cell">
                         <div className="flex items-center justify-end gap-1">
                           <svg
@@ -146,6 +155,7 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
                           <span className="font-medium">{formatDuration(activity.duration)}</span>
                         </div>
                       </td>
+                      {/** きもち */}
                       <td className="text-center hidden md:table-cell w-32">
                         {data?.showMood && (
                           <div
@@ -196,6 +206,7 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
       <ActivityDetailModal
         selectedActivity={selectedActivity}
         onClose={() => setSelectedActivity(null)}
+        isShowScore={data?.showScore}
       />
     </div>
   );
@@ -207,7 +218,8 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
 const ActivityDetailModal: FC<{
   selectedActivity: LearningActivity | null;
   onClose: () => void;
-}> = ({ selectedActivity, onClose }) => {
+  isShowScore: boolean | undefined;
+}> = ({ selectedActivity, onClose, isShowScore }) => {
   return (
     <dialog id="activity_detail_modal" className={`modal ${selectedActivity ? 'modal-open' : ''}`}>
       <div className="modal-box max-w-lg">
@@ -233,34 +245,36 @@ const ActivityDetailModal: FC<{
             </h3>
 
             <div className="divider" />
-
+            {/** TODO: gridにしちゃってるのでなんか寂しい */}
             <div className="grid grid-cols-2 gap-4 mt-4">
-              <div className="stats shadow bg-base-100">
-                <div className="stat">
-                  <div className="stat-title flex items-center gap-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-primary"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <title>点数</title>
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                    今回の点数
-                  </div>
-                  <div className="stat-value text-primary">
-                    {selectedActivity.score}
-                    <span className="text-xs">点</span>
+              {isShowScore && (
+                <div className="stats shadow bg-base-100">
+                  <div className="stat">
+                    <div className="stat-title flex items-center gap-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 text-primary"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <title>点数</title>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                      今回の点数
+                    </div>
+                    <div className="stat-value text-primary">
+                      {selectedActivity.score}
+                      <span className="text-xs">点</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               <div className="stats shadow bg-base-100">
                 <div className="stat">
@@ -280,7 +294,7 @@ const ActivityDetailModal: FC<{
                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    かかった時間
+                    学習時間
                   </div>
                   <div className="stat-value text-info text-3xl">
                     {formatDuration(selectedActivity.duration)}

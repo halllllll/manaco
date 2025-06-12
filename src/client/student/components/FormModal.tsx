@@ -157,214 +157,120 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
                           </span>
                         </label>
                         <div>
+                          {/** Popover APIをやろうとしたがSafari 17環境が多いため動かず、仕方なくmodalを使う */}
                           <button
                             type="button"
                             name={field.name}
-                            popoverTarget="date-popover"
                             className="input input-border text-xl"
                             id={field.name}
-                            // style="anchorName:--target-date" // anchorpositioning関係はエディタ上では現状のルール,環境およびツールチェインだとエラーになる
-                            style={{ anchorName: '--target-date' } as CSSProperties}
+                            onClick={(e) => {
+                              const di = document.getElementById('date-modal') as HTMLDialogElement;
+                              di.showModal();
+                            }}
                           >
                             {today}
                           </button>
-                          <div
-                            popover="auto"
-                            id="date-popover"
-                            className="dropdown bg-base-100 rounded-box shadow-lg max-w-xl w-full"
-                            // style="positionAnchor:--target-date" // anchorpositioning関係はエディタ上では現状のルール,環境およびツールチェインだとエラーになる
+                          <dialog
+                            id="date-modal"
+                            className="modal"
                             style={{ positionAnchor: '--target-date' } as CSSProperties}
                           >
-                            <div className="card bg-base-100 shadow-md border border-base-200 w-full max-w-xl">
-                              <div className="card-body">
-                                <h2 className="card-title text-xl flex items-center gap-2">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-6 w-6 text-accent"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
+                            <div className="modal-box">
+                              <div className="card">
+                                <div className="card-body">
+                                  <h2 className="card-title text-xl flex items-center gap-2">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-6 w-6 text-accent"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <title>{'calendar'}</title>
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                      />
+                                    </svg>
+                                    カレンダー
+                                  </h2>
+                                  <calendar-date
+                                    className="cally bg-base-100 p-2 shadow-none rounded-box w-full font-bold"
+                                    value={field.state.value}
+                                    formatWeekday="short"
+                                    showOutsideDays={true}
+                                    // isDateDisallowed={(date) => {
+                                    //   const disabledDates =
+                                    //     dashboardData?.activities.map(
+                                    //       (activity) => activity.activityDate,
+                                    //     ) || [];
+                                    //   return disabledDates.includes(date.toISOString().split('T')[0]);
+                                    // }}
+                                    onchange={(e) => {
+                                      const value = (e.target as HTMLInputElement).value;
+                                      field.handleChange(value);
+                                      const targetDateButton =
+                                        document.getElementById('target-date-btn');
+                                      if (targetDateButton) {
+                                        targetDateButton.innerText = value;
+                                      }
+
+                                      const modal = document.getElementById(
+                                        'date-modal',
+                                      ) as HTMLDialogElement;
+                                      modal.close();
+                                    }}
                                   >
-                                    <title>{'calendar'}</title>
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                    />
-                                  </svg>
-                                  カレンダー
-                                </h2>
-                                <calendar-date
-                                  className="cally bg-base-100 p-2 shadow-none rounded-box w-full font-bold"
-                                  value={field.state.value}
-                                  formatWeekday="short"
-                                  showOutsideDays={true}
-                                  isDateDisallowed={(date) => {
-                                    const disabledDates =
-                                      dashboardData?.activities.map(
-                                        (activity) => activity.activityDate,
-                                      ) || [];
-                                    return disabledDates.includes(date.toISOString().split('T')[0]);
-                                  }}
-                                  onchange={(e) => {
-                                    const value = (e.target as HTMLInputElement).value;
-                                    field.handleChange(value);
-                                    const targetDateButton =
-                                      document.getElementById('target-date-btn');
-                                    if (targetDateButton) {
-                                      targetDateButton.innerText = value;
-                                    }
-                                    // close popover
-                                    const popover = document.getElementById('date-popover');
-                                    if (popover && 'hidePopover' in popover) {
-                                      (popover as HTMLElement).hidePopover();
-                                    }
-                                  }}
-                                >
-                                  <button
-                                    type={'button'}
-                                    slot={'previous'}
-                                    aria-label={'previous'}
-                                    className="btn btn-ghost btn-md btn-outline"
-                                  >
-                                    <span className="flex items-center">
-                                      <svg
-                                        className="fill-current size-4"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <title>前の月</title>
-                                        <path d="M15.75 19.5 8.25 12l7.5-7.5" />
-                                      </svg>
-                                      <span className="ml-1">前の月</span>
-                                    </span>
-                                  </button>
-                                  <button
-                                    type={'button'}
-                                    slot={'next'}
-                                    aria-label={'next'}
-                                    className="btn btn-ghost btn-md btn-outline"
-                                  >
-                                    <span className="flex items-center">
-                                      <span className="mr-1">次の月</span>
-                                      <svg
-                                        className="fill-current size-4"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <title>次の月</title>
-                                        <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                                      </svg>
-                                    </span>
-                                  </button>
-                                  <calendar-month />
-                                </calendar-date>
+                                    <button
+                                      type={'button'}
+                                      slot={'previous'}
+                                      aria-label={'previous'}
+                                      className="btn btn-ghost btn-md btn-outline"
+                                    >
+                                      <span className="flex items-center">
+                                        <svg
+                                          className="fill-current size-4"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <title>前の月</title>
+                                          <path d="M15.75 19.5 8.25 12l7.5-7.5" />
+                                        </svg>
+                                        <span className="ml-1">前の月</span>
+                                      </span>
+                                    </button>
+                                    <button
+                                      type={'button'}
+                                      slot={'next'}
+                                      aria-label={'next'}
+                                      className="btn btn-ghost btn-md btn-outline"
+                                    >
+                                      <span className="flex items-center">
+                                        <span className="mr-1">次の月</span>
+                                        <svg
+                                          className="fill-current size-4"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <title>次の月</title>
+                                          <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                        </svg>
+                                      </span>
+                                    </button>
+                                    <calendar-month />
+                                  </calendar-date>
+                                </div>
                               </div>
                             </div>
-                          </div>
+                          </dialog>
                         </div>
                       </div>
                     );
                   }}
                 />
               </div>
-              {/* 学習時間 */}
-              {/* <div className="form-control w-full mb-4">
-              <label className="label" htmlFor="study_time">
-                <span className="label-text text-lg font-medium flex items-center gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <title>{'clock'}</title>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  どれくらい勉強した？
-                </span>
-              </label>
-              <div className="flex gap-4">
-                <div className="flex lg:flex-row flex-col lg: justify-around gap-4 items-center w-full">
-                  <div className="flex flex-col items-center">
-                    <span className="text-sm mb-1">分</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        className="btn btn-outline btn-md bg-neutral text-neutral-content"
-                        onClick={() => setMinutes(Math.max(minutes - 10, 0))}
-                      >
-                        <span className="i-lucide-chevrons-left" />
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-outline btn-md"
-                        onClick={() => setMinutes(Math.max(minutes - 1, 0))}
-                      >
-                        <span className="i-lucide-chevron-left" />
-                      </button>
-                      <div className="mx-2  text-center text-2xl font-semibold w-10">{minutes}</div>
-                      <button
-                        type="button"
-                        className="btn btn-md btn-outline"
-                        onClick={() => setMinutes(minutes + 1)}
-                      >
-                        <span className="i-lucide-chevron-right" />
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-md btn-outline bg-neutral text-neutral-content"
-                        onClick={() => setMinutes(minutes + 10)}
-                      >
-                        <span className="i-lucide-chevrons-right" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-sm mb-1">秒</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        className="btn btn-outline btn-md bg-neutral text-neutral-content"
-                        onClick={() => setSeconds(Math.max(seconds - 10, 0))}
-                      >
-                        <span className="i-lucide-chevrons-left" />
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-outline btn-md"
-                        onClick={() => setSeconds(Math.max(seconds - 1, 0))}
-                      >
-                        <span className="i-lucide-chevron-left" />
-                      </button>
-                      <div className="mx-2  text-center text-2xl font-semibold w-10">{seconds}</div>
-                      <button
-                        type="button"
-                        className="btn btn-md btn-outline"
-                        onClick={() => setSeconds(seconds + 1)}
-                      >
-                        <span className="i-lucide-chevron-right" />
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-md btn-outline bg-neutral text-neutral-content"
-                        onClick={() => setSeconds(seconds + 10)}
-                      >
-                        <span className="i-lucide-chevrons-right" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> */}
-              {/* 学習時間 */}
               <div className="form-control w-full mb-6">
                 <label className="label" htmlFor="study_time">
                   <span className="label-text text-lg font-medium flex items-center gap-2">
@@ -388,14 +294,14 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
                 </label>
 
                 <div className="rounded-lg p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="flex flex-col md:flex-row gap-8">
                     {/* 分の設定 */}
                     <form.Field
                       name="study_time.minutes"
                       // biome-ignore lint/correctness/noChildrenProp: <explanation>
                       children={(field) => {
                         return (
-                          <div className="flex flex-col items-center space-y-4">
+                          <div className="flex flex-col items-center space-y-4 md:flex-1">
                             <div className="text-center">
                               <span className="text-lg font-medium text-base-content/70 uppercase tracking-wide">
                                 分
@@ -469,145 +375,151 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
                     />
 
                     {/* 秒の設定 */}
-                    <form.Field
-                      name="study_time.seconds"
-                      // biome-ignore lint/correctness/noChildrenProp: <explanation>
-                      children={(field) => {
-                        return (
-                          <div className="flex flex-col items-center space-y-4">
-                            <div className="text-center">
-                              <span className="text-lg font-medium text-base-content/70 uppercase tracking-wide">
-                                秒
-                              </span>
-                              <div className="text-4xl font-bold text-secondary mt-1">
-                                {field.state.value}
+                    {settingsData.showSecond && (
+                      <form.Field
+                        name="study_time.seconds"
+                        // biome-ignore lint/correctness/noChildrenProp: <explanation>
+                        children={(field) => {
+                          return (
+                            <div className="flex flex-col items-center space-y-4 md:flex-1">
+                              <div className="text-center">
+                                <span className="text-lg font-medium text-base-content/70 uppercase tracking-wide">
+                                  秒
+                                </span>
+                                <div className="text-4xl font-bold text-secondary mt-1">
+                                  {field.state.value}
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-4">
+                                <button
+                                  type="button"
+                                  className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                                  onClick={() => {
+                                    field.handleChange(Math.max(field.state.value - 10, 0));
+                                  }}
+                                  title="10秒減らす"
+                                >
+                                  <span className="i-lucide-chevrons-left text-xs" />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                                  onClick={() => {
+                                    // setSeconds(Math.max(seconds - 1, 0));
+                                    field.handleChange(Math.max(field.state.value - 1, 0));
+                                  }}
+                                  title="1秒減らす"
+                                >
+                                  <span className="i-lucide-chevron-left text-xs" />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                                  onClick={() => {
+                                    // setSeconds(seconds + 1);
+                                    field.handleChange(field.state.value + 1);
+                                  }}
+                                  title="1秒増やす"
+                                >
+                                  <span className="i-lucide-chevron-right text-xs" />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
+                                  onClick={() => {
+                                    // setSeconds(seconds + 10);
+                                    field.handleChange(field.state.value + 10);
+                                  }}
+                                  title="10秒増やす"
+                                >
+                                  <span className="i-lucide-chevrons-right text-xs" />
+                                </button>
+                              </div>
+
+                              {/* クイック設定ボタン */}
+                              <div className="flex gap-1 flex-wrap justify-center">
+                                {[15, 30, 45].map((sec) => (
+                                  <button
+                                    key={sec}
+                                    type="button"
+                                    className="btn btn-xs btn-ghost hover:btn-secondary"
+                                    onClick={() => {
+                                      field.handleChange(sec);
+                                    }}
+                                  >
+                                    {sec}秒
+                                  </button>
+                                ))}
                               </div>
                             </div>
-
-                            <div className="flex items-center gap-4">
-                              <button
-                                type="button"
-                                className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
-                                onClick={() => {
-                                  field.handleChange(Math.max(field.state.value - 10, 0));
-                                }}
-                                title="10秒減らす"
-                              >
-                                <span className="i-lucide-chevrons-left text-xs" />
-                              </button>
-                              <button
-                                type="button"
-                                className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
-                                onClick={() => {
-                                  // setSeconds(Math.max(seconds - 1, 0));
-                                  field.handleChange(Math.max(field.state.value - 1, 0));
-                                }}
-                                title="1秒減らす"
-                              >
-                                <span className="i-lucide-chevron-left text-xs" />
-                              </button>
-                              <button
-                                type="button"
-                                className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
-                                onClick={() => {
-                                  // setSeconds(seconds + 1);
-                                  field.handleChange(field.state.value + 1);
-                                }}
-                                title="1秒増やす"
-                              >
-                                <span className="i-lucide-chevron-right text-xs" />
-                              </button>
-                              <button
-                                type="button"
-                                className="btn btn-lg btn-circle btn-outline hover:btn-secondary"
-                                onClick={() => {
-                                  // setSeconds(seconds + 10);
-                                  field.handleChange(field.state.value + 10);
-                                }}
-                                title="10秒増やす"
-                              >
-                                <span className="i-lucide-chevrons-right text-xs" />
-                              </button>
-                            </div>
-
-                            {/* クイック設定ボタン */}
-                            <div className="flex gap-1 flex-wrap justify-center">
-                              {[15, 30, 45].map((sec) => (
-                                <button
-                                  key={sec}
-                                  type="button"
-                                  className="btn btn-xs btn-ghost hover:btn-secondary"
-                                  onClick={() => {
-                                    field.handleChange(sec);
-                                  }}
-                                >
-                                  {sec}秒
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }}
-                    />
+                          );
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
-              {/* 点数 */}
-              <form.Field
-                name="score"
-                // biome-ignore lint/correctness/noChildrenProp: <explanation>
-                children={(field) => {
-                  return (
-                    <div className="form-control w-full mb-6">
-                      <label className="label" htmlFor={field.name}>
-                        <span className="label-text text-lg font-medium flex items-center gap-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <title>{'score'}</title>
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                            />
-                          </svg>
-                          今日の点数は？
-                        </span>
-                      </label>
-                      <div className="flex flex-col gap-2">
-                        <div className="text-center inline-block">
-                          <input
-                            type="number"
-                            className={`${field.state.meta.isDefaultValue || !field.state.value ? 'placeholder:text-base text-md' : 'text-5xl'} text-primary focus:rounded-lg focus:border-b-base-100 border-base-300  w-48 border-b-primary border-b-2 text-center outline-none h-18 align-bottom font-bold`}
-                            value={field.state.value || ''}
-                            placeholder="タップして入力"
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                              const scoreValue = Math.min(
-                                Math.max(
-                                  Number.parseInt(e.target.value),
-                                  settingsData.scoreMin ?? 0,
-                                ),
-                                settingsData.scoreMax ?? 100,
-                              );
 
-                              // setScore(e.target.value ? Number.parseInt(e.target.value) : null);
-                              // setScore(scoreValue);
-                              field.handleChange(scoreValue);
-                            }}
-                            required
-                          />
-                          <span className="text-lg"> 点</span>
+              {/* 点数 */}
+              {settingsData.showScore && (
+                <form.Field
+                  name="score"
+                  // biome-ignore lint/correctness/noChildrenProp: <explanation>
+                  children={(field) => {
+                    return (
+                      <div className="form-control w-full mb-6">
+                        <label className="label" htmlFor={field.name}>
+                          <span className="label-text text-lg font-medium flex items-center gap-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <title>{'score'}</title>
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              />
+                            </svg>
+                            今日の点数は？
+                          </span>
+                        </label>
+                        <div className="flex flex-col gap-2">
+                          <div className="text-center inline-block">
+                            <input
+                              type="number"
+                              className={`${field.state.meta.isDefaultValue || !field.state.value ? 'placeholder:text-base text-md' : 'text-5xl'} text-primary focus:rounded-lg focus:border-b-base-100 border-base-300  w-48 border-b-primary border-b-2 text-center outline-none h-18 align-bottom font-bold`}
+                              value={field.state.value || ''}
+                              placeholder="タップして入力"
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                const scoreValue = Math.min(
+                                  Math.max(
+                                    Number.parseInt(e.target.value),
+                                    settingsData.scoreMin ?? 0,
+                                  ),
+                                  settingsData.scoreMax ?? 100,
+                                );
+
+                                // setScore(e.target.value ? Number.parseInt(e.target.value) : null);
+                                // setScore(scoreValue);
+                                field.handleChange(scoreValue);
+                              }}
+                              required
+                            />
+                            <span className="text-lg"> 点</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                }}
-              />
+                    );
+                  }}
+                />
+              )}
+
               {/* 気分 (オプション) */}
               {settingsData.showMood && (
                 <form.Field

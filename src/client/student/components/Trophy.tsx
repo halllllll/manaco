@@ -1,3 +1,4 @@
+import { useSettings } from '@/client/api/settings/hook';
 import { type FC, useMemo } from 'react';
 import type { UserDashboardProps } from '../types/props';
 
@@ -71,10 +72,6 @@ export const Trophy: FC<{ activities: UserDashboardProps['userData']['activities
       return activityDate >= weekStart;
     });
 
-    // 高得点率を計算（80点以上）
-    const highScoreCount = scores.filter((s) => s >= 80).length;
-    const highScoreRate = Math.round((highScoreCount / scores.length) * 100);
-
     return {
       maxScore,
       avgScore,
@@ -86,15 +83,17 @@ export const Trophy: FC<{ activities: UserDashboardProps['userData']['activities
       maxStreak,
       perfectScores: scores.filter((s) => s === 100).length,
       thisWeekSessions: thisWeekActivities.length,
-      highScoreRate,
     };
   }, [orderedActivities]);
+
+  // app settings
+  const { data: settingsData, error: settingsError, isLoading: settingsIsLoading } = useSettings();
 
   if (!stats) {
     return (
       <div className="card shadow-md lg:w-1/3 bg-base-100 border border-base-200">
         <div className="card-body">
-          <h2 className="card-title text-xl flex items-center gap-2">
+          <h2 className="card-title text-xl flex items-center gap-2 flex-shrink-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 text-secondary"
@@ -121,8 +120,8 @@ export const Trophy: FC<{ activities: UserDashboardProps['userData']['activities
   }
 
   return (
-    <div className="card shadow-md lg:w-1/3 bg-base-100 border border-base-200">
-      <div className="card-body">
+    <div className="card shadow-md lg:w-1/3 bg-base-100 border border-base-200 flex flex-col">
+      <div className="card-body flex flex-col overflow-hidden">
         <h2 className="card-title text-xl flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -142,43 +141,50 @@ export const Trophy: FC<{ activities: UserDashboardProps['userData']['activities
           学習統計
         </h2>
 
-        <div className="flex flex-col gap-4 overflow-y-auto max-h-[400px] md:max-h-[40vh]">
+        <div className="flex flex-col gap-4 overflow-y-auto">
           {/* 主要指標 */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 p-3 rounded-lg">
-              <div className="flex items-center gap-2 mb-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-warning"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <title>最高得点</title>
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-                <span className="text-xs font-medium text-warning">最高得点</span>
-              </div>
-              <div className="text-2xl font-bold text-warning">{stats.maxScore}</div>
-              <div className="text-xs text-base-content/60">点</div>
-            </div>
 
-            <div className="bg-gradient-to-br from-success/10 to-success/5 border border-success/20 p-3 rounded-lg">
-              <div className="flex items-center gap-2 mb-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-success"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <title> </title>
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-xs font-medium text-success">平均得点</span>
+          {settingsData?.showScore && (
+            <>
+              {/** 得点関連 */}
+              <div className="grid grid-cols-2 gap-3">
+                {/** 最高得点 */}
+                <div className="bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 p-3 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-warning"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <title>最高得点</title>
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                    <span className="text-xs font-medium text-warning">最高得点</span>
+                  </div>
+                  <div className="text-2xl font-bold text-warning">{stats.maxScore}</div>
+                  <div className="text-xs text-base-content/60">点</div>
+                </div>
+                {/** 平均得点 */}
+                <div className="bg-gradient-to-br from-success/10 to-success/5 border border-success/20 p-3 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-success"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <title> </title>
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-xs font-medium text-success">平均得点</span>
+                  </div>
+                  <div className="text-2xl font-bold text-success">{stats.avgScore}</div>
+                  <div className="text-xs text-base-content/60">点</div>
+                </div>
               </div>
-              <div className="text-2xl font-bold text-success">{stats.avgScore}</div>
-              <div className="text-xs text-base-content/60">点</div>
-            </div>
-          </div>
+            </>
+          )}
 
           {/* 学習実績 */}
           <div className="bg-base-200/50 border border-base-300 p-4 rounded-lg">
@@ -209,10 +215,12 @@ export const Trophy: FC<{ activities: UserDashboardProps['userData']['activities
                 <span className="text-sm text-base-content/70">学習日数</span>
                 <span className="font-bold text-secondary">{stats.studyDays}日</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-base-content/70">満点回数</span>
-                <span className="font-bold text-warning">{stats.perfectScores}回</span>
-              </div>
+              {settingsData?.showScore && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-base-content/70">満点回数</span>
+                  <span className="font-bold text-warning">{stats.perfectScores}回</span>
+                </div>
+              )}
             </div>
           </div>
 
