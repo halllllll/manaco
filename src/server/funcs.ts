@@ -18,3 +18,7 @@ export const columnToA1 = (columnNumber: number): string => {
 
   return result;
 };
+
+export const assertNever = (_: never) => {
+  throw new Error('This code should not be called');
+};

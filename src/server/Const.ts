@@ -24,6 +24,11 @@ export const DefaultSettingsItemValue: {
   desc: string;
 }[] = [
   {
+    name: '点数記録',
+    value: true,
+    desc: '点数を記録する（FALSEの場合、点数下限・上限の設定は無視されます）',
+  },
+  {
     name: '点数下限',
     value: 0,
     desc: 'フォームで受け入れる点数の下限',
@@ -43,6 +48,11 @@ export const DefaultSettingsItemValue: {
     value: true,
     desc: 'フォームで「メモ」の表示切り替え',
   },
+  {
+    name: '秒表示',
+    value: false,
+    desc: 'フォームで「秒」の表示切り替え',
+  },
 ];
 export type SettingsResult = {
   item: SettingsItem;
@@ -51,13 +61,18 @@ export type SettingsResult = {
 
 export const SETTINGS_SHEET_LABEL: readonly SettingsSheetItem[] = [
   {
-    name: '点数下限',
+    name: '点数記録',
     rowAt: 2,
+    type: 'boolean',
+  },
+  {
+    name: '点数下限',
+    rowAt: 3,
     type: 'number',
   },
   {
     name: '点数上限',
-    rowAt: 3,
+    rowAt: 4,
     type: 'number',
   },
   {
@@ -68,6 +83,11 @@ export const SETTINGS_SHEET_LABEL: readonly SettingsSheetItem[] = [
   {
     name: 'メモ表示',
     rowAt: 6,
+    type: 'boolean',
+  },
+  {
+    name: '秒表示',
+    rowAt: 7,
     type: 'boolean',
   },
 ] as const;

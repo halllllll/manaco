@@ -5,6 +5,7 @@ import {
   LEARNING_ACTIVITY_SHEET_HEADERS,
   LEARNING_ACTIVITY_SHEET_NAME,
   SETTINGS_SHEET_HEADERS,
+  SETTINGS_SHEET_LABEL,
   SETTINGS_SHEET_NAME,
   type SettingsResult,
   type SettingsSheetItem,
@@ -12,7 +13,7 @@ import {
   USER_SHEET_NAME,
   ss,
 } from './Const';
-import { columnToA1 } from './funcs';
+import { assertNever, columnToA1 } from './funcs';
 
 /**
  * 登録されている全ユーザーを取得
@@ -197,6 +198,28 @@ export const init = () => {
     .setValues([[...SETTINGS_SHEET_HEADERS]]);
   settingSheet.getRange(1, 1, 1, SETTINGS_SHEET_HEADERS.length).setFontWeight('bold');
   settingSheet.setColumnWidths(1, SETTINGS_SHEET_HEADERS.length, 100);
+  // * add validation rule
+  for (const label of SETTINGS_SHEET_LABEL) {
+    const targetRange = settingSheet.getRange(label.rowAt, 2);
+    switch (label.type) {
+      case 'boolean':
+        targetRange.setDataValidation(
+          SpreadsheetApp.newDataValidation().requireValueInList(['FALSE', 'TRUE'], true).build(),
+        );
+        break;
+      case 'number':
+        targetRange.setDataValidation(
+          SpreadsheetApp.newDataValidation().requireNumberBetween(0, 1000).build(),
+        );
+        break;
+      case 'date':
+        targetRange.setDataValidation(SpreadsheetApp.newDataValidation().requireDate().build());
+        break;
+      default:
+        assertNever(label.type);
+        break;
+    }
+  }
 
   // Set the first row as frozen
   userSheet.setFrozenRows(1);

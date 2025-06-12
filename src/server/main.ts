@@ -22,6 +22,7 @@ import { customMenu1, initAppMenu, openDialog } from './Menu/Menu';
 import type { LearningActivityRequest } from '@/shared/types/activity';
 import { getSettings, getUserActivities, getUserById, init, saveActivity } from './query';
 
+import { assertNever } from './funcs';
 import {
   AppSettingSheetValidationTest,
   LearningLogSheetValidationTest,
@@ -154,10 +155,6 @@ const initApp = (): InitAppDTO => {
       message: `Error: ${err.name}: ${err.message}`,
     };
   }
-};
-
-const assertNever = (_: never) => {
-  throw new Error('This code should not be called');
 };
 
 const getSettingsData = (): SettingsDTO => {
