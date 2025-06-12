@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 /**
- * ダッシュボードローディング時のスケルトンコンポーネント (新レイアウト版)
+ * ダッシュボードローディング時のスケルトンコンポーネント
  */
 export const DashboardSkeleton: FC = () => {
   return (
