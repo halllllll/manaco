@@ -156,6 +156,10 @@ const initApp = (): InitAppDTO => {
   }
 };
 
+const assertNever = (_: never) => {
+  throw new Error('This code should not be called');
+};
+
 const getSettingsData = (): SettingsDTO => {
   try {
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
@@ -176,7 +180,14 @@ const getSettingsData = (): SettingsDTO => {
         case 'メモ表示':
           o.showMemo = value as boolean;
           break;
+        case '秒表示':
+          o.showSecond = value as boolean;
+          break;
+        case '点数記録':
+          o.showScore = value as boolean;
+          break;
         default:
+          assertNever(label);
           break;
       }
       return o;

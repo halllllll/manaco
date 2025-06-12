@@ -306,27 +306,35 @@ export const mockHealthCheckData: Record<string, ValidationResult> = {
 // アプリ設定データ
 export const mockAppSettingsData: Record<string, AppSettings> = {
   '1': {
+    showScore: false,
     scoreMax: 100,
     scoreMin: 0,
     showMood: true,
     showMemo: true,
+    showSecond: false,
   },
   '2': {
+    showScore: true,
     scoreMax: 100,
     scoreMin: 0,
     showMood: false,
     showMemo: false,
+    showSecond: true,
   },
   '3': {
+    showScore: false,
     scoreMax: 15,
     scoreMin: 0,
     showMood: true,
-    showMemo: false,
+    showMemo: true,
+    showSecond: true,
   },
   '4': {
+    showScore: false,
     scoreMax: 50,
     scoreMin: 10,
     showMood: false,
     showMemo: true,
+    showSecond: false,
   },
 };

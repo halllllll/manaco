@@ -3,4 +3,6 @@ export type AppSettings = {
   scoreMax: number;
   showMood: boolean;
   showMemo: boolean;
+  showSecond: boolean;
+  showScore: boolean;
 };

@@ -3,7 +3,13 @@ const ss = SpreadsheetApp.getActive();
 export const SETTINGS_SHEET_NAME = 'アプリ設定';
 export const SETTINGS_SHEET_HEADERS: readonly string[] = ['設定項目', '値', '説明'] as const;
 
-export type SettingsItem = '点数下限' | '点数上限' | 'きもち表示' | 'メモ表示';
+export type SettingsItem =
+  | '点数記録'
+  | '点数下限'
+  | '点数上限'
+  | 'きもち表示'
+  | 'メモ表示'
+  | '秒表示';
 export type SettingsType = 'number' | 'boolean' | 'date';
 
 export type SettingsSheetItem = {
