@@ -41,6 +41,9 @@
       "file": "./daisyui.md"
     }
   ],
+  "github.copilot.advanced": {
+    "authProvider": "github"
+  },
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#e85b38",
     "activityBar.background": "#e85b38",
