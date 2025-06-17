@@ -10,7 +10,7 @@ import { Trophy } from './Trophy';
 export const UserDashboard: FC<UserDashboardProps> = ({ userData }) => {
   return (
     <div className="flex flex-col">
-      <div className="flex flex-col lg:flex-row gap-4 mb-4 max-h-[400px]">
+      <div className="flex flex-col lg:flex-row gap-4 mb-4 max-h-[440px]">
         <Graph activities={userData.activities} />
         <Trophy activities={userData.activities} />
       </div>

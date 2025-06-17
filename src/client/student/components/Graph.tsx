@@ -4,6 +4,7 @@ import type { LearningActivity } from '@/shared/types/activity'; // Added
 import * as htmlToImage from 'html-to-image';
 import type { FC } from 'react';
 import React, { useMemo, useRef, useState } from 'react'; // Added React, useMemo
+import { type Activity, ActivityCalendar } from 'react-activity-calendar';
 import {
   Bar,
   ComposedChart,
@@ -20,7 +21,7 @@ import { useUserStats } from '../hooks/useUserStats';
 import type { GraphProps } from '../types/props';
 
 // Define GraphChartProps interface
-interface GraphChartProps {
+interface ChartComponentProps {
   data: LearningActivity[];
   maxScore: number;
   isShowScore: boolean | undefined;
@@ -29,7 +30,7 @@ interface GraphChartProps {
 }
 
 // Define MemoizedGraphChart outside the Graph component and wrap with React.memo
-const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
+const MemoizedGraphChart: FC<ChartComponentProps> = React.memo(
   // よくわからないがheightが固定
   ({ data, maxScore, isShowScore, width = '100%', height = 300 }) => {
     // データ数に応じた動的なbarSizeとmarginの計算
@@ -166,7 +167,94 @@ const MemoizedGraphChart: FC<GraphChartProps> = React.memo(
     );
   },
 );
-MemoizedGraphChart.displayName = 'MemoizedGraphChart';
+// MemoizedGraphChart.displayName = 'MemoizedGraphChart';
+
+const MemoizedHeatmapChart: FC<ChartComponentProps> = React.memo(
+  ({ data, width = '100%', height = 300 }) => {
+    const dateMap = new Map<string, Activity>();
+    for (const d of data) {
+      if (dateMap.has(d.activityDate)) {
+        const updateData = dateMap.get(d.activityDate) as Activity;
+        updateData.count += 1;
+        dateMap.set(d.activityDate, updateData);
+      } else {
+        const newData: Activity = {
+          date: d.activityDate,
+          count: 1,
+          level: 1,
+        };
+        dateMap.set(d.activityDate, newData);
+      }
+    }
+
+    console.log([...dateMap.values()]);
+
+    return (
+      <div style={{ width, height }}>
+        <ActivityCalendar
+          data={[...dateMap.values()]}
+          blockSize={30}
+          showWeekdayLabels={true}
+          hideMonthLabels={false}
+          theme={{
+            light: ['#fefefe', '#7ac7c4', '#384259'],
+            dark: ['hsl(0, 0.00%, 85.10%)', '#7DB9B6', '#E96479'],
+          }}
+          maxLevel={2}
+          weekStart={1}
+          labels={{
+            weekdays: ['日', '月', '火', '水', '木', '金', '土'],
+            months: [
+              '1月',
+              '2月',
+              '3月',
+              '4月',
+              '5月',
+              '6月',
+              '7月',
+              '8月',
+              '9月',
+              '10月',
+              '11月',
+              '12月',
+            ],
+            totalCount: '',
+          }}
+          hideColorLegend={true}
+          hideTotalCount={true}
+        />
+      </div>
+    );
+  },
+);
+
+type TabType = 'graph' | 'heatmap';
+// 将来的な拡張のためのタブ設定
+interface TabConfig {
+  id: TabType;
+  label: string;
+  displayName: string;
+  // icon: JSX.Element;
+  // showStats: boolean; // 統計情報を表示するかどうか
+}
+
+const CHART_COMPONENTS: Record<TabType, FC<ChartComponentProps>> = {
+  graph: MemoizedGraphChart,
+  heatmap: MemoizedHeatmapChart,
+};
+
+const TAB_CONFIGS: Record<TabType, TabConfig> = {
+  graph: {
+    id: 'graph',
+    label: 'グラフ',
+    displayName: 'グラフ',
+  },
+  heatmap: {
+    id: 'heatmap',
+    label: 'ヒートマップ',
+    displayName: 'ヒートマップ',
+  },
+};
 
 /**
  * 学習記録グラフコンポーネント
@@ -183,7 +271,12 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
     return Math.max(...activities.map((a) => a.score));
   }, [activities]); // Simplified dependency array
 
+  const [activeTab, setActiveTab] = useState<TabType>('graph');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const activeTabConfig = TAB_CONFIGS[activeTab];
+  const ActiveChartComponent = CHART_COMPONENTS[activeTab];
+
   const chartRef = useRef<HTMLDivElement>(null); // For the main card graph
   const modalContentRef = useRef<HTMLDivElement>(null); // For capturing modal content
   const { addToast } = useToast();
@@ -220,7 +313,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
         filter: filter, // フィルターを適用
       });
       const link = document.createElement('a');
-      link.download = `学習記録_${userData?.name || 'ユーザー'}_${new Date().toISOString().split('T')[0]}.png`;
+      link.download = `学習記録_${userData?.name || 'ユーザー'}_${activeTabConfig.displayName}_${new Date().toISOString().split('T')[0]}.png`;
       link.href = dataUrl;
       link.click();
       addToast('success', 'グラフと情報を画像として保存しました', 3000);
@@ -258,7 +351,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
                 type="button"
                 onClick={() => setIsModalOpen(true)}
                 className="btn btn-sm btn-outline btn-primary"
-                title="グラフを拡大表示"
+                title={`${activeTabConfig.displayName}を拡大表示`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -285,12 +378,31 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
               </button>
             </div>
           </div>
-          <div ref={chartRef}>
-            <MemoizedGraphChart
-              data={orderedActivities}
-              maxScore={maxScore}
-              isShowScore={settingsData?.showScore}
-            />
+          <div className="tabs tabs-border border border-gray-300 rounded-md">
+            {Object.values(TAB_CONFIGS).map((tabConfig, index) => {
+              const ChartComponent = CHART_COMPONENTS[tabConfig.id];
+              return (
+                <React.Fragment key={tabConfig.id}>
+                  <input
+                    type="radio"
+                    name="tabs"
+                    className="tab"
+                    aria-label={tabConfig.label}
+                    defaultChecked={index === 0}
+                    onChange={() => setActiveTab(tabConfig.id)}
+                  />
+                  <div className="tab-content">
+                    <div ref={tabConfig.id === 'graph' ? chartRef : undefined}>
+                      <ChartComponent
+                        data={orderedActivities}
+                        maxScore={maxScore}
+                        isShowScore={settingsData?.showScore}
+                      />
+                    </div>
+                  </div>
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -312,14 +424,20 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
           {/* Graph Area - Fixed minimum height to ensure visibility */}
           {/* <div className="h-[70dvh] max-h-3/5 mb-4"> */}
           <div className="mb-4">
-            <MemoizedGraphChart
+            <ActiveChartComponent
+              data={orderedActivities}
+              maxScore={maxScore}
+              isShowScore={settingsData?.showScore}
+              height={300}
+            />
+            {/* <MemoizedGraphChart
               data={orderedActivities}
               maxScore={maxScore}
               isShowScore={settingsData?.showScore}
               width="100%"
               // height="40%"
               height={300}
-            />
+            /> */}
           </div>
           {/* User Info and Stats Area */}
           <div className="p-4 border-t border-base-300 overflow-y-auto">
@@ -463,7 +581,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                 />
               </svg>
-              グラフを画像保存
+              {`${activeTabConfig.displayName}を画像保存`}
             </button>
             <button type="button" className="btn" onClick={() => setIsModalOpen(false)}>
               閉じる
