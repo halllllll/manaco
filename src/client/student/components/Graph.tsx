@@ -194,7 +194,7 @@ const MemoizedHeatmapChart: FC<ChartComponentProps> = React.memo(
         <ActivityCalendar
           data={[...dateMap.values()]}
           blockSize={30}
-          showWeekdayLabels={true}
+          showWeekdayLabels={['sun', 'mon', 'thu', 'wed', 'tue', 'fri', 'sat']}
           hideMonthLabels={false}
           theme={{
             light: ['#fefefe', '#7ac7c4', '#384259'],
@@ -378,7 +378,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
               </button>
             </div>
           </div>
-          <div className="tabs tabs-border border border-gray-300 rounded-md">
+          <div className="tabs tabs-border border border-gray-300 rounded-md pr-4 pl-4">
             {Object.values(TAB_CONFIGS).map((tabConfig, index) => {
               const ChartComponent = CHART_COMPONENTS[tabConfig.id];
               return (
