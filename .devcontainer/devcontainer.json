@@ -20,7 +20,8 @@
         "wix.vscode-import-cost",
         "formulahendry.auto-rename-tag",
         "johnpapa.vscode-peacock",
-        "biomejs.biome"
+        "biomejs.biome",
+        "bradlc.vscode-tailwindcss"
       ]
     }
   },
