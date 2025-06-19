@@ -169,9 +169,23 @@ const MemoizedGraphChart: FC<ChartComponentProps> = React.memo(
 );
 // MemoizedGraphChart.displayName = 'MemoizedGraphChart';
 
+const addDate = (days: number, anchor: string | Date): string => {
+  const difDate = new Date(anchor);
+  difDate.setDate(difDate.getDate() + days);
+  return difDate.toISOString().split('T')[0];
+};
+
 const MemoizedHeatmapChart: FC<ChartComponentProps> = React.memo(
   ({ data, width = '100%', height = 300 }) => {
-    const dateMap = new Map<string, Activity>();
+    // 見た目のために、データがないところも埋める
+    // 最初の日-2週間 ~ 最後の日+2週間
+
+    const [lastDate] = [addDate(100, data.at(-1)?.activityDate ?? new Date())];
+
+    const dateMap = new Map<string, Activity>([
+      // [firstDate, { date: firstDate, count: 1, level: 0 }],
+      // [lastDate, { date: lastDate, count: 1, level: 0 }],
+    ]);
     for (const d of data) {
       if (dateMap.has(d.activityDate)) {
         const updateData = dateMap.get(d.activityDate) as Activity;
@@ -190,39 +204,41 @@ const MemoizedHeatmapChart: FC<ChartComponentProps> = React.memo(
     console.log([...dateMap.values()]);
 
     return (
-      <div style={{ width, height }}>
-        <ActivityCalendar
-          data={[...dateMap.values()]}
-          blockSize={30}
-          showWeekdayLabels={['sun', 'mon', 'thu', 'wed', 'tue', 'fri', 'sat']}
-          hideMonthLabels={false}
-          theme={{
-            light: ['#fefefe', '#7ac7c4', '#384259'],
-            dark: ['hsl(0, 0.00%, 85.10%)', '#7DB9B6', '#E96479'],
-          }}
-          maxLevel={2}
-          weekStart={1}
-          labels={{
-            weekdays: ['日', '月', '火', '水', '木', '金', '土'],
-            months: [
-              '1月',
-              '2月',
-              '3月',
-              '4月',
-              '5月',
-              '6月',
-              '7月',
-              '8月',
-              '9月',
-              '10月',
-              '11月',
-              '12月',
-            ],
-            totalCount: '',
-          }}
-          hideColorLegend={true}
-          hideTotalCount={true}
-        />
+      <div style={{ height }} className="overflow-auto">
+        <div className="max-w-xl">
+          <ActivityCalendar
+            data={[...dateMap.values(), { date: lastDate, count: 1, level: 0 }]}
+            blockSize={30}
+            showWeekdayLabels={['sun', 'mon', 'thu', 'wed', 'tue', 'fri', 'sat']}
+            hideMonthLabels={false}
+            theme={{
+              light: ['#fefefe', '#7ac7c4', '#384259'],
+              dark: ['hsl(0, 0.00%, 85.10%)', '#7DB9B6', '#E96479'],
+            }}
+            maxLevel={2}
+            weekStart={1}
+            labels={{
+              weekdays: ['日', '月', '火', '水', '木', '金', '土'],
+              months: [
+                '1月',
+                '2月',
+                '3月',
+                '4月',
+                '5月',
+                '6月',
+                '7月',
+                '8月',
+                '9月',
+                '10月',
+                '11月',
+                '12月',
+              ],
+              totalCount: '',
+            }}
+            hideColorLegend={true}
+            hideTotalCount={true}
+          />
+        </div>
       </div>
     );
   },
