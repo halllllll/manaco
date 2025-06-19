@@ -161,7 +161,7 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
                           <button
                             type="button"
                             name={field.name}
-                            className="input input-border text-xl"
+                            className="btn btn-lg text-xl btn-neutral btn-dash btn-wide m-2"
                             id={field.name}
                             onClick={(e) => {
                               const di = document.getElementById('date-modal') as HTMLDialogElement;
