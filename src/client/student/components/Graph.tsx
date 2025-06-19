@@ -178,14 +178,10 @@ const addDate = (days: number, anchor: string | Date): string => {
 const MemoizedHeatmapChart: FC<ChartComponentProps> = React.memo(
   ({ data, width = '100%', height = 300 }) => {
     // 見た目のために、データがないところも埋める
-    // 最初の日-2週間 ~ 最後の日+2週間
 
-    const [lastDate] = [addDate(100, data.at(-1)?.activityDate ?? new Date())];
+    const lastDate = addDate(100, data.at(-1)?.activityDate ?? new Date());
 
-    const dateMap = new Map<string, Activity>([
-      // [firstDate, { date: firstDate, count: 1, level: 0 }],
-      // [lastDate, { date: lastDate, count: 1, level: 0 }],
-    ]);
+    const dateMap = new Map<string, Activity>();
     for (const d of data) {
       if (dateMap.has(d.activityDate)) {
         const updateData = dateMap.get(d.activityDate) as Activity;
@@ -200,8 +196,6 @@ const MemoizedHeatmapChart: FC<ChartComponentProps> = React.memo(
         dateMap.set(d.activityDate, newData);
       }
     }
-
-    console.log([...dateMap.values()]);
 
     return (
       <div style={{ height }} className="overflow-auto">
