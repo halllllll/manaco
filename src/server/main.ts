@@ -17,7 +17,7 @@ import {
   USER_SHEET_NAME,
   ss,
 } from './Const';
-import { customMenu1, initAppMenu, openDialog } from './Menu/Menu';
+import { initAppMenu } from './Menu/Menu';
 
 import type { LearningActivityRequest } from '@/shared/types/activity';
 import { getSettings, getUserActivities, getUserById, init, saveActivity } from './query';
@@ -51,8 +51,6 @@ const onOpen = (e: GoogleAppsScript.Events.SheetsOnOpen): void => {
   console.log(e.user);
   const menu = SpreadsheetApp.getUi().createMenu('Custom menu');
   menu.addItem('初期化', 'initAppMenu_');
-  menu.addItem('ダイアログ表示', 'openDialog_');
-  menu.addItem('custom menu from html', 'customMenu1_');
   menu.addToUi();
 };
 
@@ -257,8 +255,6 @@ const getDashboard = (): DashboardDTO => {
 global.doGet = doGet;
 global.onOpen = onOpen;
 // メニュー関連（アプリから呼び出されないようにする
-global.openDialog_ = openDialog;
-global.customMenu1_ = customMenu1;
 global.initAppMenu_ = initAppMenu;
 
 global.setActivity = setActivity; // 学習活動の登録
