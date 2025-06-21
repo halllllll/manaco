@@ -19,6 +19,7 @@ import {
   calculateDuration,
   getDefaultDuration,
   getDefaultFormValues,
+  useFormFields,
 } from './form';
 
 import { useDashboard } from '@/client/api/dashboard/hooks';
@@ -33,7 +34,7 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
   }
 
   // 将来の拡張性のためのハードコード設定値（本番では settingsData に含まれる予定）
-  const showStudyTime = false; // TODO: 将来的に settingsData.showStudyTime に置き換え
+  const showStudyTime = true; // TODO: 将来的に settingsData.showStudyTime に置き換え
 
   // フォーム設定オブジェクトを作成
   const formSettings: FormSettings = {
@@ -98,6 +99,9 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
     },
   });
 
+  // カスタムフックでフィールドを取得（入れ子構造を解消）
+  const fields = useFormFields(form);
+
   // モーダルを閉じる
   const handleClose = useCallback(() => {
     setIsModalOpen(false);
@@ -138,60 +142,46 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
                 </div>
               )}
               {/* 日付選択 */}
-              <form.Field
-                name="target-date-btn"
-                // biome-ignore lint/correctness/noChildrenProp: <explanation>
-                children={(field) => <DateInput field={field} />}
-              />
+              <fields.DateField name="target-date-btn">
+                {/* biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)） */}
+                {(field: any) => <DateInput field={field} />}
+              </fields.DateField>
+
               {/* 学習時間 */}
-              <form.Field
-                name="study_time.minutes"
-                // biome-ignore lint/correctness/noChildrenProp: <explanation>
-                children={(minutesField) => (
-                  <form.Field
-                    name="study_time.seconds"
-                    // biome-ignore lint/correctness/noChildrenProp: <explanation>
-                    children={(secondsField) => (
-                      <StudyTimeWrapper
-                        minutesField={minutesField}
-                        secondsField={secondsField}
-                        settings={formSettings}
-                      />
-                    )}
-                  />
-                )}
+              <StudyTimeWrapper
+                MinutesFieldComponent={fields.MinutesField}
+                SecondsFieldComponent={fields.SecondsField}
+                settings={formSettings}
               />
 
               {/* 点数 */}
               {formSettings.showScore && (
-                <form.Field
-                  name="score"
-                  // biome-ignore lint/correctness/noChildrenProp: <explanation>
-                  children={(field) => (
+                <fields.ScoreField name="score">
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)） */}
+                  {(field: any) => (
                     <ScoreInput
                       field={field}
                       scoreMin={formSettings.scoreMin ?? 0}
                       scoreMax={formSettings.scoreMax ?? 100}
                     />
                   )}
-                />
+                </fields.ScoreField>
               )}
 
               {/* 気分 (オプション) */}
               {formSettings.showMood && (
-                <form.Field
-                  name="mood"
-                  // biome-ignore lint/correctness/noChildrenProp: <explanation>
-                  children={(field) => <MoodInput field={field} />}
-                />
+                <fields.MoodField name="mood">
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)） */}
+                  {(field: any) => <MoodInput field={field} />}
+                </fields.MoodField>
               )}
+
               {/* コメント */}
               {formSettings.showMemo && (
-                <form.Field
-                  name="memo"
-                  // biome-ignore lint/correctness/noChildrenProp: <explanation>
-                  children={(field) => <MemoInput field={field} />}
-                />
+                <fields.MemoField name="memo">
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)） */}
+                  {(field: any) => <MemoInput field={field} />}
+                </fields.MemoField>
               )}
               {/* 送信ボタン */}
               <form.Subscribe

@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 interface ScoreInputProps {
-  // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 Preview）
+  // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)）（Claude Sonnet 4 Preview）
   field: any;
   scoreMin: number;
   scoreMax: number;

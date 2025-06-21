@@ -2,7 +2,7 @@ import { MOOD_OPTIONS, type MoodOption } from '@/shared/constants/mood';
 import type { FC } from 'react';
 
 interface MoodInputProps {
-  // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 Preview）
+  // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)）（Claude Sonnet 4 Preview）
   field: any;
 }
 

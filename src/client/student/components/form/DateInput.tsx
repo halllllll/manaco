@@ -2,7 +2,7 @@ import type { CSSProperties, FC } from 'react';
 import { useMemo } from 'react';
 
 interface DateInputProps {
-  // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 Preview）
+  // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)）（Claude Sonnet 4 Preview）
   field: any;
 }
 

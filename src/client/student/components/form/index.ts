@@ -1,5 +1,6 @@
 export { DateInput } from './DateInput';
 export { FormActions } from './FormActions';
+export { useFormFields } from './hooks/useFormFields';
 export { MemoInput } from './MemoInput';
 export { MoodInput } from './MoodInput';
 export { ScoreInput } from './ScoreInput';

@@ -3,16 +3,16 @@ import { StudyTimeInput } from './StudyTimeInput';
 import type { FormSettings } from './types/FormTypes';
 
 interface StudyTimeWrapperProps {
-  // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 Preview）
-  minutesField: any;
-  // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 Preview）
-  secondsField?: any;
+  // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのField型は複雑すぎるためanyを使用（Claude Sonnet 4(Preview)）
+  MinutesFieldComponent: any;
+  // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのField型は複雑すぎるためanyを使用（Claude Sonnet 4(Preview)）
+  SecondsFieldComponent?: any;
   settings: FormSettings;
 }
 
 export const StudyTimeWrapper: FC<StudyTimeWrapperProps> = ({
-  minutesField,
-  secondsField,
+  MinutesFieldComponent,
+  SecondsFieldComponent,
   settings,
 }) => {
   // 学習時間の記録が無効な場合は何も表示しない
@@ -21,10 +21,32 @@ export const StudyTimeWrapper: FC<StudyTimeWrapperProps> = ({
   }
 
   return (
-    <StudyTimeInput
-      minutesField={minutesField}
-      secondsField={secondsField}
-      showSeconds={settings.showSecond}
-    />
+    <>
+      <MinutesFieldComponent name="study_time.minutes">
+        {/* biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)） */}
+        {(minutesField: any) => (
+          <>
+            {settings.showSecond && SecondsFieldComponent ? (
+              <SecondsFieldComponent name="study_time.seconds">
+                {/* biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)） */}
+                {(secondsField: any) => (
+                  <StudyTimeInput
+                    minutesField={minutesField}
+                    secondsField={secondsField}
+                    showSeconds={settings.showSecond}
+                  />
+                )}
+              </SecondsFieldComponent>
+            ) : (
+              <StudyTimeInput
+                minutesField={minutesField}
+                secondsField={undefined}
+                showSeconds={false}
+              />
+            )}
+          </>
+        )}
+      </MinutesFieldComponent>
+    </>
   );
 };
