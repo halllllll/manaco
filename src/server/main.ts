@@ -181,6 +181,9 @@ const getSettingsData = (): SettingsDTO => {
         case '点数記録':
           o.showScore = value as boolean;
           break;
+        case '学習時間を記録':
+          o.showStudyTime = value as boolean;
+          break;
         default:
           assertNever(label);
           break;

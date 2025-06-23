@@ -7,9 +7,10 @@ export type SettingsItem =
   | '点数記録'
   | '点数下限'
   | '点数上限'
+  | '学習時間を記録'
+  | '秒表示'
   | 'きもち表示'
-  | 'メモ表示'
-  | '秒表示';
+  | 'メモ表示';
 export type SettingsType = 'number' | 'boolean' | 'date';
 
 export type SettingsSheetItem = {
@@ -39,6 +40,17 @@ export const DefaultSettingsItemValue: {
     desc: 'フォームで受け入れる点数の上限',
   },
   {
+    name: '学習時間を記録',
+    value: true,
+    desc: '学習時間を記録する（FALSEの場合、「秒表示」の設定は無視されます）',
+  },
+  {
+    name: '秒表示',
+    value: false,
+    desc: 'フォームで「秒」の表示切り替え',
+  },
+
+  {
     name: 'きもち表示',
     value: true,
     desc: 'フォームで「きもち」の表示切り替え',
@@ -47,11 +59,6 @@ export const DefaultSettingsItemValue: {
     name: 'メモ表示',
     value: true,
     desc: 'フォームで「メモ」の表示切り替え',
-  },
-  {
-    name: '秒表示',
-    value: false,
-    desc: 'フォームで「秒」の表示切り替え',
   },
 ];
 export type SettingsResult = {
@@ -76,18 +83,24 @@ export const SETTINGS_SHEET_LABEL: readonly SettingsSheetItem[] = [
     type: 'number',
   },
   {
-    name: 'きもち表示',
+    name: '学習時間を記録',
     rowAt: 5,
     type: 'boolean',
   },
   {
-    name: 'メモ表示',
+    name: '秒表示',
     rowAt: 6,
     type: 'boolean',
   },
+
   {
-    name: '秒表示',
+    name: 'きもち表示',
     rowAt: 7,
+    type: 'boolean',
+  },
+  {
+    name: 'メモ表示',
+    rowAt: 8,
     type: 'boolean',
   },
 ] as const;
