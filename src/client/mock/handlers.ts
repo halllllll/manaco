@@ -28,7 +28,7 @@ export const handlers = [
   // アクセスしたときにdashboardに必要なデータをまとめて取得
   http.get(getMSWPath(API_ENDPOINTS.DASHBOARD), async () => {
     console.info('--- mock api: dashboard ---');
-    await delay(1400);
+    await delay(1000);
     // simulate fetch error
     if (Math.random() > 0.9) {
       return new HttpResponse(null, { status: 500, statusText: 'Internal Server Error' });
@@ -56,7 +56,7 @@ export const handlers = [
   // 設定データ取得 API
   http.get(getMSWPath(API_ENDPOINTS.SETTINGS), async () => {
     console.info('--- mock api: settings ---');
-    await delay(3000);
+    await delay(500);
 
     const data = mockAppSettingsData['1'];
 
