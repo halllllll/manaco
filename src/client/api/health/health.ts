@@ -10,7 +10,7 @@ export const HealthAPI = {
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         return ret.data!;
       }
-      throw new Error(`${ret.message}${ret.details ?? ` - ${ret.details}`}`);
+      throw new Error(`${ret.message}: ${ret.details ?? ` - ${ret.details}`}`);
     }
     /**
      * in dev, intercepted by MSW
