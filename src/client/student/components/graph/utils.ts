@@ -47,14 +47,14 @@ export const getOptimalBarConfig = (dataLength: number) => {
  */
 export const getAvailableTabs = (settings: AppSettings): TabType[] => {
   const tabs: TabType[] = [];
-  
+
   // 時間設定がある場合のみグラフタブを表示
   if (settings.showStudyTime) {
     tabs.push('graph');
   }
-  
+
   // ヒートマップは常に表示
   tabs.push('heatmap');
-  
+
   return tabs;
 };

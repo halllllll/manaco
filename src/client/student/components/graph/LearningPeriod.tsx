@@ -13,7 +13,9 @@ export const LearningPeriod: FC<LearningPeriodProps> = ({ activities }) => {
     return null;
   }
 
-  const orderedActivities = activities.toSorted((a, b) => a.activityDate.localeCompare(b.activityDate));
+  const orderedActivities = activities.toSorted((a, b) =>
+    a.activityDate.localeCompare(b.activityDate),
+  );
 
   return (
     <div className="mt-4 bg-gradient-to-br from-green-100 to-green-50 rounded-xl p-4 shadow-sm border border-green-200">
@@ -38,9 +40,7 @@ export const LearningPeriod: FC<LearningPeriodProps> = ({ activities }) => {
       <div className="flex items-center justify-center gap-4">
         <div className="bg-white rounded-lg p-3 text-center border border-green-200 flex-1">
           <div className="text-sm text-green-700 mb-1">はじめたひ</div>
-          <div className="font-bold text-green-800">
-            {orderedActivities[0].activityDate}
-          </div>
+          <div className="font-bold text-green-800">{orderedActivities[0].activityDate}</div>
         </div>
         <div className="text-green-600 font-bold text-xl">→</div>
         <div className="bg-white rounded-lg p-3 text-center border border-green-200 flex-1">

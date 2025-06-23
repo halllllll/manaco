@@ -5,7 +5,7 @@ import React, { useRef } from 'react';
 import { GraphChart } from './GraphChart';
 import { HeatmapChart } from './HeatmapChart';
 import type { ChartComponentProps, TabType } from './types';
-import { getAvailableTabs, TAB_CONFIGS } from './utils';
+import { TAB_CONFIGS, getAvailableTabs } from './utils';
 
 interface GraphTabsProps {
   activities: LearningActivity[];
@@ -31,7 +31,9 @@ export const GraphTabs: FC<GraphTabsProps> = ({
   onTabChange,
 }) => {
   const chartRef = useRef<HTMLDivElement>(null);
-  const orderedActivities = activities.toSorted((a, b) => a.activityDate.localeCompare(b.activityDate));
+  const orderedActivities = activities.toSorted((a, b) =>
+    a.activityDate.localeCompare(b.activityDate),
+  );
   const availableTabs = getAvailableTabs(settings);
 
   // 時間設定がない場合はヒートマップのみ表示
@@ -53,7 +55,7 @@ export const GraphTabs: FC<GraphTabsProps> = ({
         const tabConfig = TAB_CONFIGS[tabId];
         const ChartComponent = CHART_COMPONENTS[tabId];
         const isActive = activeTab === tabId;
-        
+
         return (
           <React.Fragment key={tabConfig.id}>
             <input

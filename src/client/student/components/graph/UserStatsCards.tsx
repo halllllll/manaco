@@ -39,16 +39,12 @@ export const UserStatsCards: FC<UserStatsCardsProps> = ({ activities, settings }
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-sm text-blue-700">がんばった回数</span>
-            <span className="text-xl font-bold text-blue-800">
-              {userStats.totalActivities}回
-            </span>
+            <span className="text-xl font-bold text-blue-800">{userStats.totalActivities}回</span>
           </div>
           {settings.showScore && (
             <div className="flex justify-between items-center">
               <span className="text-sm text-blue-700">さいこうてんすう</span>
-              <span className="text-xl font-bold text-blue-800">
-                {userStats.bestScore}点
-              </span>
+              <span className="text-xl font-bold text-blue-800">{userStats.bestScore}点</span>
             </div>
           )}
         </div>

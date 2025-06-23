@@ -3,13 +3,13 @@ import type { LearningActivity } from '@/shared/types/activity';
 import type { AppSettings } from '@/shared/types/settings';
 import * as htmlToImage from 'html-to-image';
 import type { FC } from 'react';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { useUserState } from '../../hooks/useUserState';
 import { GraphChart } from './GraphChart';
 import { HeatmapChart } from './HeatmapChart';
 import { LearningPeriod } from './LearningPeriod';
-import type { ChartComponentProps, TabType } from './types';
 import { UserStatsCards } from './UserStatsCards';
+import type { ChartComponentProps, TabType } from './types';
 import { TAB_CONFIGS } from './utils';
 
 interface GraphModalProps {
@@ -44,7 +44,9 @@ export const GraphModal: FC<GraphModalProps> = ({
   const activeTabConfig = TAB_CONFIGS[activeTab];
   const ActiveChartComponent = CHART_COMPONENTS[activeTab];
 
-  const orderedActivities = activities.toSorted((a, b) => a.activityDate.localeCompare(b.activityDate));
+  const orderedActivities = activities.toSorted((a, b) =>
+    a.activityDate.localeCompare(b.activityDate),
+  );
 
   // グラフを画像として保存する関数
   const saveAsImage = async () => {
