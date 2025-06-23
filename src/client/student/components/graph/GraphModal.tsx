@@ -102,6 +102,7 @@ export const GraphModal: FC<GraphModalProps> = ({
             maxScore={maxScore}
             isShowScore={settings.showScore}
             height={300}
+            width={'100%'}
           />
         </div>
 

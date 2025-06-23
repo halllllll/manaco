@@ -7,7 +7,7 @@ import { addDate } from './utils';
 /**
  * 学習記録ヒートマップチャートコンポーネント
  */
-export const HeatmapChart: FC<ChartComponentProps> = React.memo(({ data, height = 300 }) => {
+export const HeatmapChart: FC<ChartComponentProps> = React.memo(({ data, width, height = 300 }) => {
   // 見た目のために、データがないところも埋める
   const lastDate = addDate(200, data.at(-1)?.activityDate ?? new Date());
 
@@ -29,7 +29,7 @@ export const HeatmapChart: FC<ChartComponentProps> = React.memo(({ data, height 
 
   return (
     <div style={{ height }} className="overflow-auto">
-      <div className="max-w-xl">
+      <div className={width ? `${width}` : '2xl:w-4xl w-2xl mx-auto'}>
         <ActivityCalendar
           data={[...dateMap.values(), { date: lastDate, count: 1, level: 0 }]}
           blockSize={30}
