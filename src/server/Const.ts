@@ -10,7 +10,8 @@ export type SettingsItem =
   | '学習時間を記録'
   | '秒表示'
   | 'きもち表示'
-  | 'メモ表示';
+  | 'メモ表示'
+  | '取り組み表示';
 export type SettingsType = 'number' | 'boolean' | 'date';
 
 export type SettingsSheetItem = {
@@ -65,6 +66,16 @@ export type SettingsResult = {
   item: SettingsItem;
   value: Date | number | boolean;
 };
+
+export const DefaultActivityList: { name: string; color: string; desc: string }[] = [
+  { name: 'こくご', color: '#ede266', desc: '国語' },
+  { name: '漢字の書き取り', color: '#73f256', desc: '国語' },
+  { name: 'English', color: '#36b7f7', desc: '英語' },
+  { name: '算数', color: '#8843f7', desc: '算数（上）' },
+  { name: '読書', color: '#ede266', desc: '読書' },
+  { name: '塾', color: '#a4a4a4', desc: '習い事' },
+  { name: '日記', color: '#FFF', desc: '宿題' },
+];
 
 export const SETTINGS_SHEET_LABEL: readonly SettingsSheetItem[] = [
   {
@@ -121,7 +132,11 @@ export const LEARNING_ACTIVITY_SHEET_HEADERS: readonly string[] = [
   '点数',
   'かかった時間（秒）',
   'きもち',
+  '取り組んだ内容',
   'メモ',
 ] as const;
+
+export const ACTIVITY_LIST_SHEET_NAME = '取り組みリスト';
+export const ACTIVITY_LIST_SHEET_HEADERS: readonly string[] = ['名前', 'メモ'];
 
 export { ss };

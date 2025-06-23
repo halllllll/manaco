@@ -6,4 +6,5 @@ export type AppSettings = {
   showSecond: boolean;
   showScore: boolean;
   showStudyTime: boolean; // 時間設定の有無
+  showActivity: boolean;
 };

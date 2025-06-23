@@ -313,6 +313,7 @@ export const mockAppSettingsData: Record<string, AppSettings> = {
     showMemo: true,
     showSecond: false,
     showStudyTime: false,
+    showActivity: false,
   },
   '2': {
     showScore: true,
@@ -322,6 +323,7 @@ export const mockAppSettingsData: Record<string, AppSettings> = {
     showMemo: false,
     showSecond: true,
     showStudyTime: true,
+    showActivity: true,
   },
   '3': {
     showScore: false,
@@ -330,7 +332,8 @@ export const mockAppSettingsData: Record<string, AppSettings> = {
     showMood: true,
     showMemo: true,
     showSecond: true,
-    showStudyTime: false, // 時間設定なしのテストケース
+    showStudyTime: false,
+    showActivity: true,
   },
   '4': {
     showScore: false,
@@ -340,5 +343,6 @@ export const mockAppSettingsData: Record<string, AppSettings> = {
     showMemo: true,
     showSecond: false,
     showStudyTime: true,
+    showActivity: false,
   },
 };

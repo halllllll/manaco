@@ -1,6 +1,9 @@
 import type { LearningActivity, LearningActivityRequest } from '@/shared/types/activity';
 import { USER_ROLES, type User } from '@/shared/types/user';
 import {
+  ACTIVITY_LIST_SHEET_HEADERS,
+  ACTIVITY_LIST_SHEET_NAME,
+  DefaultActivityList,
   DefaultSettingsItemValue,
   LEARNING_ACTIVITY_SHEET_HEADERS,
   LEARNING_ACTIVITY_SHEET_NAME,
@@ -145,32 +148,31 @@ export const getSettings = (sheet: GoogleAppsScript.Spreadsheet.Sheet): Settings
 };
 
 /**
+ * create new sheet
+ */
+function newSheet(name: string): GoogleAppsScript.Spreadsheet.Sheet {
+  const targetSheet = ss.getSheetByName(name);
+  if (targetSheet) {
+    ss.deleteSheet(targetSheet);
+  }
+  return ss.insertSheet(name);
+}
+
+/**
  * Spreadsheetの初期化処理
  * シートが存在しない場合は作成し、ヘッダを設定する
- * すでに存在する場合は、データをクリアしてヘッダを設定する
+ * すでに存在する場合は削除して作り直す
+ * シートが無になる場合があるので一時シートを作成して凌ぐ
  */
 
 export const init = () => {
-  // Check if sheets exist, create them if not
-  let userSheet = ss.getSheetByName(USER_SHEET_NAME);
-  let activitySheet = ss.getSheetByName(LEARNING_ACTIVITY_SHEET_NAME);
-  let settingSheet = ss.getSheetByName(SETTINGS_SHEET_NAME);
-
-  if (!userSheet) {
-    // Create sheets if they don't exist
-    userSheet = ss.insertSheet(USER_SHEET_NAME);
-  }
-  if (!activitySheet) {
-    activitySheet = ss.insertSheet(LEARNING_ACTIVITY_SHEET_NAME);
-  }
-  if (!settingSheet) {
-    settingSheet = ss.insertSheet(SETTINGS_SHEET_NAME);
-  }
-
-  // Clear existing data and formatting
-  userSheet.clear();
-  activitySheet.clear();
-  settingSheet.clear();
+  const _tempSheet = newSheet(Utilities.getUuid()); // 一時シート
+  const userSheet = newSheet(USER_SHEET_NAME);
+  userSheet.setTabColor('#FFD1DC');
+  const activitySheet = newSheet(LEARNING_ACTIVITY_SHEET_NAME);
+  const settingSheet = newSheet(SETTINGS_SHEET_NAME);
+  const activityListSheet = newSheet(ACTIVITY_LIST_SHEET_NAME);
+  ss.deleteSheet(_tempSheet);
 
   // Set headers for USER sheet
   userSheet
@@ -191,6 +193,13 @@ export const init = () => {
     .setValues([[...LEARNING_ACTIVITY_SHEET_HEADERS]]);
   activitySheet.getRange(1, 1, 1, LEARNING_ACTIVITY_SHEET_HEADERS.length).setFontWeight('bold');
   activitySheet.setColumnWidths(1, LEARNING_ACTIVITY_SHEET_HEADERS.length, 100);
+
+  // Set headers for Activity List sheet
+  activityListSheet
+    .getRange(1, 1, 1, ACTIVITY_LIST_SHEET_HEADERS.length)
+    .setValues([[...ACTIVITY_LIST_SHEET_HEADERS]]);
+  activityListSheet.getRange(1, 1, 1, ACTIVITY_LIST_SHEET_HEADERS.length).setFontWeight('bold');
+  activityListSheet.setColumnWidths(1, ACTIVITY_LIST_SHEET_HEADERS.length, 100);
 
   // Set headers for SETTINGS sheet
   settingSheet
@@ -225,8 +234,17 @@ export const init = () => {
   userSheet.setFrozenRows(1);
   activitySheet.setFrozenRows(1);
   settingSheet.setFrozenRows(1);
+  activityListSheet.setFrozenRows(1);
 
-  // const defaultSettings
-  const targetRange = settingSheet.getRange(2, 1, DefaultSettingsItemValue.length, 3);
-  targetRange.setValues(DefaultSettingsItemValue.map((item) => [item.name, item.value, item.desc]));
+  // set default setting items
+  settingSheet
+    .getRange(2, 1, DefaultSettingsItemValue.length, 3)
+    .setValues(DefaultSettingsItemValue.map((item) => [item.name, item.value, item.desc]));
+
+  // set default activity subject values and background color
+
+  activityListSheet
+    .getRange(2, 1, DefaultActivityList.length, 2)
+    .setValues(DefaultActivityList.map((item) => [item.name, item.desc]))
+    .setBackgrounds(DefaultActivityList.map((item) => [item.color, '#fff']));
 };
