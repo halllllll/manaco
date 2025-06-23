@@ -33,12 +33,9 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
     throw new Error(`Failed to fetch settings: ${settingsError.name} - ${settingsError.message}`);
   }
 
-  // 将来の拡張性のためのハードコード設定値（本番では settingsData に含まれる予定）
-  const showStudyTime = true; // TODO: 将来的に settingsData.showStudyTime に置き換え
-
   // フォーム設定オブジェクトを作成
   const formSettings: FormSettings = {
-    showStudyTime,
+    showStudyTime: settingsData?.showStudyTime ?? true, // AppSettingsから直接取得
     showSecond: settingsData?.showSecond ?? false,
     showScore: settingsData?.showScore ?? false,
     showMood: settingsData?.showMood ?? false,
