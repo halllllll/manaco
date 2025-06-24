@@ -3,7 +3,7 @@ import type { Mood } from './mood';
 export interface LearningActivity {
   activityDate: string;
   duration: number; // 秒単位
-  score: number;
+  score?: number;
   mood?: Mood;
   memo?: string;
   activityType?: string[]; // 取り組みの種類

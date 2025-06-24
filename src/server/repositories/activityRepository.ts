@@ -92,7 +92,7 @@ export function saveActivity(activity: LearningActivityRequest): { ok: boolean; 
         activity.score,
         activity.duration,
         activity.mood,
-        'TODO',
+        activity.activityType ? activity.activityType.join(', ') : '',
         activity.memo,
       ]);
 
