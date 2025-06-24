@@ -88,6 +88,11 @@ export const DefaultSettingsItemValue: {
     value: true,
     desc: 'フォームで「メモ」の表示切り替え',
   },
+  {
+    name: '取り組み表示',
+    value: false,
+    desc: '「取り組みリスト」から選択するアイテムの表示切り替え',
+  },
 ];
 
 export type SettingsResult = {
@@ -139,6 +144,11 @@ export const SETTINGS_SHEET_LABEL: readonly SettingsSheetItem[] = [
   {
     name: 'メモ表示',
     rowAt: 8,
+    type: 'boolean',
+  },
+  {
+    name: '取り組み表示',
+    rowAt: 9,
     type: 'boolean',
   },
 ] as const;

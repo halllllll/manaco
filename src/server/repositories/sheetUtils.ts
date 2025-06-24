@@ -34,6 +34,23 @@ export function getAllRows(sheetName: string, includeHeader = false): unknown[][
 }
 
 /**
+ * Rangeを取得する
+ */
+export function getAllDataRange(sheetName: string): GoogleAppsScript.Spreadsheet.Range {
+  const { isExist, sheet } = validateSheetExists(sheetName);
+
+  if (!isExist) {
+    throw new DataAccessError(`Sheet "${sheetName}" does not exist.`);
+  }
+
+  try {
+    return sheet.getDataRange();
+  } catch (error) {
+    throw new DataAccessError(`Failed to get range from sheet "${sheetName}"`, error);
+  }
+}
+
+/**
  * Append a row to a sheet
  * @param sheetName Name of the sheet to append to
  * @param rowData Array of values to append

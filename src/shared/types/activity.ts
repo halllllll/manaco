@@ -11,3 +11,8 @@ export interface LearningActivity {
 export interface LearningActivityRequest extends LearningActivity {
   userId: string; // Apps Script側でやるとAPI呼び出しのオーバーヘッドがあるので
 }
+
+export interface ActivityItem {
+  name: string;
+  color: string;
+}

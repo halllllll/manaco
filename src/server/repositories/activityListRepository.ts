@@ -7,7 +7,8 @@ import {
   DefaultActivityList,
 } from '@/server/utils/constants';
 import { DataAccessError } from '@/server/utils/errors';
-import { createSheet } from './sheetUtils';
+import type { ActivityItem } from '@/shared/types/activity';
+import { createSheet, getAllDataRange } from './sheetUtils';
 
 /**
  * Initialize activity list sheet with headers and default values
@@ -39,4 +40,17 @@ export function initActivityListSheet(): GoogleAppsScript.Spreadsheet.Sheet {
   } catch (error) {
     throw new DataAccessError('Failed to initialize activity list sheet', error);
   }
+}
+
+export function getActivityItems(): ActivityItem[] {
+  const dataRange = getAllDataRange(ACTIVITY_LIST_SHEET_NAME);
+  const backgrounds = dataRange.getBackgrounds().slice(1);
+  const values = dataRange.getValues().slice(1); // Skip header row
+
+  return values.map((row, i) => {
+    return {
+      name: row[0] as string,
+      color: backgrounds[i][0] as string,
+    };
+  });
 }

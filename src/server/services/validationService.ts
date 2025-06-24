@@ -3,6 +3,8 @@ import { initActivitySheet } from '@/server/repositories/activityRepository';
 import { initSettingsSheet } from '@/server/repositories/settingsRepository';
 import { initUserSheet } from '@/server/repositories/userRepository';
 import {
+  ACTIVITY_LIST_SHEET_HEADERS,
+  ACTIVITY_LIST_SHEET_NAME,
   LEARNING_ACTIVITY_SHEET_HEADERS,
   LEARNING_ACTIVITY_SHEET_NAME,
   SETTINGS_SHEET_HEADERS,
@@ -29,14 +31,18 @@ export function validateAllService(): SpreadsheetValidateDTO {
   const resultValidateSettingsSheet = getAndValidateHeaders(SETTINGS_SHEET_NAME, [
     ...SETTINGS_SHEET_HEADERS,
   ]);
+  const resultValidateActivityListSheet = getAndValidateHeaders(ACTIVITY_LIST_SHEET_NAME, [
+    ...ACTIVITY_LIST_SHEET_HEADERS,
+  ]);
 
   if (
     !resultValidateUserSheet.isValid ||
     !resultValidateActivitySheet.isValid ||
-    !resultValidateSettingsSheet.isValid
+    !resultValidateSettingsSheet.isValid ||
+    !resultValidateActivityListSheet.isValid
   ) {
     console.error(
-      `Validation failed:\nuser sheet: ${resultValidateUserSheet}:\nactivity sheet: ${resultValidateActivitySheet}\nsetting sheet: ${resultValidateSettingsSheet}`,
+      `Validation failed:\nuser sheet: ${resultValidateUserSheet}:\nactivity sheet: ${resultValidateActivitySheet}\nsetting sheet: ${resultValidateSettingsSheet}\nactivity list sheet: ${resultValidateActivityListSheet}`,
     );
 
     return {
@@ -46,6 +52,7 @@ export function validateAllService(): SpreadsheetValidateDTO {
         ...resultValidateUserSheet.messages,
         ...resultValidateActivitySheet.messages,
         ...resultValidateSettingsSheet.messages,
+        ...resultValidateActivityListSheet.messages,
       ].join('\n'),
     };
   }
