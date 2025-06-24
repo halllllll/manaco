@@ -21,7 +21,15 @@ export function getSettingsHandler(): AppSettingResponse {
 
   if (settings.success && settings.data.showActivity) {
     const activityItems = getActivityListService();
-    if (activityItems.success) {
+    if (!activityItems.success) {
+      // エラー
+      return {
+        success: false,
+        message: activityItems.message || 'Failed to retrieve activity items',
+      };
+    }
+    // 空じゃない場合のみ許容
+    if (activityItems.success && activityItems.data.length > 0) {
       return {
         success: true,
         data: {
@@ -30,11 +38,6 @@ export function getSettingsHandler(): AppSettingResponse {
         },
       };
     }
-    // エラー
-    return {
-      success: false,
-      message: activityItems.message || 'Failed to retrieve activity items',
-    };
   }
   return {
     success: true,
