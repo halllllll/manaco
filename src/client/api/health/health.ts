@@ -1,4 +1,4 @@
-import type { ValidationResult } from '@/server/validate';
+import type { ValidationResult } from '@/server/utils/validation';
 import { API_ENDPOINTS, getMSWPath } from '../endpoint';
 import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 

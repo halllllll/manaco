@@ -1,4 +1,4 @@
-import type { ValidationResult } from '@/server/validate';
+import type { ValidationResult } from '@/server/utils/validation';
 import type { UserWithActivities } from '@/shared/types/user';
 import type { AppSettings } from './settings';
 import type { User } from './user';

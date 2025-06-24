@@ -14,7 +14,7 @@ const initAppMenu = (): void => {
     if (result.success) {
       ui.alert('初期化に成功しました');
     } else {
-      ui.alert('初期中にエラーが発生しました。');
+      ui.alert(`初期中にエラーが発生しました。\n${result.message}\n${result.details}`);
     }
   } else {
     ui.alert('キャンセルされました');
