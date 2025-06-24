@@ -9,6 +9,7 @@ import type { ModalProps } from '../types/props';
 
 import { FormModalSkeleton } from './FormModalSkeleton';
 import {
+  ActivityTypeInput,
   DateInput,
   FormActions,
   type FormSettings,
@@ -74,6 +75,7 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
           memo: values.value.memo,
           mood: values.value.mood as Mood,
           score: values.value.score,
+          activityType: values.value.activityType,
           userId: userData.id,
         };
         const res = await postActivity(data);
@@ -88,6 +90,7 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
             memo: values.value.memo,
             mood: values.value.mood as Mood,
             score: values.value.score,
+            activityType: values.value.activityType,
           });
           addToast('success', '保存しました！学習をふりかえろう！');
           setIsModalOpen(false);
@@ -177,6 +180,19 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
                 </fields.MoodField>
               )}
 
+              {/* アクティビティタイプ */}
+              {formSettings.activityType && formSettings.activityType.length > 0 && (
+                <fields.ActivityTypeField name="activityType">
+                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)） */}
+                  {(field: any) => (
+                    <ActivityTypeInput
+                      field={field}
+                      activityItems={formSettings.activityType || []}
+                    />
+                  )}
+                </fields.ActivityTypeField>
+              )}
+
               {/* コメント */}
               {formSettings.showMemo && (
                 <fields.MemoField name="memo">
@@ -184,6 +200,7 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
                   {(field: any) => <MemoInput field={field} />}
                 </fields.MemoField>
               )}
+
               {/* 送信ボタン */}
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}

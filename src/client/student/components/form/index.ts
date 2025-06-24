@@ -1,3 +1,4 @@
+export { ActivityTypeInput } from './ActivityTypeInput';
 export { DateInput } from './DateInput';
 export { FormActions } from './FormActions';
 export { useFormFields } from './hooks/useFormFields';

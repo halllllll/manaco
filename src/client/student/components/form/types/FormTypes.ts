@@ -13,6 +13,7 @@ export interface FormData {
   score: number;
   mood: Mood | '';
   memo: string;
+  activityType: string[];
 }
 
 export interface FormSettings {

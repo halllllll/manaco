@@ -58,7 +58,7 @@ export const handlers = [
     console.info('--- mock api: settings ---');
     await delay(500);
 
-    const data = mockAppSettingsData['4'];
+    const data = mockAppSettingsData['1'];
 
     if (!data) {
       return HttpResponse.json('データなし');

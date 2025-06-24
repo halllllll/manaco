@@ -11,5 +11,6 @@ export const useFormFields = (form: any) => {
     ScoreField: form.Field,
     MoodField: form.Field,
     MemoField: form.Field,
+    ActivityTypeField: form.Field,
   };
 };

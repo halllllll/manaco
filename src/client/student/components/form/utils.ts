@@ -13,6 +13,7 @@ export const getDefaultFormValues = (): FormData => ({
   score: 0,
   mood: '',
   memo: '',
+  activityType: [],
 });
 
 /**
