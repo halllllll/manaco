@@ -18,7 +18,6 @@ export type DashboardDTO = BaseResponse<UserWithActivities | null>;
 
 export type SettingsDTO = BaseResponse<AppSettings>;
 
-// export type SpreadsheetValidateDTO = BaseResponse<Omit<ValidationResult, keyof ValidationResult> | null>;
 export type SpreadsheetValidateDTO = BaseResponse<ValidationResult | null>;
 
 export type UserDTO = BaseResponse<User | null>;
