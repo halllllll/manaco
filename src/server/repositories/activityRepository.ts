@@ -7,7 +7,32 @@ import { validateSheetExists } from '@/server/utils/validation';
 import type { LearningActivity, LearningActivityRequest } from '@/shared/types/activity';
 import type { Mood } from '@/shared/types/mood';
 import { LEARNING_ACTIVITY_SHEET_HEADERS, LEARNING_ACTIVITY_SHEET_NAME } from '../utils/constants';
-import { getAllRows, withLock } from './sheetUtils';
+import { createSheet, getAllRows, withLock } from './sheetUtils';
+
+/**
+ * Initialize learning activity sheet with headers
+ * @returns Initialized activity sheet
+ */
+export function initActivitySheet(): GoogleAppsScript.Spreadsheet.Sheet {
+  try {
+    const sheet = createSheet(LEARNING_ACTIVITY_SHEET_NAME);
+
+    // Set headers with styling
+    const headerRange = sheet.getRange(1, 1, 1, LEARNING_ACTIVITY_SHEET_HEADERS.length);
+    headerRange.setValues([[...LEARNING_ACTIVITY_SHEET_HEADERS]]);
+    headerRange.setFontWeight('bold');
+
+    // Set column widths
+    sheet.setColumnWidths(1, LEARNING_ACTIVITY_SHEET_HEADERS.length, 100);
+
+    // Freeze the header row
+    sheet.setFrozenRows(1);
+
+    return sheet;
+  } catch (error) {
+    throw new DataAccessError('Failed to initialize activity sheet', error);
+  }
+}
 
 /**
  * Get all activity logs from the learning activity sheet

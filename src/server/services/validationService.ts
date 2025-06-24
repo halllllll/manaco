@@ -1,7 +1,5 @@
-import {
-  initActivityListSheet,
-  initActivitySheet,
-} from '@/server/repositories/activityListRepository';
+import { initActivityListSheet } from '@/server/repositories/activityListRepository';
+import { initActivitySheet } from '@/server/repositories/activityRepository';
 import { initSettingsSheet } from '@/server/repositories/settingsRepository';
 import { initUserSheet } from '@/server/repositories/userRepository';
 import {
