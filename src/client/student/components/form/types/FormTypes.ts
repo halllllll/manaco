@@ -1,3 +1,4 @@
+import type { ActivityItem } from '@/shared/types/activity';
 import type { Mood } from '@/shared/types/mood';
 
 export interface StudyTime {
@@ -22,4 +23,5 @@ export interface FormSettings {
   showMemo: boolean;
   scoreMin?: number;
   scoreMax?: number;
+  activityType?: ActivityItem[];
 }

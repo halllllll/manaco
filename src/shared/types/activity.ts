@@ -6,6 +6,7 @@ export interface LearningActivity {
   score: number;
   mood?: Mood;
   memo?: string;
+  activityType?: string[]; // 取り組みの種類
 }
 
 export interface LearningActivityRequest extends LearningActivity {

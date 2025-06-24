@@ -25,13 +25,14 @@ export type UserDTO = BaseResponse<User | null>;
 
 export type InitAppDTO = BaseResponse<null>;
 
-export type AppSettingResponse = BaseResponse<
+export type AppSettingResponseData =
   | (AppSettings & {
       showActivity: true;
       activityItems: ActivityItem[];
     })
-  | (AppSettings & { showActivity: false })
->;
+  | (AppSettings & { showActivity: false });
+
+export type AppSettingResponse = BaseResponse<AppSettingResponseData>;
 
 // 成功可否だけわかればいいのでデータを含まない
 export type UserActivityDTO = BaseResponse<null>;

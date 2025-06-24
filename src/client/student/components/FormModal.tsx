@@ -42,6 +42,10 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
     showMemo: settingsData?.showMemo ?? false,
     scoreMin: settingsData?.scoreMin,
     scoreMax: settingsData?.scoreMax,
+    activityType:
+      settingsData?.showActivity && settingsData?.activityItems
+        ? settingsData.activityItems
+        : undefined,
   };
 
   // dashboard (for update activity data)
