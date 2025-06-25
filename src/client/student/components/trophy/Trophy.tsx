@@ -35,7 +35,7 @@ export const Trophy: FC<{ activities: UserDashboardProps['userData']['activities
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <title>学習統計</title>
+            <title>統計データ</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -43,7 +43,7 @@ export const Trophy: FC<{ activities: UserDashboardProps['userData']['activities
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          学習統計
+          統計データ
         </h2>
 
         <div className="flex flex-col gap-4 overflow-y-auto">

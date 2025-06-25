@@ -143,7 +143,7 @@ export const ActivityDetailModal: FC<ActivityDetailModalProps> = ({
                     {selectedActivity.activityType.map((type) => (
                       <span
                         key={`activity-type-${type}`}
-                        className="badge badge-warning badge-outline p-3"
+                        className="badge badge-neutral badge-outline p-3"
                       >
                         {type}
                       </span>

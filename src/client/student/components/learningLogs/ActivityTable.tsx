@@ -299,7 +299,7 @@ const renderActivityCell = (columnId: ActivityColumnId, activity: LearningActivi
           {activity.activityType.map((type) => (
             <span
               key={`type-${type}`}
-              className="badge badge-sm badge-warning badge-outline truncate"
+              className="badge badge-sm badge-neutral badge-outline truncate"
             >
               {type}
             </span>
