@@ -18,7 +18,7 @@ export const Graph: FC<GraphProps> = ({ activities }) => {
     if (activities.length === 0) {
       return 0;
     }
-    return Math.max(...activities.map((a) => a.score));
+    return Math.max(...activities.map((a) => a.score ?? 0));
   }, [activities]);
 
   // デフォルトのアクティブタブを設定に基づいて決定
