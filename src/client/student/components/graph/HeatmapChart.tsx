@@ -1,6 +1,8 @@
 import type { FC } from 'react';
 import React from 'react';
 import { type Activity, ActivityCalendar } from 'react-activity-calendar';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
 import type { ChartComponentProps } from './types';
 import { addDate } from './utils';
 
@@ -61,7 +63,14 @@ export const HeatmapChart: FC<ChartComponentProps> = React.memo(({ data, width, 
           }}
           hideColorLegend={true}
           hideTotalCount={true}
+          renderBlock={(block, activity) => {
+            return React.cloneElement(block, {
+              'data-tooltip-id': 'react-tooltip',
+              'data-tooltip-html': `${activity.date}`,
+            });
+          }}
         />
+        <ReactTooltip id="react-tooltip" />
       </div>
     </div>
   );
