@@ -26,10 +26,8 @@
     }
   },
   "features": {
-    // "ghcr.io/devcontainers-contrib/features/pnpm:2": {},
-    // "ghcr.io/shyim/devcontainers-features/bun:0": {}
-    // "ghcr.io/prulloac/devcontainer-features/bun:1": {}
-    "ghcr.io/michidk/devcontainers-features/bun:1": {}
+    "ghcr.io/michidk/devcontainers-features/bun:1": {},
+		"ghcr.io/devcontainers/features/rust:1": {}
   },
 
   // Features to add to the dev container. More info: https://containers.dev/features.
@@ -39,7 +37,7 @@
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "bun add -g @google/clasp",
+  "postCreateCommand": "bun add -g @google/clasp && cargo install similarity-ts",
 
   // Configure tool-specific properties.
   // "customizations": {},
