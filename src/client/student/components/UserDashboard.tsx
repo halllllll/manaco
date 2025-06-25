@@ -2,8 +2,7 @@ import type { FC } from 'react';
 import type { UserDashboardProps } from '../types/props';
 import { Graph } from './Graph';
 import { LearningLogSection } from './LearningLogSection';
-import { Trophy } from './trophy';
-
+import { Trophy } from './trophy/Trophy';
 /**
  * 登録済みユーザーのダッシュボードコンポーネント
  */
