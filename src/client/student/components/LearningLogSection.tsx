@@ -1,4 +1,4 @@
-import { useSettings } from '@/client/api/settings/hook';
+import { useSettings } from '@/api/settings/hook';
 import type { LearningActivity } from '@/shared/types/activity';
 import { type FC, useState } from 'react';
 import type { LearningLogSectionProps } from '../types/props';

@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 
-import { API_ENDPOINTS, getMSWPath } from '../api/endpoint';
+import { API_ENDPOINTS, getMSWPath } from '../../api/endpoint';
 import { currentMockUserId } from './browser';
 
 import type { UserActivityDTO } from '@/shared/types/dto';

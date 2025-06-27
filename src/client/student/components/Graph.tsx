@@ -1,4 +1,4 @@
-import { useSettings } from '@/client/api/settings/hook';
+import { useSettings } from '@/api/settings/hook';
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 import type { GraphProps } from '../types/props';

@@ -1,4 +1,4 @@
-import { useSettings } from '@/client/api/settings/hook';
+import { useSettings } from '@/api/settings/hook';
 import { type FC, useMemo } from 'react';
 import type { UserDashboardProps } from '../../types/props';
 import { EmptyTrophy } from './EmptyTrophy';

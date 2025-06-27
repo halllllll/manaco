@@ -1,5 +1,5 @@
-import { useDashboard } from '@/client/api/dashboard/hooks';
-import { useSheetName, useSheetUrl } from '@/client/api/sheet/hooks';
+import { useDashboard } from '@/api/dashboard/hooks';
+import { useSheetName, useSheetUrl } from '@/api/sheet/hooks';
 import type { UserWithActivities } from '@/shared/types/user';
 import { useMemo } from 'react';
 

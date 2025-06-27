@@ -1,5 +1,5 @@
-import { useActivityPost } from '@/client/api/activity/hook';
-import { useSettings } from '@/client/api/settings/hook';
+import { useActivityPost } from '@/api/activity/hook';
+import { useSettings } from '@/api/settings/hook';
 import { useToast } from '@/client/context/ToastConterxt';
 import type { LearningActivity } from '@/shared/types/activity';
 import { useForm } from '@tanstack/react-form';
@@ -23,8 +23,8 @@ import {
   useFormFields,
 } from './form';
 
-import { useDashboard } from '@/client/api/dashboard/hooks';
-import { useGetUser } from '@/client/api/user/hook';
+import { useDashboard } from '@/api/dashboard/hooks';
+import { useGetUser } from '@/api/user/hook';
 import type { Mood } from '@/shared/types/mood';
 
 export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {

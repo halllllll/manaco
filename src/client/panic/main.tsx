@@ -1,4 +1,4 @@
-import { useHealthCheck } from '@/client/api/health/hooks';
+import { useHealthCheck } from '@/api/health/hooks';
 import { Header } from '@/client/components/parts/header';
 import React, { type FC } from 'react';
 import ReactDOM from 'react-dom/client';

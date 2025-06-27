@@ -1,5 +1,5 @@
-import { useDashboard } from '@/client/api/dashboard/hooks';
-import { useSheetName } from '@/client/api/sheet/hooks';
+import { useDashboard } from '@/api/dashboard/hooks';
+import { useSheetName } from '@/api/sheet/hooks';
 import type { FC, ReactNode } from 'react';
 
 interface HeaderProps {
