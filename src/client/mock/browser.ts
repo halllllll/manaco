@@ -1,5 +1,6 @@
 import { setupWorker } from 'msw/browser';
 import { handlers } from './handlers';
+import { teacherHandlers } from './teacherHandlers';
 
 // 現在のモックユーザーコンテキスト
 export let currentMockUserId = localStorage.getItem('dev-user-id') || 'dev-user-1';
@@ -12,4 +13,7 @@ window.addEventListener('message', (event) => {
   }
 });
 
-export const worker = setupWorker(...handlers);
+// 全てのハンドラーを統合
+const allHandlers = [...handlers, ...teacherHandlers];
+
+export const worker = setupWorker(...allHandlers);

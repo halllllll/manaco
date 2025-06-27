@@ -16,6 +16,8 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.6",
     "@tanstack/react-form": "^1.12.0",
+    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.13.11",
     "cally": "^0.8.0",
     "daisyui": "^5.0.35",
     "gas-client": "^1.2.1",

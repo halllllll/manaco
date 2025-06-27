@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { SWRConfig } from 'swr';
+import { ToastProvider } from '../context/ToastConterxt';
 import { App } from './App';
 
 async function enableMocking() {
@@ -28,7 +29,9 @@ enableMocking().then(() => {
           errorRetryInterval: 0,
         }}
       >
-        <App />
+        <ToastProvider>
+          <App />
+        </ToastProvider>
       </SWRConfig>
     </React.StrictMode>,
   );
