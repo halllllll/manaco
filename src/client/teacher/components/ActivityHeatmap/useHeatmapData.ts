@@ -50,6 +50,14 @@ export const useHeatmapData = (selectedClass = 'all') => {
         }
         const dashboardResult = await dashboardResponse.json();
 
+        // レスポンスの形式を確認して適切に取り出す
+        if (dashboardResult.success && dashboardResult.data) {
+          setDashboardData(dashboardResult.data);
+          console.log('[useHeatmapData] Dashboard data loaded:', dashboardResult.data);
+        } else {
+          throw new Error('Invalid dashboard data format');
+        }
+
         // 生徒データを取得
         const studentsResponse = await fetch(
           `/api/teacher/students${selectedClass !== 'all' ? `?class=${selectedClass}` : ''}`,
@@ -59,8 +67,13 @@ export const useHeatmapData = (selectedClass = 'all') => {
         }
         const studentsResult = await studentsResponse.json();
 
-        setDashboardData(dashboardResult);
-        setStudents(studentsResult);
+        // レスポンスの形式を確認して適切に取り出す
+        if (studentsResult.success && studentsResult.data) {
+          setStudents(studentsResult.data);
+          console.log('[useHeatmapData] Students data loaded:', studentsResult.data.length);
+        } else {
+          throw new Error('Invalid students data format');
+        }
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Unknown error'));
       } finally {

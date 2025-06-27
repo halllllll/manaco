@@ -20,7 +20,7 @@ export const DevTools = () => {
     // 選択されたユーザーを保存
     localStorage.setItem('dev-user-id', currentUser);
     // MSWにユーザー変更を通知
-    window.postMessage({ type: 'MSW_SET_USER', userId: currentUser }, '*');
+    window.postMessage({ type: 'MSW_SET_STUDENT', userId: currentUser }, '*');
   }, [currentUser]);
 
   return (

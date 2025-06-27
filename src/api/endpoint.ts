@@ -7,6 +7,12 @@ export const API_ENDPOINTS = {
   HEALTH: 'health',
   SETTINGS: 'settings',
   SAVE_ACTIVITY: 'save-activity',
+  // 教員ビュー用エンドポイント
+  TEACHER_CURRENT: 'teacher-current',
+  TEACHER_STUDENTS: 'teacher-students',
+  TEACHER_CLASSES: 'teacher-classes',
+  TEACHER_DASHBOARD: 'teacher-dashboard',
+  TEACHER_STUDENT_DETAIL: 'teacher-student-detail',
 } as const;
 
 export type ApiEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS];

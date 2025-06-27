@@ -1,54 +1,58 @@
-import { delay, http, HttpResponse } from 'msw';
-import { mockTeacherData } from './teacherData';
-// 追加の生徒データはここではインポートしない
+import { HttpResponse, delay, http } from 'msw';
 
-// 現在の選択中の教員ID
-let currentTeacherId = 'teacher-1';
-// 現在のクラスフィルター
-let currentClassFilter = 'all';
+import { currentClassFilter, currentTeacherId } from './browser';
+import { mockActivities, mockClasses, mockStudents, mockTeachers } from './teacherData';
 
-// MSWのライフサイクルイベントを購読（devtoolからのユーザー変更通知を受け取る）
-window.addEventListener('message', (event) => {
-  if (event.data.type === 'MSW_SET_TEACHER') {
-    currentTeacherId = event.data.teacherId;
-    currentClassFilter = event.data.classFilter;
-    console.log(
-      `[MSW] Teacher changed to ${currentTeacherId}, Class filter: ${currentClassFilter}`,
-    );
-  }
-});
+import type { LearningActivity } from '@/shared/types/activity';
+import type {
+  TeacherClassesDTO,
+  TeacherCurrentDTO,
+  TeacherDashboardDTO,
+  TeacherDashboardData,
+  TeacherStudentDetailDTO,
+  TeacherStudentsDTO,
+} from '@/shared/types/teacher';
+import type { User, UserWithActivities } from '@/shared/types/user';
 
 // 教師用APIのハンドラ
 export const teacherHandlers = [
   // 現在のログイン中の教員情報取得
   http.get('/api/teacher/current', async () => {
+    console.info('--- mock api: teacher current ---');
     await delay(300);
-    const teacher = mockTeacherData.teachers.find((t) => t.id === currentTeacherId);
+    const teacher = mockTeachers.find((t: User) => t.id === currentTeacherId);
 
     if (!teacher) {
-      return new HttpResponse(JSON.stringify({ error: 'Teacher not found' }), { status: 404 });
+      return HttpResponse.json({
+        success: false,
+        message: 'Teacher not found',
+      } as TeacherCurrentDTO);
     }
 
-    return HttpResponse.json(teacher);
+    return HttpResponse.json({
+      success: true,
+      data: teacher,
+    } as TeacherCurrentDTO);
   }),
 
   // 全生徒リスト取得
   http.get('/api/teacher/students', async ({ request }) => {
+    console.info('--- mock api: teacher students ---');
     await delay(500);
     const url = new URL(request.url);
     const classFilter = url.searchParams.get('class') || currentClassFilter;
     console.log('[MSW] Students API called. Class filter:', classFilter);
 
-    let students = [...mockTeacherData.students]; // 配列をコピー
+    let students = [...mockStudents]; // 配列をコピー
 
     // クラスでフィルタリング
     if (classFilter !== 'all') {
-      students = students.filter((s) => s.belonging === classFilter);
+      students = students.filter((s: User) => s.belonging === classFilter);
     }
 
     // 学習活動データを付加した生徒リストを作成
-    const studentsWithActivities = students.map((student) => {
-      const activities = mockTeacherData.activities[student.id] || [];
+    const studentsWithActivities: UserWithActivities[] = students.map((student: User) => {
+      const activities = mockActivities[student.id] || [];
       return {
         ...student,
         activities,
@@ -63,39 +67,71 @@ export const teacherHandlers = [
       );
     }
 
-    return HttpResponse.json(studentsWithActivities);
+    return HttpResponse.json({
+      success: true,
+      data: studentsWithActivities,
+    } as TeacherStudentsDTO);
   }),
 
   // 生徒の詳細情報取得（ID指定）
   http.get('/api/teacher/students/:id', async ({ params }) => {
+    console.info('--- mock api: teacher student detail ---');
     await delay(400);
-    const { id } = params;
-    const student = mockTeacherData.students.find((s) => s.id === String(id));
+
+    const id = params.id;
+
+    if (!id) {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: 'Student ID is required',
+        } as TeacherStudentDetailDTO,
+        { status: 400 },
+      );
+    }
+
+    const student = mockStudents.find((s: User) => s.id === id);
 
     if (!student) {
-      return new HttpResponse(JSON.stringify({ error: 'Student not found' }), { status: 404 });
+      return HttpResponse.json(
+        {
+          success: false,
+          message: 'Student not found',
+        } as TeacherStudentDetailDTO,
+        { status: 404 },
+      );
     }
 
     // 生徒の学習活動データを取得
-    const activities = mockTeacherData.activities[student.id] || [];
+    const activities = mockActivities[student.id] || [];
 
     // 生徒情報と学習活動データを結合
-    const studentWithActivities = {
+    const studentWithActivities: UserWithActivities = {
       ...student,
       activities,
     };
 
-    return HttpResponse.json(studentWithActivities);
+    return HttpResponse.json({
+      success: true,
+      data: studentWithActivities,
+    } as TeacherStudentDetailDTO);
   }),
 
   // クラス一覧取得
   http.get('/api/teacher/classes', async () => {
+    console.info('--- mock api: teacher classes ---');
     await delay(300);
-    return HttpResponse.json(mockTeacherData.classes);
+
+    return HttpResponse.json({
+      success: true,
+      data: mockClasses,
+    } as TeacherClassesDTO);
   }),
 
   // 学習活動の概要データ取得（ダッシュボード用）
   http.get('/api/teacher/dashboard', async ({ request }) => {
+    console.info('--- mock api: teacher dashboard ---');
+    console.log('Request URL:', request.url);
     await delay(600);
     const url = new URL(request.url);
     const classFilter = url.searchParams.get('class') || currentClassFilter;
@@ -116,8 +152,8 @@ export const teacherHandlers = [
     // 対象の生徒をフィルタリング
     const targetStudents =
       classFilter !== 'all'
-        ? mockTeacherData.students.filter((s) => s.belonging === classFilter)
-        : mockTeacherData.students;
+        ? mockStudents.filter((s: User) => s.belonging === classFilter)
+        : mockStudents;
 
     console.log(`[MSW] Filtered students for dashboard: ${targetStudents.length} students`);
 
@@ -126,17 +162,17 @@ export const teacherHandlers = [
 
     // 各生徒の活動を集計
     for (const student of targetStudents) {
-      const studentActivities = mockTeacherData.activities[student.id] || [];
+      const studentActivities = mockActivities[student.id] || [];
 
       // 今日の活動
       const todayActivities = studentActivities.filter(
-        (activity) => activity.activityDate === today,
+        (activity: LearningActivity) => activity.activityDate === today,
       );
       totalActivitiesToday += todayActivities.length;
 
       // 今週の活動
       const weekActivities = studentActivities.filter(
-        (activity) => activity.activityDate >= startOfWeekStr,
+        (activity: LearningActivity) => activity.activityDate >= startOfWeekStr,
       );
       totalActivitiesThisWeek += weekActivities.length;
     }
@@ -148,20 +184,18 @@ export const teacherHandlers = [
       date.setDate(now.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
 
-      const dayData: {
-        date: string;
-        displayDate: string;
-        activities: Record<string, boolean>;
-      } = {
+      const dayData = {
         date: dateStr,
         displayDate: `${date.getMonth() + 1}/${date.getDate()}`,
-        activities: {},
+        activities: {} as Record<string, boolean>,
       };
 
       // 各生徒の活動状況
       for (const student of targetStudents) {
-        const studentActivities = mockTeacherData.activities[student.id] || [];
-        const hasActivity = studentActivities.some((activity) => activity.activityDate === dateStr);
+        const studentActivities = mockActivities[student.id] || [];
+        const hasActivity = studentActivities.some(
+          (activity: LearningActivity) => activity.activityDate === dateStr,
+        );
 
         dayData.activities[student.id] = hasActivity;
       }
@@ -169,7 +203,7 @@ export const teacherHandlers = [
       last10Days.push(dayData);
     }
 
-    const result = {
+    const dashboardData: TeacherDashboardData = {
       totalStudents: targetStudents.length,
       todayActivities: totalActivitiesToday,
       weekActivities: totalActivitiesThisWeek,
@@ -177,11 +211,15 @@ export const teacherHandlers = [
     };
 
     console.log('[MSW] Dashboard response data prepared:', {
-      students: result.totalStudents,
-      todayActivities: result.todayActivities,
-      weekActivities: result.weekActivities,
-      heatmapDays: result.activityHeatmap.length,
+      students: dashboardData.totalStudents,
+      todayActivities: dashboardData.todayActivities,
+      weekActivities: dashboardData.weekActivities,
+      heatmapDays: dashboardData.activityHeatmap.length,
     });
-    return HttpResponse.json(result);
+
+    return HttpResponse.json({
+      success: true,
+      data: dashboardData,
+    } as TeacherDashboardDTO);
   }),
 ];

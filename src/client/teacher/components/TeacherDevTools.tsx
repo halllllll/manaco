@@ -15,41 +15,20 @@ export const TeacherDevTools = () => {
     { id: 'admin-1', name: '校長先生', role: 'admin' },
   ];
 
-  // 選択されているクラス
-  const [currentClass, setCurrentClass] = useState(() => {
-    return localStorage.getItem('dev-class-filter') || 'all';
-  });
-
-  // クラス一覧
-  const classList = [
-    { id: 'all', name: 'すべてのクラス' },
-    { id: 'class-1', name: '1年1組' },
-    { id: 'class-2', name: '1年2組' },
-    { id: 'class-3', name: '2年1組' },
-    { id: 'class-4', name: '2年2組' },
-    { id: 'class-5', name: '3年1組' },
-    { id: 'class-6', name: '3年2組' },
-    { id: 'class-7', name: '4年1組' },
-    { id: 'class-8', name: '4年2組' },
-    { id: 'class-9', name: '5年1組' },
-    { id: 'class-10', name: '6年1組' },
-  ];
-
   useEffect(() => {
     // 選択された教員ユーザーを保存
     localStorage.setItem('dev-teacher-id', currentTeacher);
-    // 選択されたクラスを保存
-    localStorage.setItem('dev-class-filter', currentClass);
-    // MSWにユーザー変更を通知
+
+    // MSWにユーザー変更を通知 (classFilterは'all'に固定)
     window.postMessage(
       {
         type: 'MSW_SET_TEACHER',
         teacherId: currentTeacher,
-        classFilter: currentClass,
+        classFilter: 'all',
       },
       '*',
     );
-  }, [currentTeacher, currentClass]);
+  }, [currentTeacher]);
 
   return (
     <div className="bg-blue-400 p-2 shadow-lg border-b border-blue-500">
@@ -72,28 +51,6 @@ export const TeacherDevTools = () => {
                     className={`${currentTeacher === teacher.id ? 'tab-active' : ''}`}
                   >
                     {teacher.name} <span className="badge badge-sm">{teacher.role}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </details>
-
-          {/* クラス選択 */}
-          <details className="dropdown dropdown-end">
-            <summary className="btn btn-sm m-1">
-              クラス: {classList.find((c) => c.id === currentClass)?.name}
-            </summary>
-
-            <ul className="menu dropdown-content bg-base-100 rounded-box z-10 w-52 p-2 shadow-lg">
-              {classList.map((cls) => (
-                <li key={cls.id}>
-                  <button
-                    type="button"
-                    role="tab"
-                    onClick={() => setCurrentClass(cls.id)}
-                    className={`${currentClass === cls.id ? 'tab-active' : ''}`}
-                  >
-                    {cls.name}
                   </button>
                 </li>
               ))}

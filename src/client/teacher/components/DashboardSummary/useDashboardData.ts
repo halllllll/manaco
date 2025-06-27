@@ -39,13 +39,20 @@ export const useDashboardData = (selectedClass = 'all') => {
         }
 
         const result = await response.json();
-        console.log('[Dashboard] API data received:', {
-          totalStudents: result.totalStudents,
-          todayActivities: result.todayActivities,
-          weekActivities: result.weekActivities,
-        });
 
-        setDashboardData(result);
+        // レスポンスの形式を確認して適切に取り出す
+        if (result.success && result.data) {
+          console.log('[Dashboard] API data received:', {
+            totalStudents: result.data.totalStudents,
+            todayActivities: result.data.todayActivities,
+            weekActivities: result.data.weekActivities,
+          });
+
+          setDashboardData(result.data);
+        } else {
+          console.error('[Dashboard] Invalid response format:', result);
+          throw new Error('Invalid dashboard data format');
+        }
       } catch (err) {
         console.error('[Dashboard] Error fetching data:', err);
         setError(err instanceof Error ? err : new Error('Unknown error'));

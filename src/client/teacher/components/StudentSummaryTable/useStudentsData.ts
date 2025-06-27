@@ -31,7 +31,13 @@ export function useStudentsData(classFilter = 'all') {
       const errorText = await res.text();
       throw new Error(errorText || 'APIリクエストに失敗しました');
     }
-    return res.json();
+    const result = await res.json();
+
+    // success/dataフォーマットを処理
+    if (result.success && result.data) {
+      return result.data;
+    }
+    throw new Error('Invalid API response format');
   };
 
   const { data, error, isLoading } = useSWR<Student[]>(

@@ -7,6 +7,8 @@ export interface LearningActivity {
   mood?: Mood;
   memo?: string;
   activityType?: string[]; // 取り組みの種類
+  subject?: string; // 教科
+  studentId?: string; // 生徒ID（教師ビューでのみ使用）
 }
 
 export interface LearningActivityRequest extends LearningActivity {
