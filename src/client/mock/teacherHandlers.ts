@@ -1,7 +1,7 @@
 import { HttpResponse, delay, http } from 'msw';
 
 import { currentClassFilter, currentTeacherId } from './browser';
-import { mockActivities, mockClasses, mockStudents, mockTeachers } from './teacherData';
+import { mockActivities, mockClasses, mockStudents, mockTeachers } from './teacherViewData';
 
 import type { LearningActivity } from '@/shared/types/activity';
 import type {

@@ -1,45 +1,26 @@
-import { useEffect } from 'react';
-import useSWR from 'swr';
-import type { Student } from '../StudentSummaryTable/useStudentsData';
+import { useTeacherStudentDetail } from '@/api/teacher/hook';
+import { useMemo } from 'react';
 
 /**
  * 生徒詳細情報取得フック
  * 指定したIDの生徒の詳細情報を取得する
+ * SWRを使用して効率的にデータを取得・キャッシュする
  */
 export function useStudentDetail(studentId: string | null) {
-  // JSONを返すフェッチャーを明示的に定義
-  const fetcher = async (url: string) => {
-    const res = await fetch(url);
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(errorText || 'APIリクエストに失敗しました');
-    }
-    const result = await res.json();
-
-    // success/dataフォーマットを処理
-    if (result.success && result.data) {
-      return result.data;
-    }
-    throw new Error('Invalid API response format');
-  };
-
-  const { data, error, isLoading, mutate } = useSWR<Student>(
-    studentId ? `/api/teacher/students/${studentId}` : null,
-    fetcher,
-    {
-      suspense: false,
-      revalidateOnFocus: false,
-      errorRetryCount: 2,
-    },
-  );
+  // 共通のSWRフックを使用
+  const { data, error, isLoading, mutate } = useTeacherStudentDetail(studentId);
 
   // デバッグ情報
-  useEffect(() => {
+  useMemo(() => {
     if (studentId) {
       console.log(`[useStudentDetail] 生徒ID: ${studentId}`);
     }
     if (data) {
-      console.log('[useStudentDetail] 生徒データ:', data);
+      console.log('[useStudentDetail] 生徒データ:', {
+        id: data.id,
+        name: data.name,
+        activitiesCount: data.activities?.length || 0,
+      });
     }
     if (error) {
       console.error('[useStudentDetail] エラー:', error);

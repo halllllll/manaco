@@ -1,5 +1,5 @@
 import { setupWorker } from 'msw/browser';
-import { handlers } from './handlers';
+import { handlers } from './studentHandlers';
 import { teacherHandlers } from './teacherHandlers';
 
 // 現在のモックユーザーコンテキスト

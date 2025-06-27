@@ -1,98 +1,78 @@
-import { useEffect, useState } from 'react';
-
-// ヒートマップの日付データの型
-export type HeatmapDay = {
-  date: string;
-  displayDate: string;
-  activities: Record<string, boolean>;
-};
-
-// 生徒データの型
-type Student = {
-  id: string;
-  name: string;
-  belonging: string;
-  role: string;
-};
-
-// ダッシュボードデータの型
-type DashboardData = {
-  totalStudents: number;
-  todayActivities: number;
-  weekActivities: number;
-  activityHeatmap: HeatmapDay[];
-};
+import { useTeacherDashboard, useTeacherStudents } from '@/api/teacher/hook';
+import type { HeatmapDay } from '@/shared/types/teacher';
+import { useMemo, useState } from 'react';
 
 // ソートオプションの型
 type SortOption = 'name' | 'activity';
 
 /**
  * ヒートマップデータを取得するカスタムフック
+ * SWRを使用して全データを一度に取得し、クライアント側で処理する
  */
 export const useHeatmapData = (selectedClass = 'all') => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  const [students, setStudents] = useState<Student[]>([]);
+  // ダッシュボードデータと生徒データをSWRで取得
+  const {
+    data: dashboardData,
+    error: dashboardError,
+    isLoading: isDashboardLoading,
+  } = useTeacherDashboard(selectedClass);
+  const {
+    data: studentsData,
+    error: studentsError,
+    isLoading: isStudentsLoading,
+  } = useTeacherStudents(selectedClass);
+
   const [sortOption, setSortOption] = useState<SortOption>('name');
 
-  // ダッシュボードデータとクラスに紐づく生徒データを取得
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
+  // エラーとローディング状態の統合
+  const error = dashboardError || studentsError || null;
+  const isLoading = isDashboardLoading || isStudentsLoading;
 
-      try {
-        // ダッシュボードデータを取得
-        const dashboardResponse = await fetch('/api/teacher/dashboard');
-        if (!dashboardResponse.ok) {
-          throw new Error('Dashboard data fetch failed');
-        }
-        const dashboardResult = await dashboardResponse.json();
+  // データの加工
+  const students = useMemo(() => {
+    return studentsData || [];
+  }, [studentsData]);
 
-        // レスポンスの形式を確認して適切に取り出す
-        if (dashboardResult.success && dashboardResult.data) {
-          setDashboardData(dashboardResult.data);
-          console.log('[useHeatmapData] Dashboard data loaded:', dashboardResult.data);
-        } else {
-          throw new Error('Invalid dashboard data format');
-        }
+  // 合計値の計算（フィルタリング済みデータから）
+  const totalStudents = dashboardData?.totalStudents || 0;
+  const todayActivities = dashboardData?.todayActivities || 0;
+  const weekActivities = dashboardData?.weekActivities || 0;
+  const heatmapData = dashboardData?.activityHeatmap || [];
 
-        // 生徒データを取得
-        const studentsResponse = await fetch(
-          `/api/teacher/students${selectedClass !== 'all' ? `?class=${selectedClass}` : ''}`,
-        );
-        if (!studentsResponse.ok) {
-          throw new Error('Students data fetch failed');
-        }
-        const studentsResult = await studentsResponse.json();
-
-        // レスポンスの形式を確認して適切に取り出す
-        if (studentsResult.success && studentsResult.data) {
-          setStudents(studentsResult.data);
-          console.log('[useHeatmapData] Students data loaded:', studentsResult.data.length);
-        } else {
-          throw new Error('Invalid students data format');
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [selectedClass]);
+  // デバッグログ
+  useMemo(() => {
+    if (dashboardData) {
+      console.log('[useHeatmapData] Dashboard data processed:', {
+        totalStudents,
+        todayActivities,
+        weekActivities,
+        heatmapDays: heatmapData.length,
+      });
+    }
+    if (studentsData) {
+      console.log('[useHeatmapData] Students data processed:', { count: students.length });
+    }
+  }, [
+    dashboardData,
+    studentsData,
+    totalStudents,
+    todayActivities,
+    weekActivities,
+    heatmapData,
+    students,
+  ]);
 
   return {
     isLoading,
-    error,
-    heatmapData: dashboardData?.activityHeatmap || [],
-    totalStudents: dashboardData?.totalStudents || 0,
-    todayActivities: dashboardData?.todayActivities || 0,
-    weekActivities: dashboardData?.weekActivities || 0,
+    error: error ? new Error(error.message) : null,
+    heatmapData,
+    totalStudents,
+    todayActivities,
+    weekActivities,
     sortOption,
     setSortOption,
     students,
   };
 };
+
+export type { HeatmapDay };

@@ -4,7 +4,7 @@ import { API_ENDPOINTS, getMSWPath } from '../../api/endpoint';
 import { currentMockUserId } from './browser';
 
 import type { UserActivityDTO } from '@/shared/types/dto';
-import { mockAppSettingsData, mockHealthCheckData, mockUserData } from './data';
+import { mockAppSettingsData, mockHealthCheckData, mockUserData } from './studentViewData';
 
 export const handlers = [
   // スプレッドシート名取得 API
