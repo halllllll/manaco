@@ -3,9 +3,29 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '../components/ErrorFallback';
 import { Toast } from '../components/Toast/toast';
 import { ActivityHeatmap } from './components/ActivityHeatmap';
+import { CurrentTeacherName } from './components/CurrentTeacherName';
+import { DashboardSummary } from './components/DashboardSummary';
 import { StudentDetailModal } from './components/StudentDetail';
 import { StudentSummaryTable } from './components/StudentSummaryTable/StudentSummaryTable';
 import { TeacherDevTools } from './components/TeacherDevTools';
+
+// クラスIDから表示名を取得する関数
+const getClassName = (classId: string): string => {
+  const classMap: Record<string, string> = {
+    all: 'すべてのクラス',
+    'class-1': '1年1組',
+    'class-2': '1年2組',
+    'class-3': '2年1組',
+    'class-4': '2年2組',
+    'class-5': '3年1組',
+    'class-6': '3年2組',
+    'class-7': '4年1組',
+    'class-8': '4年2組',
+    'class-9': '5年1組',
+    'class-10': '6年1組',
+  };
+  return classMap[classId] || classId;
+};
 
 export const App: FC = () => {
   // 選択中のクラス（all = すべてのクラス）
@@ -41,9 +61,9 @@ export const App: FC = () => {
                   {/* クラス選択ドロップダウン */}
                   <div className="dropdown dropdown-end">
                     <button type="button" className="btn btn-sm m-1">
-                      {selectedClass === 'all' ? 'すべてのクラス' : selectedClass}
+                      {selectedClass === 'all' ? 'すべてのクラス' : getClassName(selectedClass)}
                     </button>
-                    <ul className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+                    <ul className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 max-h-60 overflow-y-auto">
                       <li>
                         <button type="button" onClick={() => setSelectedClass('all')}>
                           すべてのクラス
@@ -64,10 +84,45 @@ export const App: FC = () => {
                           2年1組
                         </button>
                       </li>
+                      <li>
+                        <button type="button" onClick={() => setSelectedClass('class-4')}>
+                          2年2組
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" onClick={() => setSelectedClass('class-5')}>
+                          3年1組
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" onClick={() => setSelectedClass('class-6')}>
+                          3年2組
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" onClick={() => setSelectedClass('class-7')}>
+                          4年1組
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" onClick={() => setSelectedClass('class-8')}>
+                          4年2組
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" onClick={() => setSelectedClass('class-9')}>
+                          5年1組
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" onClick={() => setSelectedClass('class-10')}>
+                          6年1組
+                        </button>
+                      </li>
                     </ul>
                   </div>
 
-                  <div className="text-sm">ユーザー: 山田先生</div>
+                  <CurrentTeacherName />
                 </div>
               </div>
             </header>
@@ -103,31 +158,7 @@ export const App: FC = () => {
                   className="grid grid-cols-1 gap-6"
                 >
                   {/* 概要パネル */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="stats shadow bg-base-100">
-                      <div className="stat">
-                        <div className="stat-title">登録生徒数</div>
-                        <div className="stat-value text-primary">25</div>
-                        <div className="stat-desc">全クラス合計</div>
-                      </div>
-                    </div>
-
-                    <div className="stats shadow bg-base-100">
-                      <div className="stat">
-                        <div className="stat-title">今日の投稿数</div>
-                        <div className="stat-value text-secondary">12</div>
-                        <div className="stat-desc">全生徒の合計</div>
-                      </div>
-                    </div>
-
-                    <div className="stats shadow bg-base-100">
-                      <div className="stat">
-                        <div className="stat-title">今週の投稿数</div>
-                        <div className="stat-value text-accent">89</div>
-                        <div className="stat-desc">過去7日間の合計</div>
-                      </div>
-                    </div>
-                  </div>
+                  <DashboardSummary selectedClass={selectedClass} />
 
                   {/* ヒートマップ */}
                   <div className="card bg-base-100 shadow-lg">

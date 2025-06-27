@@ -1,5 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 import { mockTeacherData } from './teacherData';
+// 追加の生徒データはここではインポートしない
 
 // 現在の選択中の教員ID
 let currentTeacherId = 'teacher-1';
@@ -36,7 +37,6 @@ export const teacherHandlers = [
     await delay(500);
     const url = new URL(request.url);
     const classFilter = url.searchParams.get('class') || currentClassFilter;
-
     console.log('[MSW] Students API called. Class filter:', classFilter);
 
     let students = [...mockTeacherData.students]; // 配列をコピー
@@ -46,11 +46,24 @@ export const teacherHandlers = [
       students = students.filter((s) => s.belonging === classFilter);
     }
 
-    console.log('[MSW] Returning students:', students);
-    console.log('[MSW] Students count:', students.length);
-    console.log('[MSW] First student:', students[0]);
+    // 学習活動データを付加した生徒リストを作成
+    const studentsWithActivities = students.map((student) => {
+      const activities = mockTeacherData.activities[student.id] || [];
+      return {
+        ...student,
+        activities,
+      };
+    });
 
-    return HttpResponse.json(students);
+    console.log('[MSW] Returning students with activities:', studentsWithActivities.length);
+    if (studentsWithActivities.length > 0) {
+      console.log(
+        '[MSW] First student activities:',
+        studentsWithActivities[0].activities?.length || 0,
+      );
+    }
+
+    return HttpResponse.json(studentsWithActivities);
   }),
 
   // 生徒の詳細情報取得（ID指定）
@@ -82,13 +95,12 @@ export const teacherHandlers = [
   }),
 
   // 学習活動の概要データ取得（ダッシュボード用）
-  http.get('/api/teacher/dashboard', async () => {
+  http.get('/api/teacher/dashboard', async ({ request }) => {
     await delay(600);
-    console.log('[MSW] Dashboard API called. Mock data available:', {
-      students: mockTeacherData.students.length,
-      activities: Object.keys(mockTeacherData.activities).length,
-      classes: mockTeacherData.classes.length,
-    });
+    const url = new URL(request.url);
+    const classFilter = url.searchParams.get('class') || currentClassFilter;
+
+    console.log('[MSW] Dashboard API called. Class filter:', classFilter);
 
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -101,11 +113,21 @@ export const teacherHandlers = [
     startOfWeek.setDate(now.getDate() - dayOfWeek);
     const startOfWeekStr = startOfWeek.toISOString().split('T')[0];
 
+    // 対象の生徒をフィルタリング
+    const targetStudents =
+      classFilter !== 'all'
+        ? mockTeacherData.students.filter((s) => s.belonging === classFilter)
+        : mockTeacherData.students;
+
+    console.log(`[MSW] Filtered students for dashboard: ${targetStudents.length} students`);
+
     let totalActivitiesToday = 0;
     let totalActivitiesThisWeek = 0;
 
     // 各生徒の活動を集計
-    for (const studentActivities of Object.values(mockTeacherData.activities)) {
+    for (const student of targetStudents) {
+      const studentActivities = mockTeacherData.activities[student.id] || [];
+
       // 今日の活動
       const todayActivities = studentActivities.filter(
         (activity) => activity.activityDate === today,
@@ -137,7 +159,7 @@ export const teacherHandlers = [
       };
 
       // 各生徒の活動状況
-      for (const student of mockTeacherData.students) {
+      for (const student of targetStudents) {
         const studentActivities = mockTeacherData.activities[student.id] || [];
         const hasActivity = studentActivities.some((activity) => activity.activityDate === dateStr);
 
@@ -148,7 +170,7 @@ export const teacherHandlers = [
     }
 
     const result = {
-      totalStudents: mockTeacherData.students.length,
+      totalStudents: targetStudents.length,
       todayActivities: totalActivitiesToday,
       weekActivities: totalActivitiesThisWeek,
       activityHeatmap: last10Days,
@@ -156,6 +178,8 @@ export const teacherHandlers = [
 
     console.log('[MSW] Dashboard response data prepared:', {
       students: result.totalStudents,
+      todayActivities: result.todayActivities,
+      weekActivities: result.weekActivities,
       heatmapDays: result.activityHeatmap.length,
     });
     return HttpResponse.json(result);

@@ -1,3 +1,4 @@
+import { formatDate } from '@/shared/common/func';
 import {
   type SortingState,
   createColumnHelper,
@@ -9,7 +10,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import type { Student } from '../types/student';
+import type { Student } from './useStudentsData';
 import { useStudentsData } from './useStudentsData';
 
 type StudentSummaryTableProps = {
@@ -82,13 +83,8 @@ export const StudentSummaryTable: React.FC<StudentSummaryTableProps> = ({
           const date = info.getValue();
           if (!date) return <span className="text-gray-400">なし</span>;
 
-          // 日付をフォーマット（YYYY-MM-DD -> MM/DD）
-          const [y, m, d] = date.split('-');
-          return (
-            <span>
-              {m}/{d}
-            </span>
-          );
+          // 共通のformatDate関数を使用して日付をフォーマット
+          return <span className="whitespace-nowrap">{formatDate(date).substring(5, 13)}</span>;
         },
       },
     ),

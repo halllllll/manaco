@@ -7,9 +7,24 @@ import type { Student } from '../StudentSummaryTable/useStudentsData';
  * 指定したIDの生徒の詳細情報を取得する
  */
 export function useStudentDetail(studentId: string | null) {
+  // JSONを返すフェッチャーを明示的に定義
+  const fetcher = async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(errorText || 'APIリクエストに失敗しました');
+    }
+    return res.json();
+  };
+
   const { data, error, isLoading, mutate } = useSWR<Student>(
     studentId ? `/api/teacher/students/${studentId}` : null,
-    { suspense: false },
+    fetcher,
+    {
+      suspense: false,
+      revalidateOnFocus: false,
+      errorRetryCount: 2,
+    },
   );
 
   // デバッグ情報

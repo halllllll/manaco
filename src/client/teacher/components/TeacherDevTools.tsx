@@ -26,6 +26,13 @@ export const TeacherDevTools = () => {
     { id: 'class-1', name: '1年1組' },
     { id: 'class-2', name: '1年2組' },
     { id: 'class-3', name: '2年1組' },
+    { id: 'class-4', name: '2年2組' },
+    { id: 'class-5', name: '3年1組' },
+    { id: 'class-6', name: '3年2組' },
+    { id: 'class-7', name: '4年1組' },
+    { id: 'class-8', name: '4年2組' },
+    { id: 'class-9', name: '5年1組' },
+    { id: 'class-10', name: '6年1組' },
   ];
 
   useEffect(() => {
