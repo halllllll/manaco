@@ -1,9 +1,14 @@
+import type { User } from '@/shared/types/user';
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import type { FC } from 'react';
 import { useMemo, useRef } from 'react';
 import { type HeatmapDay, useHeatmapData } from './useHeatmapData';
-import { useReactTable, getCoreRowModel, flexRender, createColumnHelper } from '@tanstack/react-table';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import type { User } from '@/shared/types/user';
 
 type ActivityHeatmapProps = {
   className?: string;
@@ -31,7 +36,16 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({
   const sortedStudents = useMemo(() => {
     if (!heatmapData || !students) return [];
 
-    const sorted = [...students];
+    const studentsWithHeatmapActivities = students.map((student) => {
+      const activities: Record<string, boolean> = {};
+      // biome-ignore lint/complexity/noForEach: <explanation>
+      heatmapData.forEach((day) => {
+        activities[day.date] = day.activities[student.id] || false;
+      });
+      return { ...student, activities };
+    });
+
+    const sorted = [...studentsWithHeatmapActivities];
 
     if (sortOption === 'name') {
       // 名前でソート
@@ -39,14 +53,8 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({
     } else if (sortOption === 'activity') {
       // 活動量でソート（多い順）
       sorted.sort((a, b) => {
-        const aCount = heatmapData.reduce(
-          (count: number, day: HeatmapDay) => count + (day.activities[a.id] ? 1 : 0),
-          0,
-        );
-        const bCount = heatmapData.reduce(
-          (count: number, day: HeatmapDay) => count + (day.activities[b.id] ? 1 : 0),
-          0,
-        );
+        const aCount = Object.values(a.activities).filter(Boolean).length;
+        const bCount = Object.values(b.activities).filter(Boolean).length;
         return bCount - aCount;
       });
     }
@@ -59,9 +67,7 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({
     () => [
       columnHelper.accessor('name', {
         id: 'studentName',
-        header: () => (
-          <div className="sticky left-0 bg-base-100 z-10 p-2">生徒名</div>
-        ),
+        header: () => <div className="sticky left-0 bg-base-100 z-10 p-2">生徒名</div>,
         cell: (info) => (
           <div className="sticky left-0 bg-base-100 z-10 font-medium p-2">
             {info.getValue()}
@@ -73,33 +79,36 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({
         minSize: 150,
         size: 200,
       }),
-      ...(heatmapData || []).map((day: HeatmapDay) =>
-        columnHelper.display({
-          id: day.date,
-          header: () => (
-            <div className="text-center whitespace-nowrap p-2">{day.displayDate}</div>
-          ),
-          cell: (info) => {
-            const hasActivity = day.activities[info.row.original.id] || false;
-            return (
-              <div className="text-center p-2">
-                <div
-                  className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center
+      ...(heatmapData || [])
+        .slice()
+        .reverse()
+        .map((day: HeatmapDay) =>
+          columnHelper.display({
+            id: day.date,
+            header: () => (
+              <div className="text-center whitespace-nowrap p-2">{day.displayDate}</div>
+            ),
+            cell: (info) => {
+              const hasActivity = day.activities[info.row.original.id] || false;
+              return (
+                <div className="text-center p-2">
+                  <div
+                    className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center
                   ${
                     hasActivity
                       ? 'bg-primary/20 text-primary-content'
                       : 'bg-base-200 text-base-content/30'
                   }`}
-                >
-                  {hasActivity ? '○' : '−'}
+                  >
+                    {hasActivity ? '○' : '−'}
+                  </div>
                 </div>
-              </div>
-            );
-          },
-          minSize: 60,
-          size: 80,
-        }),
-      ),
+              );
+            },
+            minSize: 60,
+            size: 80,
+          }),
+        ),
     ],
     [heatmapData],
   );
