@@ -158,16 +158,13 @@ export const App: FC = () => {
                   className="grid grid-cols-1 gap-6"
                 >
                   {/* 概要パネル */}
-                  <DashboardSummary selectedClass={selectedClass} />
+                  <DashboardSummary />
 
                   {/* ヒートマップ */}
                   <div className="card bg-base-100 shadow-lg">
                     <div className="card-body">
                       <h2 className="card-title mb-4">クラス活動ヒートマップ</h2>
-                      <ActivityHeatmap
-                        selectedClass={selectedClass}
-                        onStudentSelect={handleStudentSelect}
-                      />
+                      <ActivityHeatmap onStudentSelect={handleStudentSelect} />
                     </div>
                   </div>
                 </div>

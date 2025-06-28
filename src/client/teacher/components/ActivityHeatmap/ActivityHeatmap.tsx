@@ -13,7 +13,6 @@ import { type HeatmapDay, useHeatmapData } from './useHeatmapData';
 type ActivityHeatmapProps = {
   className?: string;
   onStudentSelect?: (studentId: string) => void;
-  selectedClass?: string;
 };
 
 // カラムヘルパーを初期化
@@ -23,14 +22,9 @@ const columnHelper = createColumnHelper<User & { activities: Record<string, bool
  * 活動ヒートマップコンポーネント
  * 直近10日間の生徒の学習活動の有無を表示する
  */
-export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({
-  className = '',
-  onStudentSelect,
-  selectedClass = 'all',
-}) => {
+export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onStudentSelect }) => {
   // ヒートマップデータを取得（カスタムフック）
-  const { isLoading, error, heatmapData, sortOption, setSortOption, students } =
-    useHeatmapData(selectedClass);
+  const { isLoading, error, heatmapData, sortOption, setSortOption, students } = useHeatmapData();
 
   // ソート済みの生徒リストを生成
   const sortedStudents = useMemo(() => {

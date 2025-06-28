@@ -57,40 +57,12 @@ export type TeacherStudentsDTO =
     };
 
 /**
- * クラス一覧レスポンス型
- */
-export type TeacherClassesDTO =
-  | {
-      success: true;
-      data: ClassGroup[];
-    }
-  | {
-      success: false;
-      message: string;
-      details?: string;
-    };
-
-/**
- * 現在の教員情報レスポンス型
- */
-export type TeacherCurrentDTO =
-  | {
-      success: true;
-      data: User;
-    }
-  | {
-      success: false;
-      message: string;
-      details?: string;
-    };
-
-/**
  * 生徒詳細レスポンス型
  */
 export type TeacherStudentDetailDTO =
   | {
       success: true;
-      data: UserWithActivities;
+      data: UserWithActivities | null;
     }
   | {
       success: false;

@@ -19,7 +19,6 @@ export const StudentDetailModal: FC<StudentDetailModalProps> = ({ studentId, onC
   const { student, isLoading, error } = useStudentDetail(studentId);
   const [selectedActivity, setSelectedActivity] = useState<LearningActivity | null>(null);
 
-  // モーダル表示時に生徒データをフェッチ
   useEffect(() => {
     if (studentId) {
       console.log(`生徒詳細モーダルが開かれました: ${studentId}`);
@@ -27,7 +26,6 @@ export const StudentDetailModal: FC<StudentDetailModalProps> = ({ studentId, onC
   }, [studentId]);
 
   // 学習記録選択時の処理
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSelectActivity = (activity: any) => {
     // mockとLearningActivity型に不整合があるため、一時的にanyを使用
     // 実際のアプリでは適切な型変換が必要

@@ -10,9 +10,9 @@ export type Student = UserWithActivities;
  * クラスフィルター指定でAPI経由で生徒リストを取得
  * SWRを使用して効率的にデータを取得・キャッシュする
  */
-export function useStudentsData(classFilter = 'all') {
+export function useStudentsData() {
   // 共通のSWRフックを使用
-  const { data, error, isLoading } = useTeacherStudents(classFilter);
+  const { data, error, isLoading } = useTeacherStudents();
 
   // デバッグ情報
   useMemo(() => {

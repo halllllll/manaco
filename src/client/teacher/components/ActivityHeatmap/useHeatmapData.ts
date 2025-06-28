@@ -9,18 +9,18 @@ type SortOption = 'name' | 'activity';
  * ヒートマップデータを取得するカスタムフック
  * SWRを使用して全データを一度に取得し、クライアント側で処理する
  */
-export const useHeatmapData = (selectedClass = 'all') => {
+export const useHeatmapData = () => {
   // ダッシュボードデータと生徒データをSWRで取得
   const {
     data: dashboardData,
     error: dashboardError,
     isLoading: isDashboardLoading,
-  } = useTeacherDashboard(selectedClass);
+  } = useTeacherDashboard();
   const {
     data: studentsData,
     error: studentsError,
     isLoading: isStudentsLoading,
-  } = useTeacherStudents(selectedClass);
+  } = useTeacherStudents();
 
   const [sortOption, setSortOption] = useState<SortOption>('name');
 

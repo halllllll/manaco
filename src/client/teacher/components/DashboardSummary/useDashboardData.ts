@@ -5,9 +5,9 @@ import { useMemo } from 'react';
  * ダッシュボードデータを取得するカスタムフック
  * SWRを使用して効率的にデータを取得・キャッシュする
  */
-export const useDashboardData = (selectedClass = 'all') => {
+export const useDashboardData = () => {
   // SWRを使ってダッシュボードデータを取得
-  const { data: dashboardData, error, isLoading } = useTeacherDashboard(selectedClass);
+  const { data: dashboardData, error, isLoading } = useTeacherDashboard();
 
   // デバッグログ
   useMemo(() => {

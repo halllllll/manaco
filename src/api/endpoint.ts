@@ -28,16 +28,10 @@ export const getApiPath = (
   endpointKey: ApiEndpointKey,
   params?: { studentId?: string; class?: string },
 ): string => {
-  let path = API_ENDPOINTS[endpointKey];
-
-  // パスパラメータを置換
-  if (params?.studentId) {
-    path = path.replace(':id', params.studentId);
-  }
+  const path = API_ENDPOINTS[endpointKey];
 
   // クエリパラメータを追加
   if (params?.class && params.class !== 'all') {
-    // @ts-expect-error
     const url = new URL(path, 'http://localhost');
     url.searchParams.set('class', params.class);
     return `${url.pathname}${url.search}`;

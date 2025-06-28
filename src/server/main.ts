@@ -14,6 +14,10 @@ import {
   saveActivityHandler,
   validateAllHandler,
 } from './api';
+import {
+  getTeacherDashboardHandler,
+  getTeacherStudentsHandler,
+} from './api/handlers/teacherHandler';
 import { getCurrentUser } from './services/userService';
 import { validateAllService } from './services/validationService';
 import {
@@ -92,12 +96,16 @@ global.initApp = initAppHandler;
 // Settings functions
 global.getSettingsData = getSettingsHandler;
 
+global.getTeacherDashboard = getTeacherDashboardHandler;
+global.getTeacherStudents = getTeacherStudentsHandler;
+
 // Export functions for the frontend API
 export {
   getDashboardHandler as getDashboard,
   getSettingsHandler as getSettingsData,
   getSpreadsheetNameHandler as getSpreadSheetName,
   getSpreadsheetUrlHandler as getSpreadSheetUrl,
+  getTeacherStudentsHandler as getTeacherStudents,
   getUserHandler as getUser,
   initAppHandler as initApp,
   saveActivityHandler as setActivity,

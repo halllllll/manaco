@@ -24,16 +24,14 @@ type StudentSummaryTableProps = {
  * @tanstack/react-tableを使用
  */
 export const StudentSummaryTable: React.FC<StudentSummaryTableProps> = ({
-  selectedClass = 'all',
   onStudentSelect,
   className = '',
 }) => {
   // 生徒データ取得
-  const { students, isLoading, error } = useStudentsData(selectedClass);
+  const { students, isLoading, error } = useStudentsData();
 
   // デバッグ用
   console.log('StudentSummaryTable rendered', {
-    selectedClass,
     studentsCount: students.length,
     isLoading,
     hasError: !!error,
@@ -183,6 +181,7 @@ export const StudentSummaryTable: React.FC<StudentSummaryTableProps> = ({
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
+                    // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
                     <th
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}

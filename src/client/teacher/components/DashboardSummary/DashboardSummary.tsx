@@ -1,17 +1,12 @@
 import type { FC } from 'react';
 import { useDashboardData } from './useDashboardData';
 
-interface DashboardSummaryProps {
-  selectedClass?: string;
-}
-
 /**
  * ダッシュボードの概要パネルを表示するコンポーネント
  * 登録生徒数、今日の投稿数、今週の投稿数を表示する
  */
-export const DashboardSummary: FC<DashboardSummaryProps> = ({ selectedClass = 'all' }) => {
-  const { isLoading, error, totalStudents, todayActivities, weekActivities } =
-    useDashboardData(selectedClass);
+export const DashboardSummary: FC = () => {
+  const { isLoading, error, totalStudents, todayActivities, weekActivities } = useDashboardData();
 
   if (isLoading) {
     return <DashboardSummarySkeleton />;

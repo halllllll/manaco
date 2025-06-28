@@ -6,8 +6,6 @@ import { mockActivities, mockClasses, mockStudents, mockTeachers } from './teach
 
 import type { LearningActivity } from '@/shared/types/activity';
 import type {
-  TeacherClassesDTO,
-  TeacherCurrentDTO,
   TeacherDashboardDTO,
   TeacherDashboardData,
   TeacherStudentDetailDTO,
@@ -17,24 +15,7 @@ import type { User, UserWithActivities } from '@/shared/types/user';
 
 // 教師用APIのハンドラ
 export const teacherHandlers = [
-  // 現在のログイン中の教員情報取得
-  http.get(getApiPath('TEACHER_CURRENT'), async () => {
-    console.info('--- mock api: teacher current ---');
-    await delay(300);
-    const teacher = mockTeachers.find((t: User) => t.id === currentTeacherId);
-
-    if (!teacher) {
-      return HttpResponse.json({
-        success: false,
-        message: 'Teacher not found',
-      } as TeacherCurrentDTO);
-    }
-
-    return HttpResponse.json({
-      success: true,
-      data: teacher,
-    } as TeacherCurrentDTO);
-  }),
+  
 
   // 全生徒リスト取得
   http.get(getApiPath('TEACHER_STUDENTS'), async ({ request }) => {
@@ -117,26 +98,12 @@ export const teacherHandlers = [
     } as TeacherStudentDetailDTO);
   }),
 
-  // クラス一覧取得
-  http.get(getApiPath('TEACHER_CLASSES'), async () => {
-    console.info('--- mock api: teacher classes ---');
-    await delay(300);
-
-    return HttpResponse.json({
-      success: true,
-      data: mockClasses,
-    } as TeacherClassesDTO);
-  }),
+  
 
   // 学習活動の概要データ取得（ダッシュボード用）
-  http.get(getApiPath('TEACHER_DASHBOARD'), async ({ request }) => {
+  http.get(getApiPath('TEACHER_DASHBOARD'), async () => {
     console.info('--- mock api: teacher dashboard ---');
-    console.log('Request URL:', request.url);
     await delay(600);
-    const url = new URL(request.url);
-    const classFilter = url.searchParams.get('class') || currentClassFilter;
-
-    console.log('[MSW] Dashboard API called. Class filter:', classFilter);
 
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -150,10 +117,7 @@ export const teacherHandlers = [
     const startOfWeekStr = startOfWeek.toISOString().split('T')[0];
 
     // 対象の生徒をフィルタリング
-    const targetStudents =
-      classFilter !== 'all'
-        ? mockStudents.filter((s: User) => s.belonging === classFilter)
-        : mockStudents;
+    const targetStudents = mockStudents;
 
     console.log(`[MSW] Filtered students for dashboard: ${targetStudents.length} students`);
 
@@ -177,32 +141,6 @@ export const teacherHandlers = [
       totalActivitiesThisWeek += weekActivities.length;
     }
 
-    // 直近10日間の活動状況を集計
-    const last10Days = [];
-    for (let i = 0; i < 10; i++) {
-      const date = new Date(now);
-      date.setDate(now.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
-
-      const dayData = {
-        date: dateStr,
-        displayDate: `${date.getMonth() + 1}/${date.getDate()}`,
-        activities: {} as Record<string, boolean>,
-      };
-
-      // 各生徒の活動状況
-      for (const student of targetStudents) {
-        const studentActivities = mockActivities[student.id] || [];
-        const hasActivity = studentActivities.some(
-          (activity: LearningActivity) => activity.activityDate === dateStr,
-        );
-
-        dayData.activities[student.id] = hasActivity;
-      }
-
-      last10Days.push(dayData);
-    }
-
     // 10日間の活動ヒートマップを作成
     const activityHeatmap = createActivityHeatmap(targetStudents, now);
 
@@ -215,7 +153,6 @@ export const teacherHandlers = [
 
     // ★ デバッグログを追加
     console.log('[MSW Teacher Dashboard Response]', {
-      classFilter,
       responseData: dashboardData,
     });
 

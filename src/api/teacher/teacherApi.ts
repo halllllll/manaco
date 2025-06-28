@@ -1,10 +1,10 @@
 import type {
-  TeacherClassesDTO,
-  TeacherCurrentDTO,
   TeacherDashboardDTO,
   TeacherStudentDetailDTO,
   TeacherStudentsDTO,
 } from '@/shared/types/teacher';
+import { getApiPath } from '../endpoint';
+import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 /**
  * Teacher API functions for data fetching
@@ -13,68 +13,55 @@ export const TeacherAPI = {
   /**
    * Get teacher dashboard data
    */
-  getDashboard: async (url: string): Promise<TeacherDashboardDTO> => {
-    console.log('[TeacherAPI] Fetching dashboard data from', url);
-    const response = await fetch(url);
-    const data = await response.json();
-    console.log('[TeacherAPI] Dashboard data response:', {
-      success: data.success,
-      students: data.data?.totalStudents,
-    });
-    return data;
+  getDashboard: async (): Promise<TeacherDashboardDTO> => {
+    console.log('[TeacherAPI] Fetching dashboard data');
+    if (isGASEnvironment()) {
+      const ret = await serverFunctions.getTeacherDashboard();
+      return ret;
+    }
+
+    /**
+     * in dev, intercepted by MSW
+     * @see src/client/mock/teacherHandlers.ts
+     */
+    const response = await fetch(getApiPath('TEACHER_DASHBOARD'));
+    return await response.json();
   },
 
   /**
    * Get students with activities
    */
-  getStudents: async (url: string): Promise<TeacherStudentsDTO> => {
-    console.log('[TeacherAPI] Fetching students data from', url);
-    const response = await fetch(url);
-    const data = await response.json();
-    console.log('[TeacherAPI] Students data response:', {
-      success: data.success,
-      count: data.data?.length,
-    });
-    return data;
-  },
+  getStudents: async (): Promise<TeacherStudentsDTO> => {
+    console.log('[TeacherAPI] Fetching students data');
+    if (isGASEnvironment()) {
+      const ret = await serverFunctions.getTeacherStudents();
+      console.info('students data ok???');
+      return ret;
+    }
 
-  /**
-   * Get available classes/groups
-   */
-  getClasses: async (url: string): Promise<TeacherClassesDTO> => {
-    console.log('[TeacherAPI] Fetching classes data from', url);
-    const response = await fetch(url);
-    const data = await response.json();
-    console.log('[TeacherAPI] Classes data response:', {
-      success: data.success,
-      count: data.data?.length,
-    });
-    return data;
-  },
-
-  /**
-   * Get current teacher information
-   */
-  getCurrentTeacher: async (url: string): Promise<TeacherCurrentDTO> => {
-    console.log('[TeacherAPI] Fetching current teacher data from', url);
-    const response = await fetch(url);
-    const data = await response.json();
-    console.log('[TeacherAPI] Current teacher response:', {
-      success: data.success,
-    });
-    return data;
+    /**
+     * in dev, intercepted by MSW
+     * @see src/client/mock/teacherHandlers.ts
+     */
+    const response = await fetch(getApiPath('TEACHER_STUDENTS'));
+    return await response.json();
   },
 
   /**
    * Get student details by ID
    */
-  getStudentDetail: async (url: string): Promise<TeacherStudentDetailDTO> => {
-    console.log('[TeacherAPI] Fetching student detail from', url);
-    const response = await fetch(url);
-    const data = await response.json();
-    console.log('[TeacherAPI] Student detail response:', {
-      success: data.success,
-    });
-    return data;
+  getStudentDetail: async (studentId: string): Promise<TeacherStudentDetailDTO> => {
+    console.log('[TeacherAPI] Fetching student detail for ID:', studentId);
+    if (isGASEnvironment()) {
+      const ret = await serverFunctions.getTeacherStudentDetail(studentId);
+      return ret;
+    }
+
+    /**
+     * in dev, intercepted by MSW
+     * @see src/client/mock/teacherHandlers.ts
+     */
+    const response = await fetch(getApiPath('TEACHER_STUDENTS', { studentId }));
+    return await response.json();
   },
 };

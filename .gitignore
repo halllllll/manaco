@@ -1,5 +1,5 @@
 *.clasp.json
-
+dummy_learning_activities.csv
 # Logs
 logs
 *.log
