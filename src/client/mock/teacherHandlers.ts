@@ -1,5 +1,6 @@
 import { HttpResponse, delay, http } from 'msw';
 
+import { getApiPath } from '../../api/endpoint';
 import { currentClassFilter, currentTeacherId } from './browser';
 import { mockActivities, mockClasses, mockStudents, mockTeachers } from './teacherViewData';
 
@@ -17,7 +18,7 @@ import type { User, UserWithActivities } from '@/shared/types/user';
 // 教師用APIのハンドラ
 export const teacherHandlers = [
   // 現在のログイン中の教員情報取得
-  http.get('/api/teacher/current', async () => {
+  http.get(getApiPath('TEACHER_CURRENT'), async () => {
     console.info('--- mock api: teacher current ---');
     await delay(300);
     const teacher = mockTeachers.find((t: User) => t.id === currentTeacherId);
@@ -36,7 +37,7 @@ export const teacherHandlers = [
   }),
 
   // 全生徒リスト取得
-  http.get('/api/teacher/students', async ({ request }) => {
+  http.get(getApiPath('TEACHER_STUDENTS'), async ({ request }) => {
     console.info('--- mock api: teacher students ---');
     await delay(500);
     const url = new URL(request.url);
@@ -74,7 +75,7 @@ export const teacherHandlers = [
   }),
 
   // 生徒の詳細情報取得（ID指定）
-  http.get('/api/teacher/students/:id', async ({ params }) => {
+  http.get(getApiPath('TEACHER_STUDENTS', { studentId: ':id' }), async ({ params }) => {
     console.info('--- mock api: teacher student detail ---');
     await delay(400);
 
@@ -118,7 +119,7 @@ export const teacherHandlers = [
   }),
 
   // クラス一覧取得
-  http.get('/api/teacher/classes', async () => {
+  http.get(getApiPath('TEACHER_CLASSES'), async () => {
     console.info('--- mock api: teacher classes ---');
     await delay(300);
 
@@ -129,7 +130,7 @@ export const teacherHandlers = [
   }),
 
   // 学習活動の概要データ取得（ダッシュボード用）
-  http.get('/api/teacher/dashboard', async ({ request }) => {
+  http.get(getApiPath('TEACHER_DASHBOARD'), async ({ request }) => {
     console.info('--- mock api: teacher dashboard ---');
     console.log('Request URL:', request.url);
     await delay(600);

@@ -1,5 +1,5 @@
 import type { User } from '@/shared/types/user';
-import { API_ENDPOINTS, getMSWPath } from '../endpoint';
+import { getApiPath } from '../endpoint';
 
 import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
@@ -18,7 +18,7 @@ export const UserAPI = {
      * In development, intercepted by MSW
      * @see src/client/mock/handlers.ts
      */
-    const response = await fetch(getMSWPath(API_ENDPOINTS.USER));
+    const response = await fetch(getApiPath('USER'));
     return await response.json();
   },
 };

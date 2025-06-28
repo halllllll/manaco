@@ -1,5 +1,5 @@
 import type { AppSettingResponseData } from '@/shared/types/dto';
-import { API_ENDPOINTS, getMSWPath } from '../endpoint';
+import { getApiPath } from '../endpoint';
 import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 export const SettingsAPI = {
@@ -17,7 +17,7 @@ export const SettingsAPI = {
      * in dev, intercepted by MSW
      * @see src/client/mock/handlers.ts
      */
-    const response = await fetch(getMSWPath(API_ENDPOINTS.SETTINGS));
+    const response = await fetch(getApiPath('SETTINGS'));
     return await response.json();
   },
 };

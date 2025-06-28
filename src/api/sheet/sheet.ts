@@ -1,4 +1,4 @@
-import { API_ENDPOINTS, getMSWPath } from '../endpoint';
+import { getApiPath } from '../endpoint';
 import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 export const SheetApp = {
@@ -12,7 +12,7 @@ export const SheetApp = {
      * in dev, intercepted by MSW
      * @see src/client/mock/handlers.ts
      */
-    const response = await fetch(getMSWPath(API_ENDPOINTS.SHEET_NAME));
+    const response = await fetch(getApiPath('SHEET_NAME'));
     return await response.json();
   },
   getSheetUrl: async (): Promise<string> => {
@@ -23,7 +23,7 @@ export const SheetApp = {
      * in dev, intercepted by MSW
      * @see src/client/mock/handlers.ts
      */
-    const response = await fetch(getMSWPath(API_ENDPOINTS.SHEET_URL));
+    const response = await fetch(getApiPath('SHEET_URL'));
     return await response.json();
   },
 };

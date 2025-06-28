@@ -1,6 +1,6 @@
 import type { LearningActivityRequest } from '@/shared/types/activity';
 import type { UserActivityDTO } from '@/shared/types/dto';
-import { API_ENDPOINTS, getMSWPath } from '../endpoint';
+import { getApiPath } from '../endpoint';
 import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 export const ActivityAPI = {
@@ -12,7 +12,7 @@ export const ActivityAPI = {
     if (data === undefined) {
       throw new Error('Data is undefined');
     }
-    const response = await fetch(getMSWPath(API_ENDPOINTS.SAVE_ACTIVITY), {
+    const response = await fetch(getApiPath('SAVE_ACTIVITY'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

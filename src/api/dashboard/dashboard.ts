@@ -1,5 +1,5 @@
 import type { UserWithActivities } from '@/shared/types/user';
-import { API_ENDPOINTS, getMSWPath } from '../endpoint';
+import { getApiPath } from '../endpoint';
 import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 export const DashboardAPI = {
@@ -17,7 +17,7 @@ export const DashboardAPI = {
      * in dev, intercepted by MSW
      * @see src/client/mock/handlers.ts
      */
-    const response = await fetch(getMSWPath(API_ENDPOINTS.DASHBOARD));
+    const response = await fetch(getApiPath('DASHBOARD'));
     return await response.json();
   },
 

@@ -1,5 +1,5 @@
 import type { ValidationResult } from '@/server/utils/validation';
-import { API_ENDPOINTS, getMSWPath } from '../endpoint';
+import { getApiPath } from '../endpoint';
 import { isGASEnvironment, serverFunctions } from '../serverFunctions';
 
 export const HealthAPI = {
@@ -16,7 +16,7 @@ export const HealthAPI = {
      * in dev, intercepted by MSW
      * @see src/client/mock/handlers.ts
      */
-    const response = await fetch(getMSWPath(API_ENDPOINTS.HEALTH));
+    const response = await fetch(getApiPath('HEALTH'));
     return await response.json();
   },
 };

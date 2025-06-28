@@ -1,40 +1,46 @@
 export const API_ENDPOINTS = {
-  USER: 'user',
-  SHEET_NAME: 'sheet-name',
-  SHEET_URL: 'sheet-url',
-  DASHBOARD: 'dashboard',
-  LEARNING_ACTIVITIES: 'learning-activities',
-  HEALTH: 'health',
-  SETTINGS: 'settings',
-  SAVE_ACTIVITY: 'save-activity',
-  // 教員ビュー用エンドポイント
-  TEACHER_STUDENTS: 'teacher-students',
-  TEACHER_CLASSES: 'teacher-classes',
-  TEACHER_DASHBOARD: 'teacher-dashboard',
-  TEACHER_STUDENT_DETAIL: 'teacher-student-detail',
-  TEACHER_CURRENT: 'teacher-current',
+  // Student endpoints
+  USER: '/mock/user',
+  SHEET_NAME: '/mock/sheet-name',
+  SHEET_URL: '/mock/sheet-url',
+  DASHBOARD: '/mock/dashboard',
+  LEARNING_ACTIVITIES: '/mock/learning-activities',
+  HEALTH: '/mock/health',
+  SETTINGS: '/mock/settings',
+  SAVE_ACTIVITY: '/mock/save-activity',
+
+  // Teacher endpoints
+  TEACHER_CURRENT: '/mock/teacher/current',
+  TEACHER_DASHBOARD: '/mock/teacher/dashboard',
+  TEACHER_STUDENTS: '/mock/teacher/students',
+  TEACHER_CLASSES: '/mock/teacher/classes',
 } as const;
 
-export type ApiEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS];
-
-export const getMSWPath = (endpoint: ApiEndpoint): string => `/mock/${endpoint}`;
+export type ApiEndpointKey = keyof typeof API_ENDPOINTS;
 
 /**
- * 教員APIのエンドポイントを生成する
- * @param endpoint APIエンドポイントの種類
- * @param params パラメータ（classフィルター、studentIdなど）
+ * APIのエンドポイントURLを生成する
+ * @param endpointKey APIエンドポイントのキー
+ * @param params パラメータ（studentId, classなど）
  * @returns 完全なAPIパス
  */
-export const getTeacherApiPath = (
-  endpoint: 'dashboard' | 'students' | 'classes' | 'current',
-  params?: { class?: string; studentId?: string },
+export const getApiPath = (
+  endpointKey: ApiEndpointKey,
+  params?: { studentId?: string; class?: string },
 ): string => {
-  let path = `/api/teacher/${endpoint}`;
+  let path = API_ENDPOINTS[endpointKey];
 
-  if (params?.studentId && endpoint === 'students') {
-    path = `${path}/${params.studentId}`;
-  } else if (params?.class && params.class !== 'all') {
-    path = `${path}?class=${params.class}`;
+  // パスパラメータを置換
+  if (params?.studentId) {
+    path = path.replace(':id', params.studentId);
+  }
+
+  // クエリパラメータを追加
+  if (params?.class && params.class !== 'all') {
+    // @ts-expect-error
+    const url = new URL(path, 'http://localhost');
+    url.searchParams.set('class', params.class);
+    return `${url.pathname}${url.search}`;
   }
 
   return path;

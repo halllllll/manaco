@@ -1,14 +1,15 @@
 import type { ClassGroup, TeacherDashboardData } from '@/shared/types/teacher';
 import type { User, UserWithActivities } from '@/shared/types/user';
 import useSWR from 'swr';
-import { getTeacherApiPath } from '../endpoint';
+import { getApiPath } from '../endpoint';
 import { TeacherAPI } from './teacherApi';
 
 /**
  * ログイン中の教員情報を取得するカスタムフック
  */
 export const useCurrentTeacher = () => {
-  const { data, error, isLoading } = useSWR('currentTeacher', TeacherAPI.getCurrentTeacher, {
+  const url = getApiPath('TEACHER_CURRENT');
+  const { data, error, isLoading } = useSWR(url, () => TeacherAPI.getCurrentTeacher(url), {
     revalidateOnFocus: false,
     dedupingInterval: 60000, // 1分間キャッシュ
   });
@@ -23,16 +24,12 @@ export const useCurrentTeacher = () => {
  * @param classFilter 対象のクラス（省略時は全クラス）
  */
 export const useTeacherDashboard = (classFilter?: string) => {
-  const url = getTeacherApiPath('dashboard', { class: classFilter });
+  const url = getApiPath('TEACHER_DASHBOARD', { class: classFilter });
 
-  const { data, error, isLoading, mutate } = useSWR(
-    ['teacherDashboard', classFilter || 'all'],
-    () => TeacherAPI.getDashboard(url),
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 10000,
-    },
-  );
+  const { data, error, isLoading, mutate } = useSWR(url, () => TeacherAPI.getDashboard(url), {
+    revalidateOnFocus: false,
+    dedupingInterval: 10000,
+  });
 
   const dashboardData: TeacherDashboardData | undefined = data?.success ? data.data : undefined;
 
@@ -49,16 +46,12 @@ export const useTeacherDashboard = (classFilter?: string) => {
  * @param classFilter 対象のクラス（省略時は全クラス）
  */
 export const useTeacherStudents = (classFilter?: string) => {
-  const url = getTeacherApiPath('students', { class: classFilter });
+  const url = getApiPath('TEACHER_STUDENTS', { class: classFilter });
 
-  const { data, error, isLoading, mutate } = useSWR(
-    ['teacherStudents', classFilter || 'all'],
-    () => TeacherAPI.getStudents(url),
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 10000,
-    },
-  );
+  const { data, error, isLoading, mutate } = useSWR(url, () => TeacherAPI.getStudents(url), {
+    revalidateOnFocus: false,
+    dedupingInterval: 10000,
+  });
 
   const students: UserWithActivities[] | undefined = data?.success ? data.data : undefined;
 
@@ -74,9 +67,9 @@ export const useTeacherStudents = (classFilter?: string) => {
  * 利用可能なクラス/グループリストを取得するカスタムフック
  */
 export const useTeacherClasses = () => {
-  const url = getTeacherApiPath('classes');
+  const url = getApiPath('TEACHER_CLASSES');
 
-  const { data, error, isLoading } = useSWR('teacherClasses', () => TeacherAPI.getClasses(url), {
+  const { data, error, isLoading } = useSWR(url, () => TeacherAPI.getClasses(url), {
     revalidateOnFocus: false,
     dedupingInterval: 30000,
   });
@@ -95,9 +88,11 @@ export const useTeacherClasses = () => {
  * @param studentId 生徒ID
  */
 export const useTeacherStudentDetail = (studentId: string | null) => {
+  const url = studentId ? getApiPath('TEACHER_STUDENTS', { studentId }) : null;
+
   const { data, error, isLoading, mutate } = useSWR(
-    studentId ? ['teacherStudentDetail', studentId] : null,
-    () => (studentId ? TeacherAPI.getStudentDetail(studentId) : null),
+    url,
+    () => (url ? TeacherAPI.getStudentDetail(url) : null),
     {
       revalidateOnFocus: false,
       dedupingInterval: 5000,

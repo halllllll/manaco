@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 
-import { API_ENDPOINTS, getMSWPath } from '../../api/endpoint';
+import { getApiPath } from '../../api/endpoint';
 import { currentMockUserId } from './browser';
 
 import type { UserActivityDTO } from '@/shared/types/dto';
@@ -8,7 +8,7 @@ import { mockAppSettingsData, mockHealthCheckData, mockUserData } from './studen
 
 export const handlers = [
   // スプレッドシート名取得 API
-  http.get(getMSWPath(API_ENDPOINTS.SHEET_NAME), async () => {
+  http.get(getApiPath('SHEET_NAME'), async () => {
     console.info('--- mock api: speradsheet name ---');
     await delay(800);
     const data = mockUserData[currentMockUserId];
@@ -19,14 +19,14 @@ export const handlers = [
   }),
 
   // スプレッドシートURL取得 API
-  http.get(getMSWPath(API_ENDPOINTS.SHEET_URL), async () => {
+  http.get(getApiPath('SHEET_URL'), async () => {
     console.info('--- mock api: speradsheet url ---');
     await delay(800);
     return HttpResponse.json('https://example.com/dev-spreadsheet');
   }),
 
   // アクセスしたときにdashboardに必要なデータをまとめて取得
-  http.get(getMSWPath(API_ENDPOINTS.DASHBOARD), async () => {
+  http.get(getApiPath('DASHBOARD'), async () => {
     console.info('--- mock api: dashboard ---');
     await delay(1000);
     // simulate fetch error
@@ -42,7 +42,7 @@ export const handlers = [
   }),
 
   // ヘルスチェック API
-  http.get(getMSWPath(API_ENDPOINTS.HEALTH), async () => {
+  http.get(getApiPath('HEALTH'), async () => {
     console.info('--- mock api: health check ---');
     await delay(2000);
     // const data = mockUserData[currentMockUserId];
@@ -54,7 +54,7 @@ export const handlers = [
   }),
 
   // 設定データ取得 API
-  http.get(getMSWPath(API_ENDPOINTS.SETTINGS), async () => {
+  http.get(getApiPath('SETTINGS'), async () => {
     console.info('--- mock api: settings ---');
     await delay(500);
 
@@ -67,7 +67,7 @@ export const handlers = [
   }),
 
   // post activity
-  http.post(getMSWPath(API_ENDPOINTS.SAVE_ACTIVITY), async ({ request: req }) => {
+  http.post(getApiPath('SAVE_ACTIVITY'), async ({ request: req }) => {
     console.info('--- mock api: save activity ---');
     await delay(1200);
 
@@ -86,7 +86,7 @@ export const handlers = [
   }),
 
   // user
-  http.get(getMSWPath(API_ENDPOINTS.USER), async () => {
+  http.get(getApiPath('USER'), async () => {
     console.info('--- mock api: user ---');
     await delay(800);
     const user = mockUserData[currentMockUserId];

@@ -5,7 +5,6 @@ import type {
   TeacherStudentDetailDTO,
   TeacherStudentsDTO,
 } from '@/shared/types/teacher';
-import { getTeacherApiPath } from '../endpoint';
 
 /**
  * Teacher API functions for data fetching
@@ -56,8 +55,7 @@ export const TeacherAPI = {
   /**
    * Get current teacher information
    */
-  getCurrentTeacher: async (): Promise<TeacherCurrentDTO> => {
-    const url = getTeacherApiPath('current');
+  getCurrentTeacher: async (url: string): Promise<TeacherCurrentDTO> => {
     console.log('[TeacherAPI] Fetching current teacher data from', url);
     const response = await fetch(url);
     const data = await response.json();
@@ -70,8 +68,7 @@ export const TeacherAPI = {
   /**
    * Get student details by ID
    */
-  getStudentDetail: async (studentId: string): Promise<TeacherStudentDetailDTO> => {
-    const url = getTeacherApiPath('students', { studentId });
+  getStudentDetail: async (url: string): Promise<TeacherStudentDetailDTO> => {
     console.log('[TeacherAPI] Fetching student detail from', url);
     const response = await fetch(url);
     const data = await response.json();
