@@ -60,13 +60,12 @@ export const teacherHandlers = [
       };
     });
 
-    console.log('[MSW] Returning students with activities:', studentsWithActivities.length);
-    if (studentsWithActivities.length > 0) {
-      console.log(
-        '[MSW] First student activities:',
-        studentsWithActivities[0].activities?.length || 0,
-      );
-    }
+    // ★ デバッグログを追加
+    console.log('[MSW Teacher Students Response]', {
+      classFilter,
+      count: studentsWithActivities.length,
+      responseData: studentsWithActivities,
+    });
 
     return HttpResponse.json({
       success: true,
@@ -204,18 +203,20 @@ export const teacherHandlers = [
       last10Days.push(dayData);
     }
 
+    // 10日間の活動ヒートマップを作成
+    const activityHeatmap = createActivityHeatmap(targetStudents, now);
+
     const dashboardData: TeacherDashboardData = {
       totalStudents: targetStudents.length,
       todayActivities: totalActivitiesToday,
       weekActivities: totalActivitiesThisWeek,
-      activityHeatmap: last10Days,
+      activityHeatmap,
     };
 
-    console.log('[MSW] Dashboard response data prepared:', {
-      students: dashboardData.totalStudents,
-      todayActivities: dashboardData.todayActivities,
-      weekActivities: dashboardData.weekActivities,
-      heatmapDays: dashboardData.activityHeatmap.length,
+    // ★ デバッグログを追加
+    console.log('[MSW Teacher Dashboard Response]', {
+      classFilter,
+      responseData: dashboardData,
     });
 
     return HttpResponse.json({
@@ -224,3 +225,35 @@ export const teacherHandlers = [
     } as TeacherDashboardDTO);
   }),
 ];
+
+// --- ヘルパー関数 ---
+
+/**
+ * 指定された生徒リストと基準日から、過去10日間の活動ヒートマップデータを生成する
+ * @param students 対象の生徒リスト
+ * @param baseDate 基準日
+ * @returns ヒートマップデータ
+ */
+const createActivityHeatmap = (students: User[], baseDate: Date) => {
+  const heatmap = [];
+  for (let i = 0; i < 10; i++) {
+    const date = new Date(baseDate);
+    date.setDate(baseDate.getDate() - i);
+    const dateStr = date.toISOString().split('T')[0];
+
+    const dayData = {
+      date: dateStr,
+      displayDate: `${date.getMonth() + 1}/${date.getDate()}`,
+      activities: {} as Record<string, boolean>,
+    };
+
+    for (const student of students) {
+      const studentActivities = mockActivities[student.id] || [];
+      dayData.activities[student.id] = studentActivities.some(
+        (activity) => activity.activityDate === dateStr,
+      );
+    }
+    heatmap.push(dayData);
+  }
+  return heatmap;
+};
