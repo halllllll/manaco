@@ -87,9 +87,10 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
           columnHelper.accessor((row) => row.activities[day.date], {
             id: day.date,
             header: () => (
-              <div className="text-center whitespace-nowrap">
+              <div className="text-center">
                 <span className="sm:hidden">{day.displayDate.replace(/[月日]/g, '/')}</span>
                 <span className="hidden sm:inline">{day.displayDate}</span>
+                <div className="text-xs">{day.dayOfWeek}</div>
               </div>
             ),
             size: 70,
@@ -130,6 +131,11 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
     overscan: 5,
   });
 
+  const totalTableWidth = useMemo(() => {
+    return columns.reduce((sum, column) => sum + (column.size || 0), 0);
+  }, [columns]);
+
+
   if (isLoading) return <HeatmapSkeleton />;
   if (error) return <div className="alert alert-error">データの読み込みに失敗しました。</div>;
   if (!heatmapData || heatmapData.length === 0)
@@ -139,7 +145,7 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
     <div className={`card bg-base-100 shadow-lg ${className}`}>
       <div className="card-body">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-          <h3 className="card-title text-lg sm:text-xl">{`活動状況`}</h3>
+          <h3 className="card-title text-lg sm:text-xl">{`活動状況（直近14日間）`}</h3>
           <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <span className="text-xs sm:text-sm">並び順:</span>
@@ -168,8 +174,11 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
           className="w-full overflow-auto"
           style={{ maxHeight: 'calc(100vh - 350px)', minHeight: '400px' }}
         >
-          <table className="table w-full border-collapse">
-            <thead className="sticky top-0 bg-base-100 z-20">
+          <table
+            className="table border-collapse"
+            style={{ width: `${totalTableWidth}px` }} // Set explicit width
+          >
+            <thead className="sticky top-0 bg-base-100 z-20" style={{ width: '100%' }}>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
@@ -181,6 +190,15 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                       }}
                       className={`p-2 ${
                         header.id === 'studentName' ? 'sticky left-0 z-10 bg-base-100' : ''
+                      } ${
+                        // Add weekend background for header
+                        heatmapData &&
+                        heatmapData.find((d) => d.date === header.id)?.dayOfWeek === '土'
+                          ? 'bg-blue-50'
+                          : heatmapData &&
+                              heatmapData.find((d) => d.date === header.id)?.dayOfWeek === '日'
+                            ? 'bg-red-50'
+                            : ''
                       }`}
                     >
                       {flexRender(header.column.columnDef.header, header.getContext())}
@@ -193,6 +211,7 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
               style={{
                 height: `${rowVirtualizer.getTotalSize()}px`,
                 position: 'relative',
+                width: '100%', // Explicitly set tbody width to 100%
               }}
             >
               {rowVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -207,7 +226,7 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                       width: '100%',
                       height: `${virtualRow.size}px`,
                       transform: `translateY(${virtualRow.start}px)`,
-                      display: 'flex', // Add display: flex back to tr
+                      display: 'flex',
                     }}
                     className={`${onStudentSelect ? 'cursor-pointer hover:bg-base-100' : ''}`}
                     onClick={() => onStudentSelect?.(row.original.id)}
@@ -225,13 +244,22 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                         style={{
                           width: cell.column.getSize(),
                           minWidth: cell.column.getSize(),
-                          flexShrink: 0, // Ensure cells don't shrink
-                          flexBasis: cell.column.getSize(), // Set flex-basis
+                          flexShrink: 0,
+                          flexBasis: cell.column.getSize(),
                         }}
                         className={`p-2 flex items-center ${
                           cell.column.id === 'studentName'
                             ? 'sticky left-0 z-10 font-medium bg-base-100'
                             : 'justify-center'
+                        } ${
+                          // Add weekend background for cell
+                          heatmapData &&
+                          heatmapData.find((d) => d.date === cell.column.id)?.dayOfWeek === '土'
+                            ? 'bg-blue-50'
+                            : heatmapData &&
+                                heatmapData.find((d) => d.date === cell.column.id)?.dayOfWeek === '日'
+                              ? 'bg-red-50'
+                              : ''
                         }`}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}

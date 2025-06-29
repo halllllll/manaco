@@ -36,7 +36,10 @@ export function getTeacherDashboardService(): TeacherDashboardData {
   for (let i = 0; i < HEATMAP_DAYS_COUNT; i++) {
     const currentDate = new Date(heatmapStartDate);
     currentDate.setDate(heatmapStartDate.getDate() + i);
-    const dateString = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD形式
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = currentDate.getDate().toString().padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`; // YYYY-MM-DD形式
 
     // 曜日を取得
     const dayOfWeekNames = ['日', '月', '火', '水', '木', '金', '土'];
