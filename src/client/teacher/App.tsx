@@ -1,3 +1,4 @@
+import { useSheetName } from '@/api/sheet/hooks';
 import { type FC, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '../components/ErrorFallback';
@@ -17,6 +18,8 @@ export const App: FC = () => {
   // 現在表示中の画面（'dashboard': ダッシュボード, 'students': 生徒一覧）
   const [activeTab, setActiveTab] = useState<'dashboard' | 'students'>('dashboard');
 
+  const { data: title, isLoading: isLoadingSheetName } = useSheetName();
+
   // 生徒が選択された時の処理
   const handleStudentSelect = (studentId: string) => {
     setSelectedStudent(studentId);
@@ -35,7 +38,7 @@ export const App: FC = () => {
           <div className="flex flex-col min-h-screen bg-base-100">
             <header className="bg-primary text-primary-content p-4 shadow-md">
               <div className="container mx-auto flex justify-between items-center">
-                <h1 className="text-2xl font-bold">教員ダッシュボード</h1>
+                <h1 className="text-2xl font-bold">{`教員用画面 ${isLoadingSheetName ? '' : title}`}</h1>
 
                 <div className="flex items-center gap-4">
                   <CurrentTeacherName />

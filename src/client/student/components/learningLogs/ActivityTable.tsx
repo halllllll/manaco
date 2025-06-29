@@ -160,7 +160,7 @@ export const ActivityTable: FC<ActivityTableProps> = ({
                 const styles = getColumnStyles(columnId, column.responsive);
 
                 const headerClassNames = [
-                  'sticky top-0 bg-base-100 text-primary-content font-bold z-10 shadow-sm',
+                  'sticky top-0 bg-base-100  font-bold z-10 shadow-sm',
                   styles.className.header(),
                   styles.className.responsive(),
                   index === 0 ? 'rounded-tl-lg' : '',
