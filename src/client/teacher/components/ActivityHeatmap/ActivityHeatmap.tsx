@@ -7,354 +7,242 @@ import {
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { FC } from 'react';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { type HeatmapDay, useHeatmapData } from './useHeatmapData';
+import { useMemo, useRef } from 'react';
+import { useHeatmapData } from './useHeatmapData';
 
 type ActivityHeatmapProps = {
   className?: string;
   onStudentSelect?: (studentId: string) => void;
 };
 
-// カラムヘルパーを初期化
-const columnHelper = createColumnHelper<User & { activities: Record<string, boolean> }>();
+type TableData = User & {
+  activities: Record<string, boolean>;
+  totalActivityCount: number;
+};
 
-// デフォルトの列幅設定
-const DEFAULT_STUDENT_NAME_WIDTH = 200;
-const DEFAULT_DATE_COLUMN_WIDTH = 80;
+const columnHelper = createColumnHelper<TableData>();
 
 /**
- * 活動ヒートマップコンポーネント
- * 直近10日間の生徒の学習活動の有無を表示する
+ * @tanstack/react-table と @tanstack/react-virtual を使用して再実装された活動ヒートマップコンポーネント。
+ * CSSのposition:stickyによる固定列と行の仮想化により、パフォーマンスとメンテナンス性を向上させています。
  */
 export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onStudentSelect }) => {
-  // ヒートマップデータを取得（カスタムフック）
-  const { isLoading, error, heatmapData, sortOption, setSortOption, students } = useHeatmapData();
+  const {
+    isLoading,
+    error,
+    heatmapData,
+    sortOption,
+    setSortOption,
+    students,
+  } = useHeatmapData();
 
-  // ヘッダーテーブル参照
-  const headerRef = useRef<HTMLDivElement>(null);
-  // 本体テーブル参照
-  const bodyRef = useRef<HTMLDivElement>(null);
-  // テーブルコンテナ参照
-  const containerRef = useRef<HTMLDivElement>(null);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
-  // コンテナの幅を状態として管理（デフォルト値を設定）
-  const [containerWidth, setContainerWidth] = useState(800); // デフォルト値を十分大きく設定
-
-  // 画面サイズ変更を検知してコンテナ幅を更新
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const updateWidth = () => {
-      if (containerRef.current) {
-        const newWidth = containerRef.current.getBoundingClientRect().width;
-        if (newWidth > 0) {
-          // 0幅の場合は更新しない
-          setContainerWidth(newWidth);
-        }
-      }
-    };
-
-    // 初期化時に一度実行
-    updateWidth();
-
-    // リサイズイベントでコンテナ幅を更新
-    const resizeObserver = new ResizeObserver(updateWidth);
-    resizeObserver.observe(containerRef.current);
-
-    // DOM読み込み完了後にも再計算
-    setTimeout(updateWidth, 100);
-
-    return () => {
-      if (containerRef.current) {
-        resizeObserver.unobserve(containerRef.current);
-      }
-      resizeObserver.disconnect();
-    };
-  }, []);
-
-  // ソート済みの生徒リストを生成
-  const sortedStudents = useMemo(() => {
+  const tableData = useMemo(() => {
     if (!heatmapData || !students) return [];
 
-    const studentsWithHeatmapActivities = students.map((student) => {
+    return students.map((student) => {
       const activities: Record<string, boolean> = {};
-      // biome-ignore lint/complexity/noForEach: <explanation>
+      let totalActivityCount = 0;
       heatmapData.forEach((day) => {
-        activities[day.date] = day.activities[student.id] || false;
+        const hasActivity = day.activities[student.id] || false;
+        activities[day.date] = hasActivity;
+        if (hasActivity) {
+          totalActivityCount++;
+        }
       });
-      return { ...student, activities };
+      return { ...student, activities, totalActivityCount };
     });
+  }, [heatmapData, students]);
 
-    const sorted = [...studentsWithHeatmapActivities];
-
+  const sortedData = useMemo(() => {
+    const sorted = [...tableData];
     if (sortOption === 'name') {
-      // 名前でソート
       sorted.sort((a, b) => a.name.localeCompare(b.name));
     } else if (sortOption === 'activity') {
-      // 活動量でソート（多い順）
-      sorted.sort((a, b) => {
-        const aCount = Object.values(a.activities).filter(Boolean).length;
-        const bCount = Object.values(b.activities).filter(Boolean).length;
-        return bCount - aCount;
-      });
+      sorted.sort((a, b) => b.totalActivityCount - a.totalActivityCount);
     }
-
     return sorted;
-  }, [heatmapData, students, sortOption]);
+  }, [tableData, sortOption]);
 
-  // レスポンシブ対応のカラム幅設定 - 最小幅を保証
-  const STUDENT_NAME_WIDTH = useMemo(() => {
-    // 小さい画面なら名前列を広く、ただし最小値は保証
-    if (containerWidth < 640) return Math.max(180, Math.min(200, containerWidth * 0.4));
-    // 中くらいの画面
-    if (containerWidth < 1024) return Math.max(180, containerWidth * 0.25);
-    // 大きい画面
-    return Math.max(200, containerWidth * 0.2);
-  }, [containerWidth]);
-
-  const DATE_COLUMN_WIDTH = useMemo(() => {
-    // 小さい画面では日付列を小さく、ただし最小値は保証
-    if (containerWidth < 640) return Math.max(60, containerWidth * 0.06);
-    // 中くらいの画面
-    if (containerWidth < 1024) return Math.max(70, containerWidth * 0.07);
-    // 大きい画面
-    return Math.max(80, containerWidth * 0.08);
-  }, [containerWidth]);
-
-  // React Tableのカラム定義
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
         id: 'studentName',
-        header: () => <div className="sticky left-0 bg-base-100 z-10 p-2 w-full">生徒名</div>,
+        header: '生徒名',
+        size: 200,
         cell: (info) => (
-          <div className="sticky left-0 bg-base-100 z-10 font-medium p-2 w-full">
+          <>
             {info.getValue()}
             <span className="text-xs text-gray-500 ml-2 hidden sm:inline">
               {info.row.original.belonging || '未設定'}
             </span>
-          </div>
+          </>
         ),
-        size: STUDENT_NAME_WIDTH,
-        minSize: DEFAULT_STUDENT_NAME_WIDTH,
       }),
       ...(heatmapData || [])
         .slice()
-        // .reverse() を削除し、代わりに日付でソート
-        .sort((a, b) => {
-          // 日付文字列をDate型に変換してソート（昇順 - 古い日付から新しい日付へ）
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        })
-        .map((day: HeatmapDay) =>
-          columnHelper.display({
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .map((day) =>
+          columnHelper.accessor((row) => row.activities[day.date], {
             id: day.date,
             header: () => (
-              <div className="text-center whitespace-nowrap p-2 w-full">
-                {/* スマホ表示では短い日付表示 */}
-                <span className="sm:hidden">{day.displayDate.replace(/[月日]/g, '')}</span>
+              <div className="text-center whitespace-nowrap">
+                <span className="sm:hidden">{day.displayDate.replace(/[月日]/g, '/')}</span>
                 <span className="hidden sm:inline">{day.displayDate}</span>
               </div>
             ),
+            size: 70,
             cell: (info) => {
-              const hasActivity = day.activities[info.row.original.id] || false;
+              const hasActivity = info.getValue();
               return (
-                <div className="text-center p-2 w-full">
+                <div className="flex justify-center items-center h-full">
                   <div
-                    className={`w-6 h-6 sm:w-8 sm:h-8 mx-auto rounded-full flex items-center justify-center
-                  ${
-                    hasActivity
-                      ? 'bg-primary/20 text-primary-content'
-                      : 'bg-base-200 text-base-content/30'
-                  }`}
+                    className={`w-6 h-6 sm:w-8 sm:h-8 mx-auto rounded-full flex items-center justify-center ${
+                      hasActivity
+                        ? 'bg-primary/20 text-primary-content'
+                        : 'bg-base-200 text-base-content/30'
+                    }`}
                   >
                     {hasActivity ? '○' : '−'}
                   </div>
                 </div>
               );
             },
-            size: DATE_COLUMN_WIDTH,
-            minSize: DEFAULT_DATE_COLUMN_WIDTH,
           }),
         ),
     ],
-    [heatmapData, STUDENT_NAME_WIDTH, DATE_COLUMN_WIDTH],
+    [heatmapData],
   );
 
   const table = useReactTable({
-    data: sortedStudents,
+    data: sortedData,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    defaultColumn: {
-      minSize: 60, // すべてのカラムの最小サイズ
-    },
   });
 
   const { rows } = table.getRowModel();
 
-  // スクロール同期のためのイベントハンドラ
-  useLayoutEffect(() => {
-    if (!bodyRef.current || !headerRef.current) return;
-
-    const handleScroll = () => {
-      if (headerRef.current && bodyRef.current) {
-        headerRef.current.scrollLeft = bodyRef.current.scrollLeft;
-      }
-    };
-
-    const bodyElement = bodyRef.current;
-    bodyElement.addEventListener('scroll', handleScroll);
-
-    return () => {
-      bodyElement.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
-    getScrollElement: () => bodyRef.current,
-    estimateSize: () => 50, // 各行の推定高さ (px)
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: () => 56, // row height
     overscan: 5,
   });
 
   if (isLoading) return <HeatmapSkeleton />;
-
-  if (error)
-    return (
-      <div className="alert alert-error">
-        <span>データの読み込みに失敗しました。</span>
-      </div>
-    );
-
+  if (error) return <div className="alert alert-error">データの読み込みに失敗しました。</div>;
   if (!heatmapData || heatmapData.length === 0)
-    return (
-      <div className="alert alert-info">
-        <span>表示するデータがありません。</span>
-      </div>
-    );
-
-  // ヘッダー行を取得
-  const headerGroup = table.getHeaderGroups()[0];
-
-  // 実際のテーブル幅を計算（各列の実際のサイズを合計）
-  const actualTableWidth = headerGroup.headers.reduce(
-    (total, header) => total + header.getSize(),
-    0,
-  );
+    return <div className="alert alert-info">表示するデータがありません。</div>;
 
   return (
     <div className={`card bg-base-100 shadow-lg ${className}`}>
       <div className="card-body">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-          <h3 className="card-title text-lg sm:text-xl">活動状況（直近10日間）</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-xs sm:text-sm">並び順:</span>
-            <div className="btn-group">
-              <button
-                type="button"
-                className={`btn btn-xs sm:btn-sm ${sortOption === 'name' ? 'btn-active' : ''}`}
-                onClick={() => setSortOption('name')}
-              >
-                名前順
-              </button>
-              <button
-                type="button"
-                className={`btn btn-xs sm:btn-sm ${sortOption === 'activity' ? 'btn-active' : ''}`}
-                onClick={() => setSortOption('activity')}
-              >
-                活動数順
-              </button>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+          <h3 className="card-title text-lg sm:text-xl">{`活動状況`}</h3>
+          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="text-xs sm:text-sm">並び順:</span>
+              <div className="btn-group">
+                <button
+                  type="button"
+                  className={`btn btn-xs sm:btn-sm ${sortOption === 'name' ? 'btn-active' : ''}`}
+                  onClick={() => setSortOption('name')}
+                >
+                  名前順
+                </button>
+                <button
+                  type="button"
+                  className={`btn btn-xs sm:btn-sm ${sortOption === 'activity' ? 'btn-active' : ''}`}
+                  onClick={() => setSortOption('activity')}
+                >
+                  活動数順
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* レスポンシブ対応のテーブル構造 */}
-        <div className="w-full flex flex-col" ref={containerRef}>
-          {/* ヘッダー部分 - 固定 */}
-          <div
-            ref={headerRef}
-            className="w-full overflow-hidden bg-base-100 z-50 sticky top-0"
-            style={{ overflowX: 'hidden' }}
-          >
-            <div
-              className="flex"
-              style={{ width: `${Math.max(actualTableWidth, containerWidth)}px`, minWidth: '100%' }}
-            >
-              {headerGroup.headers.map((header) => (
-                <div
-                  key={header.id}
-                  style={{
-                    width: `${Math.max(header.getSize(), header.column.columnDef.minSize || 0)}px`,
-                    flex: `0 0 ${Math.max(header.getSize(), header.column.columnDef.minSize || 0)}px`,
-                  }}
-                  className="overflow-hidden"
-                >
-                  {flexRender(header.column.columnDef.header, header.getContext())}
-                </div>
+        <div
+          ref={tableContainerRef}
+          className="w-full overflow-auto"
+          style={{ maxHeight: 'calc(100vh - 350px)', minHeight: '400px' }}
+        >
+          <table className="table w-full border-collapse">
+            <thead className="sticky top-0 bg-base-100 z-20">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      style={{
+                        width: header.getSize(),
+                        minWidth: header.getSize(),
+                      }}
+                      className={`p-2 ${
+                        header.id === 'studentName' ? 'sticky left-0 z-10 bg-base-100' : ''
+                      }`}
+                    >
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    </th>
+                  ))}
+                </tr>
               ))}
-            </div>
-          </div>
-
-          {/* 本体部分 - スクロール可能 */}
-          <div
-            ref={bodyRef}
-            className="w-full overflow-auto"
-            style={{
-              maxHeight: 'calc(100vh - 350px)',
-              minHeight: containerWidth < 640 ? '300px' : '400px',
-            }}
-          >
-            <div
+            </thead>
+            <tbody
               style={{
-                position: 'relative',
                 height: `${rowVirtualizer.getTotalSize()}px`,
-                width: `${Math.max(actualTableWidth, containerWidth)}px`,
-                minWidth: '100%',
+                position: 'relative',
               }}
             >
               {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                 const row = rows[virtualRow.index];
-                const { original: student } = row;
-
                 return (
-                  <div
+                  <tr
                     key={row.id}
-                    className={`absolute flex w-full ${
-                      onStudentSelect ? 'cursor-pointer hover:bg-base-200' : ''
-                    }`}
                     style={{
-                      transform: `translateY(${virtualRow.start}px)`,
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
                       height: `${virtualRow.size}px`,
+                      transform: `translateY(${virtualRow.start}px)`,
+                      display: 'flex', // Add display: flex back to tr
                     }}
-                    onClick={() => onStudentSelect?.(student.id)}
+                    className={`${onStudentSelect ? 'cursor-pointer hover:bg-base-100' : ''}`}
+                    onClick={() => onStudentSelect?.(row.original.id)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        onStudentSelect?.(student.id);
+                        onStudentSelect?.(row.original.id);
                       }
                     }}
-                    tabIndex={onStudentSelect ? 0 : undefined}
+                    tabIndex={onStudentSelect ? 0 : -1}
                     role={onStudentSelect ? 'button' : undefined}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <div
+                      <td
                         key={cell.id}
-                        className="overflow-hidden"
                         style={{
-                          width: `${Math.max(cell.column.getSize(), cell.column.columnDef.minSize || 0)}px`,
-                          flex: `0 0 ${Math.max(cell.column.getSize(), cell.column.columnDef.minSize || 0)}px`,
+                          width: cell.column.getSize(),
+                          minWidth: cell.column.getSize(),
+                          flexShrink: 0, // Ensure cells don't shrink
+                          flexBasis: cell.column.getSize(), // Set flex-basis
                         }}
+                        className={`p-2 flex items-center ${
+                          cell.column.id === 'studentName'
+                            ? 'sticky left-0 z-10 font-medium bg-base-100'
+                            : 'justify-center'
+                        }`}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </div>
+                      </td>
                     ))}
-                  </div>
+                  </tr>
                 );
               })}
-            </div>
-          </div>
+            </tbody>
+          </table>
         </div>
-
-        {/* モバイルでの説明 */}
         <div className="mt-2 text-xs text-gray-500 sm:hidden">
           ※ 横にスクロールすると過去の活動を確認できます
         </div>
@@ -363,19 +251,16 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
   );
 };
 
-// ローディング中のスケルトンUI - レスポンシブ対応
-const HeatmapSkeleton: FC = () => {
-  return (
-    <div className="card bg-base-100 shadow-lg animate-pulse">
-      <div className="card-body">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-          <div className="h-6 sm:h-8 bg-gray-200 rounded w-36 sm:w-48" />
-          <div className="h-6 sm:h-8 bg-gray-200 rounded w-28 sm:w-32" />
-        </div>
-        <div className="overflow-x-auto mt-4">
-          <div className="h-48 sm:h-64 bg-gray-200 rounded" />
-        </div>
+const HeatmapSkeleton: FC = () => (
+  <div className="card bg-base-100 shadow-lg animate-pulse">
+    <div className="card-body">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+        <div className="h-8 bg-gray-200 rounded w-48" />
+        <div className="h-8 bg-gray-200 rounded w-56" />
+      </div>
+      <div className="overflow-x-auto mt-4">
+        <div className="h-64 bg-gray-200 rounded" />
       </div>
     </div>
-  );
-};
+  </div>
+);

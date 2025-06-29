@@ -1,4 +1,4 @@
-import type { User, UserWithActivities } from './user';
+import type { UserWithActivities } from './user';
 
 /**
  * 教員ダッシュボードで使用するヒートマップの日付データ型
@@ -6,6 +6,7 @@ import type { User, UserWithActivities } from './user';
 export type HeatmapDay = {
   date: string;
   displayDate: string;
+  dayOfWeek: string; // 曜日
   activities: Record<string, boolean>;
 };
 

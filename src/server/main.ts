@@ -105,6 +105,7 @@ export {
   getSettingsHandler as getSettingsData,
   getSpreadsheetNameHandler as getSpreadSheetName,
   getSpreadsheetUrlHandler as getSpreadSheetUrl,
+  getTeacherDashboardHandler as getTeacherDashboard,
   getTeacherStudentsHandler as getTeacherStudents,
   getUserHandler as getUser,
   initAppHandler as initApp,

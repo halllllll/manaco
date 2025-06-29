@@ -36,25 +36,31 @@ export function getTeacherDashboardService(): TeacherDashboardData {
   for (let i = 0; i < HEATMAP_DAYS_COUNT; i++) {
     const currentDate = new Date(heatmapStartDate);
     currentDate.setDate(heatmapStartDate.getDate() + i);
-    const dateString = currentDate.toISOString().split('T')[0];
+    const dateString = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD形式
+
+    // 曜日を取得
+    const dayOfWeekNames = ['日', '月', '火', '水', '木', '金', '土'];
+    const dayOfWeek = dayOfWeekNames[currentDate.getDay()];
 
     const dayData: HeatmapDay = {
       date: dateString,
       displayDate: `${currentDate.getMonth() + 1}/${currentDate.getDate()}`,
+      dayOfWeek,
       activities: {}, // 生徒IDをキーとして活動の有無を格納
     };
     activityHeatmap.push(dayData);
     heatmapDateMap.set(dateString, dayData);
-  }
-
-  // 全ての活動を一度だけループして、カウンターとヒートマップを更新
+  }  // 全ての活動を一度だけループして、カウンターとヒートマップを更新
+  console.info('Processing activities for heatmap...');
+  console.info(`Total activities to process: ${allActivities.length}`);
+  console.info(`Students count: ${students.length}`);
+  console.info(`Heatmap period: ${heatmapStartDate.toISOString().split('T')[0]} to ${today.toISOString().split('T')[0]}`);
+  
   // biome-ignore lint/complexity/noForEach: <explanation>
   allActivities.forEach((activity) => {
     const activityDate = new Date(activity.activityDate);
     activityDate.setHours(0, 0, 0, 0); // 日の始まりに正規化
-    console.log(
-      `謎に独自変換してる箇所　もとのactivityDate:${activity.activityDate}で、変換後 ${activityDate}`,
-    );
+
     // 今日の活動数をカウント
     if (activityDate.getTime() === today.getTime()) {
       todayActivities++;
@@ -63,17 +69,24 @@ export function getTeacherDashboardService(): TeacherDashboardData {
     // ヒートマップ期間内の活動数をカウントし、ヒートマップデータを更新
     if (activityDate >= heatmapStartDate && activityDate <= today) {
       periodActivities++;
-      const dateString = activityDate.toISOString().split('T')[0];
+
+      // activity.activityDateは文字列形式なので、そのまま使用
+      const dateString = activity.activityDate;
       const dayData = heatmapDateMap.get(dateString);
+
       // その活動が学生のものであることを確認
       if (dayData && students.some((s) => s.id === activity.userId)) {
-        console.log(
-          `${dateString}の日に${activity.userId}が活動しているがactivityでは${activity.activityDate}である`,
-        );
         dayData.activities[activity.userId] = true; // その日に生徒が活動したことをマーク
+        console.info(`Activity marked: date=${dateString}, userId=${activity.userId}`);
+      } else if (!dayData) {
+        console.warn(`No dayData found for date: ${dateString}`);
+      } else {
+        console.warn(`User ${activity.userId} is not a student or not found`);
       }
     }
   });
+
+  console.info('Final heatmap data:', JSON.stringify(activityHeatmap, null, 2));
 
   const result: TeacherDashboardData = {
     totalStudents,

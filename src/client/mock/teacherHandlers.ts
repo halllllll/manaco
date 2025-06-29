@@ -175,9 +175,14 @@ const createActivityHeatmap = (students: User[], baseDate: Date) => {
     date.setDate(baseDate.getDate() - i);
     const dateStr = date.toISOString().split('T')[0];
 
+    // 曜日を取得
+    const dayOfWeekNames = ['日', '月', '火', '水', '木', '金', '土'];
+    const dayOfWeek = dayOfWeekNames[date.getDay()];
+
     const dayData = {
       date: dateStr,
       displayDate: `${date.getMonth() + 1}/${date.getDate()}`,
+      dayOfWeek,
       activities: {} as Record<string, boolean>,
     };
 

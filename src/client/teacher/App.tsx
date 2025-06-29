@@ -2,6 +2,7 @@ import { type FC, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '../components/ErrorFallback';
 import { Toast } from '../components/Toast/toast';
+import { Footer } from '../components/parts/footer';
 import { ActivityHeatmap } from './components/ActivityHeatmap';
 import { CurrentTeacherName } from './components/CurrentTeacherName';
 import { DashboardSummary } from './components/DashboardSummary';
@@ -9,28 +10,7 @@ import { StudentDetailModal } from './components/StudentDetail';
 import { StudentSummaryTable } from './components/StudentSummaryTable/StudentSummaryTable';
 import { TeacherDevTools } from './components/TeacherDevTools';
 
-// クラスIDから表示名を取得する関数
-const getClassName = (classId: string): string => {
-  const classMap: Record<string, string> = {
-    all: 'すべてのクラス',
-    'class-1': '1年1組',
-    'class-2': '1年2組',
-    'class-3': '2年1組',
-    'class-4': '2年2組',
-    'class-5': '3年1組',
-    'class-6': '3年2組',
-    'class-7': '4年1組',
-    'class-8': '4年2組',
-    'class-9': '5年1組',
-    'class-10': '6年1組',
-  };
-  return classMap[classId] || classId;
-};
-
 export const App: FC = () => {
-  // 選択中のクラス（all = すべてのクラス）
-  const [selectedClass, setSelectedClass] = useState('all');
-
   // 選択された生徒のID（詳細表示モーダル用）
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
 
@@ -58,70 +38,6 @@ export const App: FC = () => {
                 <h1 className="text-2xl font-bold">教員ダッシュボード</h1>
 
                 <div className="flex items-center gap-4">
-                  {/* クラス選択ドロップダウン */}
-                  <div className="dropdown dropdown-end">
-                    <button type="button" className="btn btn-sm m-1">
-                      {selectedClass === 'all' ? 'すべてのクラス' : getClassName(selectedClass)}
-                    </button>
-                    <ul className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 max-h-60 overflow-y-auto">
-                      <li>
-                        <button type="button" onClick={() => setSelectedClass('all')}>
-                          すべてのクラス
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" onClick={() => setSelectedClass('class-1')}>
-                          1年1組
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" onClick={() => setSelectedClass('class-2')}>
-                          1年2組
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" onClick={() => setSelectedClass('class-3')}>
-                          2年1組
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" onClick={() => setSelectedClass('class-4')}>
-                          2年2組
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" onClick={() => setSelectedClass('class-5')}>
-                          3年1組
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" onClick={() => setSelectedClass('class-6')}>
-                          3年2組
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" onClick={() => setSelectedClass('class-7')}>
-                          4年1組
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" onClick={() => setSelectedClass('class-8')}>
-                          4年2組
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" onClick={() => setSelectedClass('class-9')}>
-                          5年1組
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" onClick={() => setSelectedClass('class-10')}>
-                          6年1組
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-
                   <CurrentTeacherName />
                 </div>
               </div>
@@ -175,14 +91,13 @@ export const App: FC = () => {
                 <div role="tabpanel" aria-label="生徒一覧">
                   <ErrorBoundary FallbackComponent={ErrorFallback}>
                     {/* Suspenseを使わずに直接コンポーネントをレンダリング */}
-                    <StudentSummaryTable
-                      selectedClass={selectedClass}
-                      onStudentSelect={handleStudentSelect}
-                    />
+                    <StudentSummaryTable onStudentSelect={handleStudentSelect} />
                   </ErrorBoundary>
                 </div>
               )}
             </main>
+
+            <Footer />
           </div>
         </Suspense>
       </ErrorBoundary>

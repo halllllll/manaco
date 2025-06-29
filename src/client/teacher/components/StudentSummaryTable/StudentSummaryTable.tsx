@@ -14,19 +14,14 @@ import type { Student } from './useStudentsData';
 import { useStudentsData } from './useStudentsData';
 
 type StudentSummaryTableProps = {
-  selectedClass?: string;
   onStudentSelect?: (studentId: string) => void;
-  className?: string;
 };
 
 /**
  * 生徒一覧テーブルコンポーネント
  * @tanstack/react-tableを使用
  */
-export const StudentSummaryTable: React.FC<StudentSummaryTableProps> = ({
-  onStudentSelect,
-  className = '',
-}) => {
+export const StudentSummaryTable: React.FC<StudentSummaryTableProps> = ({ onStudentSelect }) => {
   // 生徒データ取得
   const { students, isLoading, error } = useStudentsData();
 
@@ -160,7 +155,7 @@ export const StudentSummaryTable: React.FC<StudentSummaryTableProps> = ({
   }
 
   return (
-    <div className={`card bg-base-100 shadow-lg ${className}`}>
+    <div className={'card bg-base-100 shadow-lg'}>
       <div className="card-body">
         <div className="flex justify-between items-center mb-4">
           <h3 className="card-title">生徒一覧</h3>
