@@ -21,14 +21,12 @@ export const StudentDetailModal: FC<StudentDetailModalProps> = ({ studentId, onC
 
   useEffect(() => {
     if (studentId) {
-      console.log(`生徒詳細モーダルが開かれました: ${studentId}`);
+      console.log(`open detailed student info modal: ${studentId}`);
     }
   }, [studentId]);
 
   // 学習記録選択時の処理
   const handleSelectActivity = (activity: any) => {
-    // mockとLearningActivity型に不整合があるため、一時的にanyを使用
-    // 実際のアプリでは適切な型変換が必要
     setSelectedActivity(activity as unknown as LearningActivity);
   };
 

@@ -1,11 +1,12 @@
-import { getActivitiesByUserId } from '@/server/repositories/activityRepository';
+import { getAllActivityLogs } from '@/server/repositories/activityRepository';
 import { getAllUsers, getUserById } from '@/server/repositories/userRepository';
+import { HEATMAP_DAYS_COUNT } from '@/shared/constants/heatmap';
+import type { LearningActivity } from '@/shared/types/activity';
 import type { HeatmapDay, TeacherDashboardData } from '@/shared/types/teacher';
-import type { UserWithActivities } from '@/shared/types/user';
+import type { UserWithActivities } from '@/shared/types/user'; // UserWithActivitiesをインポート
 
 /**
  * 教師用ダッシュボードデータを取得するサービス関数
- * @param classFilter 対象のクラス（省略時は全クラス）
  */
 export function getTeacherDashboardService(): TeacherDashboardData {
   const allUsers = getAllUsers();
@@ -14,65 +15,100 @@ export function getTeacherDashboardService(): TeacherDashboardData {
   const totalStudents = students.length;
 
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const sevenDaysAgo = new Date(today);
-  sevenDaysAgo.setDate(today.getDate() - 6); // 過去7日間（今日を含む）
+  today.setHours(0, 0, 0, 0); // 日の始まりに正規化
+
+  // ヒートマップ期間の開始日を計算 (今日を含めてHEATMAP_DAYS_COUNT日間)
+  const heatmapStartDate = new Date(today);
+  heatmapStartDate.setDate(today.getDate() - (HEATMAP_DAYS_COUNT - 1));
+  heatmapStartDate.setHours(0, 0, 0, 0); // 日の始まりに正規化
 
   let todayActivities = 0;
-  let weekActivities = 0;
-  const activityCountsByDate: { [date: string]: number } = {};
+  let periodActivities = 0; // HEATMAP_DAYS_COUNT期間内の活動数
 
-  // biome-ignore lint/complexity/noForEach: <explanation>
-  students.forEach((student) => {
-    const activities = getActivitiesByUserId(student.id);
-    // biome-ignore lint/complexity/noForEach: <explanation>
-    activities.forEach((activity) => {
-      const activityDate = new Date(activity.activityDate);
-      activityDate.setHours(0, 0, 0, 0);
+  // すべての活動データを一度に取得
+  const allActivities = getAllActivityLogs();
 
-      if (activityDate.getTime() === today.getTime()) {
-        todayActivities++;
-      }
-
-      if (activityDate >= sevenDaysAgo && activityDate <= today) {
-        weekActivities++;
-        const dateString = activityDate.toISOString().split('T')[0];
-        activityCountsByDate[dateString] = (activityCountsByDate[dateString] || 0) + 1;
-      }
-    });
-  });
-
+  // ヒートマップのデータ構造を初期化
   const activityHeatmap: HeatmapDay[] = [];
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(sevenDaysAgo);
-    date.setDate(sevenDaysAgo.getDate() + i);
-    const dateString = date.toISOString().split('T')[0];
-    activityHeatmap.push({
+  // 日付文字列をキーとしてHeatmapDayオブジェクトを素早く参照するためのマップ
+  const heatmapDateMap = new Map<string, HeatmapDay>();
+
+  for (let i = 0; i < HEATMAP_DAYS_COUNT; i++) {
+    const currentDate = new Date(heatmapStartDate);
+    currentDate.setDate(heatmapStartDate.getDate() + i);
+    const dateString = currentDate.toISOString().split('T')[0];
+
+    const dayData: HeatmapDay = {
       date: dateString,
-      displayDate: `${date.getMonth() + 1}/${date.getDate()}`,
-      activities: activityCountsByDate[dateString] > 0 ? { hasActivity: true } : {},
-    });
+      displayDate: `${currentDate.getMonth() + 1}/${currentDate.getDate()}`,
+      activities: {}, // 生徒IDをキーとして活動の有無を格納
+    };
+    activityHeatmap.push(dayData);
+    heatmapDateMap.set(dateString, dayData);
   }
 
-  return {
+  // 全ての活動を一度だけループして、カウンターとヒートマップを更新
+  // biome-ignore lint/complexity/noForEach: <explanation>
+  allActivities.forEach((activity) => {
+    const activityDate = new Date(activity.activityDate);
+    activityDate.setHours(0, 0, 0, 0); // 日の始まりに正規化
+    console.log(
+      `謎に独自変換してる箇所　もとのactivityDate:${activity.activityDate}で、変換後 ${activityDate}`,
+    );
+    // 今日の活動数をカウント
+    if (activityDate.getTime() === today.getTime()) {
+      todayActivities++;
+    }
+
+    // ヒートマップ期間内の活動数をカウントし、ヒートマップデータを更新
+    if (activityDate >= heatmapStartDate && activityDate <= today) {
+      periodActivities++;
+      const dateString = activityDate.toISOString().split('T')[0];
+      const dayData = heatmapDateMap.get(dateString);
+      // その活動が学生のものであることを確認
+      if (dayData && students.some((s) => s.id === activity.userId)) {
+        console.log(
+          `${dateString}の日に${activity.userId}が活動しているがactivityでは${activity.activityDate}である`,
+        );
+        dayData.activities[activity.userId] = true; // その日に生徒が活動したことをマーク
+      }
+    }
+  });
+
+  const result: TeacherDashboardData = {
     totalStudents,
     todayActivities,
-    weekActivities,
+    weekActivities: periodActivities, // TeacherDashboardDataの型に合わせてweekActivitiesを使用
     activityHeatmap,
   };
+
+  console.info('Server: getTeacherDashboardService result:', JSON.stringify(result));
+
+  return result;
 }
 
 /**
  * 教師用生徒リストを取得するサービス関数
  */
 export function getTeacherStudentsService(): UserWithActivities[] {
-  const allUsers = getAllUsers();
+  const allUsers = getAllUsers(); // 全ユーザーを一度取得
+  const allActivities = getAllActivityLogs(); // 全活動ログを一度取得
+
+  // 生徒の活動を生徒IDでグループ化
+  const activitiesByStudentId = new Map<string, LearningActivity[]>();
+  // biome-ignore lint/complexity/noForEach: <explanation>
+  allActivities.forEach((activity) => {
+    if (!activitiesByStudentId.has(activity.userId)) {
+      activitiesByStudentId.set(activity.userId, []);
+    }
+    activitiesByStudentId.get(activity.userId)?.push(activity);
+  });
+
   const students = allUsers.filter((user) => user.role === 'student');
-  console.log('students???');
-  console.log(students);
+
   return students.map((student) => ({
     ...student,
-    activities: getActivitiesByUserId(student.id),
+    activities: activitiesByStudentId.get(student.id) || [], // マップから活動を取得
   }));
 }
 
@@ -83,9 +119,13 @@ export function getTeacherStudentsService(): UserWithActivities[] {
 export function getTeacherStudentDetailService(studentId: string): UserWithActivities | null {
   const student = getUserById(studentId);
   if (student && student.role === 'student') {
+    // ここでは個々の生徒のアクティビティが必要なので、getActivitiesByUserIdを使用
+    const allActivities = getAllActivityLogs();
+    const studentActivities = allActivities.filter((activity) => activity.userId === studentId);
+
     return {
       ...student,
-      activities: getActivitiesByUserId(student.id),
+      activities: studentActivities,
     };
   }
   return null;

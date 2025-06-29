@@ -1,9 +1,10 @@
 import { HttpResponse, delay, http } from 'msw';
 
 import { getApiPath } from '../../api/endpoint';
-import { currentClassFilter, currentTeacherId } from './browser';
-import { mockActivities, mockClasses, mockStudents, mockTeachers } from './teacherViewData';
+import { currentClassFilter } from './browser';
+import { mockActivities, mockStudents } from './teacherViewData';
 
+import { HEATMAP_DAYS_COUNT } from '@/shared/constants/heatmap';
 import type { LearningActivity } from '@/shared/types/activity';
 import type {
   TeacherDashboardDTO,
@@ -15,8 +16,6 @@ import type { User, UserWithActivities } from '@/shared/types/user';
 
 // 教師用APIのハンドラ
 export const teacherHandlers = [
-  
-
   // 全生徒リスト取得
   http.get(getApiPath('TEACHER_STUDENTS'), async ({ request }) => {
     console.info('--- mock api: teacher students ---');
@@ -98,8 +97,6 @@ export const teacherHandlers = [
     } as TeacherStudentDetailDTO);
   }),
 
-  
-
   // 学習活動の概要データ取得（ダッシュボード用）
   http.get(getApiPath('TEACHER_DASHBOARD'), async () => {
     console.info('--- mock api: teacher dashboard ---');
@@ -141,7 +138,7 @@ export const teacherHandlers = [
       totalActivitiesThisWeek += weekActivities.length;
     }
 
-    // 10日間の活動ヒートマップを作成
+    // HEATMAP_DAYS_COUNT日間の活動ヒートマップを作成
     const activityHeatmap = createActivityHeatmap(targetStudents, now);
 
     const dashboardData: TeacherDashboardData = {
@@ -166,14 +163,14 @@ export const teacherHandlers = [
 // --- ヘルパー関数 ---
 
 /**
- * 指定された生徒リストと基準日から、過去10日間の活動ヒートマップデータを生成する
+ * 指定された生徒リストと基準日から、過去HEATMAP_DAYS_COUNT日間の活動ヒートマップデータを生成する
  * @param students 対象の生徒リスト
  * @param baseDate 基準日
  * @returns ヒートマップデータ
  */
 const createActivityHeatmap = (students: User[], baseDate: Date) => {
   const heatmap = [];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < HEATMAP_DAYS_COUNT; i++) {
     const date = new Date(baseDate);
     date.setDate(baseDate.getDate() - i);
     const dateStr = date.toISOString().split('T')[0];
@@ -192,5 +189,7 @@ const createActivityHeatmap = (students: User[], baseDate: Date) => {
     }
     heatmap.push(dayData);
   }
+  console.info('heatmapp???????');
+  console.info(heatmap);
   return heatmap;
 };

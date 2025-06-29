@@ -17,6 +17,7 @@ export const TeacherAPI = {
     console.log('[TeacherAPI] Fetching dashboard data');
     if (isGASEnvironment()) {
       const ret = await serverFunctions.getTeacherDashboard();
+      console.info('Client (GAS Env): Received dashboard data from serverFunctions:', JSON.stringify(ret));
       return ret;
     }
 

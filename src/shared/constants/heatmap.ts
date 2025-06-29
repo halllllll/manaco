@@ -1,0 +1,1 @@
+export const HEATMAP_DAYS_COUNT = 10;

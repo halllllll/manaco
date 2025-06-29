@@ -48,10 +48,16 @@ export function getAllActivityLogs(): (LearningActivity & { userId: string })[] 
       score: Number(row[3]),
       duration: Number(row[4]),
       mood: row[5] ? (String(row[5]) as Mood) : undefined,
-      memo: row[6] ? String(row[6]) : undefined,
+      activityType: row[6]
+        ? String(row[6])
+            .split(',')
+            .map((s) => s.trim())
+        : [],
+      memo: row[7] ? String(row[7]) : undefined,
     }));
   } catch (error) {
-    throw new DataAccessError('Failed to get activity logs', error);
+    const err = error as unknown as Error;
+    throw new DataAccessError('Failed to get activity logs', err.stack);
   }
 }
 

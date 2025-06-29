@@ -48,6 +48,7 @@ export const useHeatmapData = () => {
         weekActivities,
         heatmapDays: heatmapData.length,
       });
+      console.info('Client (Heatmap Hook): heatmapData content:', JSON.stringify(heatmapData));
     }
     if (studentsData) {
       console.log('[useHeatmapData] Students data processed:', { count: students.length });

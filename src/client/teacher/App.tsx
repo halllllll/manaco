@@ -40,7 +40,7 @@ export const App: FC = () => {
   // 生徒が選択された時の処理
   const handleStudentSelect = (studentId: string) => {
     setSelectedStudent(studentId);
-    console.log(`生徒が選択されました: ${studentId}`);
+    console.log(`selected student: ${studentId}`);
   };
 
   return (
@@ -163,7 +163,7 @@ export const App: FC = () => {
                   {/* ヒートマップ */}
                   <div className="card bg-base-100 shadow-lg">
                     <div className="card-body">
-                      <h2 className="card-title mb-4">クラス活動ヒートマップ</h2>
+                      <h2 className="card-title mb-4">学習活動ヒートマップ</h2>
                       <ActivityHeatmap onStudentSelect={handleStudentSelect} />
                     </div>
                   </div>

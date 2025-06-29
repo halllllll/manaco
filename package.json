@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "preinstall": "npx only-allow bun; npx typesync || :",
     "prepare": "npx simple-git-hooks || :",
-    "update": "bunx ncu -u"
+    "update": "bunx ncu -u",
+    "generate-dummy-data": "python3 src/shared/scripts/generate_dummy_data.py"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.6",

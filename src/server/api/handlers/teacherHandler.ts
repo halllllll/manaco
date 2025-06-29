@@ -13,7 +13,6 @@ import type {
  * Handler for getting teacher dashboard data
  */
 export function getTeacherDashboardHandler(): TeacherDashboardDTO {
-  console.log('boss, 正論投げられて逃げちゃった♥');
   try {
     const data = getTeacherDashboardService();
     return {

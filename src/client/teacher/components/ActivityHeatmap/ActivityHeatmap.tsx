@@ -25,6 +25,8 @@ const columnHelper = createColumnHelper<User & { activities: Record<string, bool
 export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onStudentSelect }) => {
   // ヒートマップデータを取得（カスタムフック）
   const { isLoading, error, heatmapData, sortOption, setSortOption, students } = useHeatmapData();
+  console.info('heatmap??????????');
+  console.info(heatmapData);
 
   // ソート済みの生徒リストを生成
   const sortedStudents = useMemo(() => {
@@ -170,7 +172,7 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
           className="overflow-auto"
           style={{ maxHeight: 'calc(100vh - 350px)' }} // 画面の高さに合わせて調整
         >
-          <table className="table table-compact w-full relative">
+          <table className="table table-compact w-full relative table-fixed">
             <thead
               className="bg-base-100" // Ensure opaque background
               style={{
@@ -220,7 +222,6 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                     role={onStudentSelect ? 'button' : undefined}
                     className={onStudentSelect ? 'cursor-pointer hover:bg-base-200' : ''}
                     style={{
-                      display: 'flex', // flexboxを使ってtdの幅を制御
                       position: 'absolute',
                       transform: `translateY(${virtualItem.start}px)`,
                       width: '100%',
@@ -231,8 +232,6 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                         key={cell.id}
                         style={{
                           width: cell.column.getSize(),
-                          flexShrink: 0,
-                          flexGrow: 0,
                         }}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
