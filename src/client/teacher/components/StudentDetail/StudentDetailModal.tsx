@@ -1,6 +1,6 @@
+import { useSettings } from '@/api/settings/hook';
 import { formatDate } from '@/shared/common/func';
 import type { LearningActivity } from '@/shared/types/activity';
-import type { AppSettings } from '@/shared/types/settings';
 import { type FC, useEffect, useState } from 'react';
 import { ActivityDetailModal } from '../../../student/components/learningLogs/ActivityDetailModal';
 import { ActivityTable } from '../../../student/components/learningLogs/ActivityTable';
@@ -16,7 +16,8 @@ type StudentDetailModalProps = {
  * 生徒の基本情報と学習活動の履歴を表示
  */
 export const StudentDetailModal: FC<StudentDetailModalProps> = ({ studentId, onClose }) => {
-  const { student, isLoading, error } = useStudentDetail(studentId);
+  const { student, isLoading: studentIsLoading, error: studentError } = useStudentDetail(studentId);
+  const { data: settings, isLoading: settingsIsLoading, error: settingsError } = useSettings();
   const [selectedActivity, setSelectedActivity] = useState<LearningActivity | null>(null);
 
   useEffect(() => {
@@ -35,17 +36,8 @@ export const StudentDetailModal: FC<StudentDetailModalProps> = ({ studentId, onC
     setSelectedActivity(null);
   };
 
-  // デフォルト設定（実際のアプリではContextやAPIから取得することが望ましい）
-  const defaultSettings: AppSettings = {
-    showMood: true,
-    showScore: true,
-    showMemo: true,
-    showSecond: true,
-    showStudyTime: true,
-    showActivity: true,
-    scoreMin: 1,
-    scoreMax: 5,
-  };
+  const isLoading = studentIsLoading || settingsIsLoading;
+  const error = studentError || settingsError;
 
   if (!studentId) return null;
 
@@ -77,12 +69,12 @@ export const StudentDetailModal: FC<StudentDetailModalProps> = ({ studentId, onC
                 d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span>生徒情報の取得中にエラーが発生しました。</span>
+            <span>生徒または設定情報の取得中にエラーが発生しました。</span>
           </div>
         )}
 
         {/* 生徒情報表示 */}
-        {student && (
+        {student && settings && (
           <>
             <h3 className="font-bold text-2xl text-primary mb-4 flex items-center gap-2">
               <svg
@@ -159,7 +151,7 @@ export const StudentDetailModal: FC<StudentDetailModalProps> = ({ studentId, onC
               <ActivityTable
                 activities={student.activities as unknown as LearningActivity[]}
                 onSelectActivity={handleSelectActivity}
-                settings={defaultSettings}
+                settings={settings}
               />
             ) : (
               <div className="alert">
@@ -200,11 +192,11 @@ export const StudentDetailModal: FC<StudentDetailModalProps> = ({ studentId, onC
       </form>
 
       {/* 学習活動詳細モーダル */}
-      {selectedActivity && (
+      {selectedActivity && settings && (
         <ActivityDetailModal
           selectedActivity={selectedActivity}
           onClose={handleCloseActivityDetail}
-          settings={defaultSettings as any} // モックとの型の不整合を回避
+          settings={settings}
         />
       )}
     </dialog>
