@@ -15,8 +15,8 @@ export const App: FC = () => {
   // 選択された生徒のID（詳細表示モーダル用）
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
 
-  // 現在表示中の画面（'dashboard': ダッシュボード, 'students': 生徒一覧）
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'students'>('dashboard');
+  // 現在表示中の画面（'heatmap': ヒートマップ, 'students': 生徒一覧）
+  const [activeTab, setActiveTab] = useState<'heatmap' | 'students'>('heatmap');
 
   const { data: title, isLoading: isLoadingSheetName } = useSheetName();
 
@@ -30,9 +30,7 @@ export const App: FC = () => {
     <>
       {/* 開発ツール（開発環境のみ表示） */}
       {import.meta.env.DEV && <TeacherDevTools />}
-
       <Toast />
-
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Suspense fallback={<div>Loading...</div>}>
           <div className="flex flex-col min-h-screen bg-base-100">
@@ -51,10 +49,10 @@ export const App: FC = () => {
               <div className="tabs tabs-boxed mb-6" role="tablist">
                 <button
                   role="tab"
-                  aria-selected={activeTab === 'dashboard'}
+                  aria-selected={activeTab === 'heatmap'}
                   type="button"
-                  className={`tab ${activeTab === 'dashboard' ? 'tab-active' : ''}`}
-                  onClick={() => setActiveTab('dashboard')}
+                  className={`tab ${activeTab === 'heatmap' ? 'tab-active' : ''}`}
+                  onClick={() => setActiveTab('heatmap')}
                 >
                   活動ダッシュボード
                 </button>
@@ -69,8 +67,7 @@ export const App: FC = () => {
                 </button>
               </div>
 
-              {/* ダッシュボード画面 */}
-              {activeTab === 'dashboard' && (
+              {activeTab === 'heatmap' && (
                 <div
                   role="tabpanel"
                   aria-label="活動ダッシュボード"
@@ -81,10 +78,7 @@ export const App: FC = () => {
 
                   {/* ヒートマップ */}
                   <div className="card bg-base-100 shadow-lg">
-                    <div className="card-body">
-                      <h2 className="card-title mb-4">学習活動ヒートマップ</h2>
-                      <ActivityHeatmap onStudentSelect={handleStudentSelect} />
-                    </div>
+                    <ActivityHeatmap onStudentSelect={handleStudentSelect} />
                   </div>
                 </div>
               )}
@@ -104,8 +98,6 @@ export const App: FC = () => {
           </div>
         </Suspense>
       </ErrorBoundary>
-
-      {/* 生徒詳細モーダル */}
       <StudentDetailModal studentId={selectedStudent} onClose={() => setSelectedStudent(null)} />
     </>
   );

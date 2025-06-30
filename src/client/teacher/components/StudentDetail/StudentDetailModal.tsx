@@ -27,8 +27,8 @@ export const StudentDetailModal: FC<StudentDetailModalProps> = ({ studentId, onC
   }, [studentId]);
 
   // 学習記録選択時の処理
-  const handleSelectActivity = (activity: any) => {
-    setSelectedActivity(activity as unknown as LearningActivity);
+  const handleSelectActivity = (activity: LearningActivity) => {
+    setSelectedActivity(activity);
   };
 
   // アクティビティ詳細モーダルを閉じる処理
