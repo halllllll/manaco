@@ -3,8 +3,17 @@ import type { FormData } from './types';
 /**
  * フォームのデフォルト値を取得
  */
+// toISOString()は常にUTCで返すため、ローカルタイムゾーンの日付を取得するための対応
+// https://neos21.net/blog/2020/12/09-01.html
+
+const dateTZOffset = () => {
+  const t = new Date(Date.now() + (new Date().getTimezoneOffset() + 9 * 60) * 60 * 1000);
+  const [year, month, day] = [t.getFullYear(), t.getMonth() + 1, t.getDate()];
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+};
+
 export const getDefaultFormValues = (): FormData => ({
-  'target-date-btn': new Date().toISOString().split('T')[0],
+  'target-date-btn': dateTZOffset(),
   study_time: {
     hour: 0,
     minutes: 0,

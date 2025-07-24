@@ -1,5 +1,4 @@
 import type { CSSProperties, FC } from 'react';
-import { useMemo } from 'react';
 
 interface DateInputProps {
   // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)）（Claude Sonnet 4 Preview）
@@ -7,8 +6,6 @@ interface DateInputProps {
 }
 
 export const DateInput: FC<DateInputProps> = ({ field }) => {
-  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
-
   return (
     <div className="form-control w-full mb-4">
       <label className="label" htmlFor={field.name}>
@@ -42,7 +39,7 @@ export const DateInput: FC<DateInputProps> = ({ field }) => {
             di.showModal();
           }}
         >
-          {today}
+          {field.state.value}
         </button>
         <dialog
           id="date-modal"
