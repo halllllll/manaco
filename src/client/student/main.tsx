@@ -7,9 +7,9 @@ import App from './App';
 async function enableMocking() {
   if (import.meta.env.DEV) {
     console.info('Mocking is enabled in development mode.');
-    const { worker } = await import('../mock/browser');
+    const { worker } = await import('@/client/mock/browser');
     return worker.start({
-      onUnhandledRequest: 'bypass', // 未処理のリクエストはそのまま通す
+      onUnhandledRequest: 'warn',
     });
   }
   return Promise.resolve();

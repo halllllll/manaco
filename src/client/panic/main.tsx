@@ -65,7 +65,8 @@ async function enableMocking() {
     console.info('Mocking is enabled in development mode.');
     const { worker } = await import('@/client/mock/browser');
     return worker.start({
-      onUnhandledRequest: 'bypass', // 未処理のリクエストはそのまま通す
+      // onUnhandledRequest: 'bypass', // 未処理のリクエストはそのまま通す
+      onUnhandledRequest: 'warn',
     });
   }
   return Promise.resolve();
