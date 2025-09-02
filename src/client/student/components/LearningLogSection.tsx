@@ -11,7 +11,7 @@ export const LearningLogSection: FC<LearningLogSectionProps> = ({ activities }) 
   // アプリ設定を取得
   const { data, error } = useSettings();
   if (error) {
-    throw new Error(`Failed to fetch settings: ${error.name} - ${error.message}`);
+    throw new Error('Failed to fetch settings', { cause: error });
   }
 
   const [selectedActivity, setSelectedActivity] = useState<LearningActivity | null>(null);

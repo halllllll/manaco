@@ -31,8 +31,9 @@ import {
  * @returns HTML output
  */
 export const doGet = (): GoogleAppsScript.HTML.HtmlOutput => {
-  console.log('validation check');
+  console.info('validation check');
   const validateResult = validateAllService();
+  console.info('get user');
   const user = getCurrentUser();
 
   if (!validateResult.success) {

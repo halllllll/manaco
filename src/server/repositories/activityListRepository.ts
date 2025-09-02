@@ -38,7 +38,7 @@ export function initActivityListSheet(): GoogleAppsScript.Spreadsheet.Sheet {
 
     return sheet;
   } catch (error) {
-    throw new DataAccessError('Failed to initialize activity list sheet', error);
+    throw new DataAccessError('Failed to initialize activity list sheet', { cause: error });
   }
 }
 

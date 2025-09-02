@@ -14,7 +14,7 @@ import { validateSheetExists } from '@/server/utils/validation';
  */
 export function getAllRows(sheetName: string, includeHeader = false): unknown[][] {
   const { isExist, sheet } = validateSheetExists(sheetName);
-
+  console.log(`sheet name? ${sheetName}`);
   if (!isExist) {
     throw new DataAccessError(`Sheet "${sheetName}" does not exist.`);
   }
@@ -29,7 +29,12 @@ export function getAllRows(sheetName: string, includeHeader = false): unknown[][
 
     return includeHeader ? values : values.slice(1);
   } catch (error) {
-    throw new DataAccessError(`Failed to read data from sheet "${sheetName}"`, error);
+    if (error instanceof ReferenceError) {
+      console.error("possible 'Sheets' Service can't be installed at online-editor");
+      throw error;
+    }
+    console.error(error);
+    throw new DataAccessError(`Failed to read data from sheet "${sheetName}"`, { cause: error });
   }
 }
 
@@ -46,7 +51,7 @@ export function getAllDataRange(sheetName: string): GoogleAppsScript.Spreadsheet
   try {
     return sheet.getDataRange();
   } catch (error) {
-    throw new DataAccessError(`Failed to get range from sheet "${sheetName}"`, error);
+    throw new DataAccessError(`Failed to get range from sheet "${sheetName}"`, { cause: error });
   }
 }
 
@@ -65,7 +70,7 @@ export function appendRow(sheetName: string, rowData: unknown[]): void {
   try {
     sheet.appendRow(rowData);
   } catch (error) {
-    throw new DataAccessError(`Failed to append row to sheet "${sheetName}"`, error);
+    throw new DataAccessError(`Failed to append row to sheet "${sheetName}"`, { cause: error });
   }
 }
 

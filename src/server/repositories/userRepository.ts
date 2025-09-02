@@ -22,7 +22,7 @@ export function getAllUsers(): User[] {
       belonging: String(row[3] ?? ''),
     }));
   } catch (error) {
-    throw new DataAccessError('Failed to get users', error);
+    throw new DataAccessError('Failed to get users', { cause: error });
   }
 }
 
@@ -36,7 +36,7 @@ export function getUserById(userId: string): User | null {
     const users = getAllUsers();
     return users.find((user) => user.id === userId) ?? null;
   } catch (error) {
-    throw new DataAccessError(`Failed to get user with ID: ${userId}`, error);
+    throw new DataAccessError(`Failed to get user with ID: ${userId}`, { cause: error });
   }
 }
 
@@ -63,7 +63,7 @@ export function createUser(user: User): void {
   try {
     sheet.appendRow([user.id, user.name, user.role, user.belonging]);
   } catch (error) {
-    throw new DataAccessError(`Failed to create user: ${user.id}`, error);
+    throw new DataAccessError(`Failed to create user: ${user.id}`, { cause: error });
   }
 }
 
@@ -82,7 +82,7 @@ export function validateUserSheet(): boolean {
     const headers = sheet.getRange(1, 1, 1, USER_SHEET_HEADERS.length).getValues()[0];
     return headers.every((header: string, index: number) => header === USER_SHEET_HEADERS[index]);
   } catch (error) {
-    throw new DataAccessError('Failed to validate user sheet', error);
+    throw new DataAccessError('Failed to validate user sheet', { cause: error });
   }
 }
 
@@ -127,6 +127,6 @@ export function initUserSheet(): GoogleAppsScript.Spreadsheet.Sheet {
 
     return sheet;
   } catch (error) {
-    throw new DataAccessError('Failed to initialize user sheet', error);
+    throw new DataAccessError('Failed to initialize user sheet', { cause: error });
   }
 }
