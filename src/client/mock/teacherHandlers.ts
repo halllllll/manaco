@@ -194,7 +194,6 @@ const createActivityHeatmap = (students: User[], baseDate: Date) => {
     }
     heatmap.push(dayData);
   }
-  console.info('heatmapp???????');
   console.info(heatmap);
   return heatmap;
 };

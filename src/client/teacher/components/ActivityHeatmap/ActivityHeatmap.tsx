@@ -309,7 +309,7 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                 height: `${rowVirtualizer.getTotalSize()}px`,
                 width: `${Math.max(actualTableWidth, containerWidth)}px`,
                 minWidth: '100%',
-                width: `${totalTableWidth}px`, // Explicitly set tbody width
+                // width: `${totalTableWidth}px`, // Explicitly set tbody width
               }}
             >
               {rowVirtualizer.getVirtualItems().map((virtualRow) => {
