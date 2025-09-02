@@ -5,8 +5,7 @@ import type { UserWithActivities } from './user';
  */
 export type HeatmapDay = {
   date: string;
-  displayDate: string;
-  dayOfWeek: string; // 曜日
+  // displayDate: string;
   activities: Record<string, boolean>;
 };
 

@@ -36,34 +36,22 @@ export function getTeacherDashboardService(): TeacherDashboardData {
   for (let i = 0; i < HEATMAP_DAYS_COUNT; i++) {
     const currentDate = new Date(heatmapStartDate);
     currentDate.setDate(heatmapStartDate.getDate() + i);
-    const year = currentDate.getFullYear();
-    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-    const day = currentDate.getDate().toString().padStart(2, '0');
-    const dateString = `${year}-${month}-${day}`; // YYYY-MM-DD形式
-
-    // 曜日を取得
-    const dayOfWeekNames = ['日', '月', '火', '水', '木', '金', '土'];
-    const dayOfWeek = dayOfWeekNames[currentDate.getDay()];
+    const dateString = currentDate.toISOString().split('T')[0];
 
     const dayData: HeatmapDay = {
       date: dateString,
-      displayDate: `${currentDate.getMonth() + 1}/${currentDate.getDate()}`,
-      dayOfWeek,
+      // displayDate: `${currentDate.getMonth() + 1}/${currentDate.getDate()}`,
       activities: {}, // 生徒IDをキーとして活動の有無を格納
     };
     activityHeatmap.push(dayData);
     heatmapDateMap.set(dateString, dayData);
-  }  // 全ての活動を一度だけループして、カウンターとヒートマップを更新
-  console.info('Processing activities for heatmap...');
-  console.info(`Total activities to process: ${allActivities.length}`);
-  console.info(`Students count: ${students.length}`);
-  console.info(`Heatmap period: ${heatmapStartDate.toISOString().split('T')[0]} to ${today.toISOString().split('T')[0]}`);
-  
+  }
+
+  // 全ての活動を一度だけループして、カウンターとヒートマップを更新
   // biome-ignore lint/complexity/noForEach: <explanation>
   allActivities.forEach((activity) => {
     const activityDate = new Date(activity.activityDate);
     activityDate.setHours(0, 0, 0, 0); // 日の始まりに正規化
-
     // 今日の活動数をカウント
     if (activityDate.getTime() === today.getTime()) {
       todayActivities++;
@@ -72,24 +60,14 @@ export function getTeacherDashboardService(): TeacherDashboardData {
     // ヒートマップ期間内の活動数をカウントし、ヒートマップデータを更新
     if (activityDate >= heatmapStartDate && activityDate <= today) {
       periodActivities++;
-
-      // activity.activityDateは文字列形式なので、そのまま使用
-      const dateString = activity.activityDate;
-      const dayData = heatmapDateMap.get(dateString);
-
+      // const dateString = activityDate.toISOString().split('T')[0];
+      const dayData = heatmapDateMap.get(activity.activityDate);
       // その活動が学生のものであることを確認
       if (dayData && students.some((s) => s.id === activity.userId)) {
         dayData.activities[activity.userId] = true; // その日に生徒が活動したことをマーク
-        console.info(`Activity marked: date=${dateString}, userId=${activity.userId}`);
-      } else if (!dayData) {
-        console.warn(`No dayData found for date: ${dateString}`);
-      } else {
-        console.warn(`User ${activity.userId} is not a student or not found`);
       }
     }
   });
-
-  console.info('Final heatmap data:', JSON.stringify(activityHeatmap, null, 2));
 
   const result: TeacherDashboardData = {
     totalStudents,
