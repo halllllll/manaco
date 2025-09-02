@@ -1,4 +1,5 @@
 import { setupWorker } from 'msw/browser';
+import { appHandlers } from './appHandlers';
 import { handlers } from './studentHandlers';
 import { teacherHandlers } from './teacherHandlers';
 
@@ -24,6 +25,6 @@ window.addEventListener('message', (event) => {
 });
 
 // 全てのハンドラーを統合
-const allHandlers = [...handlers, ...teacherHandlers];
+const allHandlers = [...handlers, ...teacherHandlers, ...appHandlers];
 
 export const worker = setupWorker(...allHandlers);

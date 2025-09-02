@@ -15,7 +15,7 @@ export const SettingsAPI = {
     }
     /**
      * in dev, intercepted by MSW
-     * @see src/client/mock/handlers.ts
+     * @see src/client/mock/appHandlers.ts
      */
     const response = await fetch(getApiPath('SETTINGS'));
     return await response.json();

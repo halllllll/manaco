@@ -1,13 +1,15 @@
 export const API_ENDPOINTS = {
   // Student endpoints
   USER: '/mock/user',
-  SHEET_NAME: '/mock/sheet-name',
-  SHEET_URL: '/mock/sheet-url',
   DASHBOARD: '/mock/dashboard',
   LEARNING_ACTIVITIES: '/mock/learning-activities',
   HEALTH: '/mock/health',
-  SETTINGS: '/mock/settings',
   SAVE_ACTIVITY: '/mock/save-activity',
+
+  // App settings endpoints
+  SHEET_NAME: '/mock/sheet-name',
+  SHEET_URL: '/mock/sheet-url',
+  SETTINGS: '/mock/settings',
 
   // Teacher endpoints
   TEACHER_CURRENT: '/mock/teacher/current',

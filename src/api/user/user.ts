@@ -16,7 +16,7 @@ export const UserAPI = {
 
     /**
      * In development, intercepted by MSW
-     * @see src/client/mock/handlers.ts
+     * @see src/client/mock/studentHandlers.ts
      */
     const response = await fetch(getApiPath('USER'));
     return await response.json();

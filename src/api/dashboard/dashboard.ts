@@ -15,7 +15,7 @@ export const DashboardAPI = {
 
     /**
      * in dev, intercepted by MSW
-     * @see src/client/mock/handlers.ts
+     * @see src/client/mock/studentHandlers.ts
      */
     const response = await fetch(getApiPath('DASHBOARD'));
     return await response.json();

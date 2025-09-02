@@ -10,7 +10,7 @@ export const SheetApp = {
     }
     /**
      * in dev, intercepted by MSW
-     * @see src/client/mock/handlers.ts
+     * @see src/client/mock/appHandlers.ts
      */
     const response = await fetch(getApiPath('SHEET_NAME'));
     return await response.json();
@@ -21,7 +21,7 @@ export const SheetApp = {
     }
     /**
      * in dev, intercepted by MSW
-     * @see src/client/mock/handlers.ts
+     * @see src/client/mock/appHandlers.ts
      */
     const response = await fetch(getApiPath('SHEET_URL'));
     return await response.json();
