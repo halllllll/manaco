@@ -4,16 +4,13 @@ import { initSettingsSheet } from '@/server/repositories/settingsRepository';
 import { initUserSheet } from '@/server/repositories/userRepository';
 import {
   ACTIVITY_LIST_SHEET_HEADERS,
-  ACTIVITY_LIST_SHEET_NAME,
   LEARNING_ACTIVITY_SHEET_HEADERS,
-  LEARNING_ACTIVITY_SHEET_NAME,
   SETTINGS_SHEET_HEADERS,
   SETTINGS_SHEET_LABEL,
-  SETTINGS_SHEET_NAME,
+  type SHEET_NAME,
   type SettingsResult,
   type SettingsSheetItem,
   USER_SHEET_HEADERS,
-  USER_SHEET_NAME,
   ss,
 } from '@/server/utils/constants';
 import { getAndValidateHeaders, validateSheetExists } from '@/server/utils/validation';
@@ -33,7 +30,7 @@ export interface ValidationResult<T = unknown> {
 /**
  * シートバリデータ関数の型
  */
-export type SheetValidatorFn = (sheetName: string) => ValidationResult;
+export type SheetValidatorFn = (sheetName: SHEET_NAME) => ValidationResult;
 
 /**
  * シートバリデータの構造
@@ -42,7 +39,7 @@ export type SheetValidatorEntry = {
   /** バリデータ名 */
   name: string;
   /** バリデータが対象とするシート名 */
-  targetSheetName: string;
+  targetSheetName: SHEET_NAME;
   /** バリデーション実行関数 */
   validate: SheetValidatorFn;
 };
@@ -54,7 +51,7 @@ export type SheetValidatorEntry = {
  * @returns ヘッダーバリデータのエントリ
  */
 export function createHeaderValidator(
-  targetSheetName: string,
+  targetSheetName: SHEET_NAME,
   expectedHeaders: readonly string[],
 ): SheetValidatorEntry {
   return {
@@ -71,13 +68,13 @@ export function createHeaderValidator(
 function createValidatorRegistry(): SheetValidatorEntry[] {
   return [
     // 基本的なヘッダーバリデーション
-    createHeaderValidator(USER_SHEET_NAME, USER_SHEET_HEADERS),
-    createHeaderValidator(LEARNING_ACTIVITY_SHEET_NAME, LEARNING_ACTIVITY_SHEET_HEADERS),
-    createHeaderValidator(SETTINGS_SHEET_NAME, SETTINGS_SHEET_HEADERS),
-    createHeaderValidator(ACTIVITY_LIST_SHEET_NAME, ACTIVITY_LIST_SHEET_HEADERS),
+    createHeaderValidator('ユーザー情報', USER_SHEET_HEADERS),
+    createHeaderValidator('学習ログ', LEARNING_ACTIVITY_SHEET_HEADERS),
+    createHeaderValidator('アプリ設定', SETTINGS_SHEET_HEADERS),
+    createHeaderValidator('取り組みリスト', ACTIVITY_LIST_SHEET_HEADERS),
 
     // 設定シート特有のバリデーション
-    createSettingsValidator(SETTINGS_SHEET_NAME, SETTINGS_SHEET_LABEL),
+    createSettingsValidator('アプリ設定', SETTINGS_SHEET_LABEL),
 
     // 将来的に追加するバリデータをここに登録する
     // 例:
@@ -209,7 +206,7 @@ export function initAppService(): InitAppDTO {
  * @returns 検証結果
  */
 export function validateSettingsSheetItems(
-  sheetName: string,
+  sheetName: SHEET_NAME,
   items: readonly SettingsSheetItem[],
 ): ValidationResult<SettingsResult[]> {
   const { isExist, sheet } = validateSheetExists(sheetName);
@@ -306,8 +303,8 @@ export function validateSettingsSheetItems(
  * @returns 設定シートバリデータ
  */
 export function createSettingsValidator(
-  targetSheetName: string = SETTINGS_SHEET_NAME,
-  items: readonly SettingsSheetItem[] = SETTINGS_SHEET_LABEL,
+  targetSheetName: 'アプリ設定',
+  items: readonly SettingsSheetItem[],
 ): SheetValidatorEntry {
   return {
     name: 'SettingsContentValidator',

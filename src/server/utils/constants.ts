@@ -5,13 +5,23 @@
 export const ss = SpreadsheetApp.getActive();
 
 // Sheet names
-export const SETTINGS_SHEET_NAME = 'アプリ設定';
-export const USER_SHEET_NAME = 'ユーザー情報';
-export const LEARNING_ACTIVITY_SHEET_NAME = '学習ログ';
-export const ACTIVITY_LIST_SHEET_NAME = '取り組みリスト';
+// export const SETTINGS_SHEET_NAME = 'アプリ設定';
+// export const USER_SHEET_NAME = 'ユーザー情報';
+// export const LEARNING_ACTIVITY_SHEET_NAME = '学習ログ';
+// export const ACTIVITY_LIST_SHEET_NAME = '取り組みリスト';
+// export const MEMO_LIST_SHEET_NAME = '自由記述欄リスト';
+
+export type SHEET_NAME =
+  | 'アプリ名'
+  | 'ユーザー情報'
+  | 'アプリ設定'
+  | '学習ログ'
+  | '取り組みリスト'
+  | '自由記述欄リスト';
 
 // Sheet headers
 export const SETTINGS_SHEET_HEADERS: readonly string[] = ['設定項目', '値', '説明'] as const;
+
 export const USER_SHEET_HEADERS: readonly string[] = [
   'アカウントID',
   '名前',
@@ -28,7 +38,13 @@ export const LEARNING_ACTIVITY_SHEET_HEADERS: readonly string[] = [
   '取り組んだ内容',
   'メモ',
 ] as const;
-export const ACTIVITY_LIST_SHEET_HEADERS: readonly string[] = ['名前', 'メモ'];
+
+export const ACTIVITY_LIST_SHEET_HEADERS: readonly string[] = ['名前', 'メモ'] as const;
+
+export const MEMO_LIST_SHEET_HEADERS: readonly string[] = [
+  'ラベル名',
+  'placeholder（任意）',
+] as const;
 
 // Settings types
 export type SettingsItem =
@@ -86,7 +102,7 @@ export const DefaultSettingsItemValue: {
   {
     name: 'メモ表示',
     value: true,
-    desc: 'フォームで「メモ」の表示切り替え',
+    desc: 'フォームで「メモ」の表示切り替え（TRUEの場合、「自由記述欄リスト」の内容が反映されます）',
   },
   {
     name: '取り組み表示',

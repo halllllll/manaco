@@ -3,7 +3,7 @@
  */
 import {
   ACTIVITY_LIST_SHEET_HEADERS,
-  ACTIVITY_LIST_SHEET_NAME,
+  // ACTIVITY_LIST_SHEET_NAME,
   DefaultActivityList,
 } from '@/server/utils/constants';
 import { DataAccessError } from '@/server/utils/errors';
@@ -16,7 +16,7 @@ import { createSheet, getAllDataRange } from './sheetUtils';
  */
 export function initActivityListSheet(): GoogleAppsScript.Spreadsheet.Sheet {
   try {
-    const sheet = createSheet(ACTIVITY_LIST_SHEET_NAME);
+    const sheet = createSheet('取り組みリスト');
 
     // Set headers with styling
     const headerRange = sheet.getRange(1, 1, 1, ACTIVITY_LIST_SHEET_HEADERS.length);
@@ -43,7 +43,7 @@ export function initActivityListSheet(): GoogleAppsScript.Spreadsheet.Sheet {
 }
 
 export function getActivityItems(): ActivityItem[] {
-  const dataRange = getAllDataRange(ACTIVITY_LIST_SHEET_NAME);
+  const dataRange = getAllDataRange('取り組みリスト');
   const backgrounds = dataRange.getBackgrounds().slice(1);
   const values = dataRange.getValues().slice(1); // Skip header row
 

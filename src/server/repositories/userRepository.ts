@@ -4,7 +4,7 @@
 import { DataAccessError } from '@/server/utils/errors';
 import { validateSheetExists } from '@/server/utils/validation';
 import { USER_ROLES, type User } from '@/shared/types/user';
-import { USER_SHEET_HEADERS, USER_SHEET_NAME } from '../utils/constants';
+import { type SHEET_NAME, USER_SHEET_HEADERS } from '../utils/constants';
 import { createSheet, getAllRows } from './sheetUtils';
 
 /**
@@ -13,7 +13,7 @@ import { createSheet, getAllRows } from './sheetUtils';
  */
 export function getAllUsers(): User[] {
   try {
-    const rows = getAllRows(USER_SHEET_NAME);
+    const rows = getAllRows('ユーザー情報');
 
     return rows.map((row) => ({
       id: String(row[0] ?? ''),
@@ -54,10 +54,11 @@ export function getUserByEmail(email: string): User | null {
  * @param user User object to create
  */
 export function createUser(user: User): void {
-  const { isExist, sheet } = validateSheetExists(USER_SHEET_NAME);
+  const sheetName: SHEET_NAME = 'ユーザー情報';
+  const { isExist, sheet } = validateSheetExists(sheetName);
 
   if (!isExist) {
-    throw new DataAccessError(`Sheet "${USER_SHEET_NAME}" does not exist.`);
+    throw new DataAccessError(`Sheet "${sheetName}" does not exist.`);
   }
 
   try {
@@ -72,7 +73,7 @@ export function createUser(user: User): void {
  * @returns Validation result
  */
 export function validateUserSheet(): boolean {
-  const { isExist, sheet } = validateSheetExists(USER_SHEET_NAME);
+  const { isExist, sheet } = validateSheetExists('ユーザー情報');
 
   if (!isExist) {
     return false;
@@ -92,7 +93,7 @@ export function validateUserSheet(): boolean {
  */
 export function initUserSheet(): GoogleAppsScript.Spreadsheet.Sheet {
   try {
-    const sheet = createSheet(USER_SHEET_NAME);
+    const sheet = createSheet('ユーザー情報');
 
     // Set tab color
     sheet.setTabColor('#FFD1DC');

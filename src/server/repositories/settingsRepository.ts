@@ -5,7 +5,8 @@ import {
   DefaultSettingsItemValue,
   SETTINGS_SHEET_HEADERS,
   SETTINGS_SHEET_LABEL,
-  SETTINGS_SHEET_NAME,
+  type SHEET_NAME,
+  // SETTINGS_SHEET_NAME,
   type SettingsItem,
   type SettingsResult,
 } from '@/server/utils/constants';
@@ -21,13 +22,14 @@ import { createSheet, getAllRows } from './sheetUtils';
  */
 export function getAllSettings(): SettingsResult[] {
   try {
-    const { isExist } = validateSheetExists(SETTINGS_SHEET_NAME);
+    const sheetName: SHEET_NAME = 'アプリ設定';
+    const { isExist } = validateSheetExists(sheetName);
 
     if (!isExist) {
-      throw new DataAccessError(`Settings sheet "${SETTINGS_SHEET_NAME}" does not exist.`);
+      throw new DataAccessError(`Settings sheet "${sheetName}" does not exist.`);
     }
 
-    const rows = getAllRows(SETTINGS_SHEET_NAME);
+    const rows = getAllRows(sheetName);
 
     return rows.map((row) => {
       const item = row[0] as SettingsItem;
@@ -121,7 +123,7 @@ export function mapSettingsToAppSettings(settingsData: SettingsResult[]): AppSet
  */
 export function initSettingsSheet(): GoogleAppsScript.Spreadsheet.Sheet {
   try {
-    const sheet = createSheet(SETTINGS_SHEET_NAME);
+    const sheet = createSheet('アプリ設定');
 
     // Set headers
     const headerRange = sheet.getRange(1, 1, 1, SETTINGS_SHEET_HEADERS.length);
@@ -174,7 +176,7 @@ export function initSettingsSheet(): GoogleAppsScript.Spreadsheet.Sheet {
  * @returns Validation result
  */
 export function validateSettingsSheet(): boolean {
-  const { isExist, sheet } = validateSheetExists(SETTINGS_SHEET_NAME);
+  const { isExist, sheet } = validateSheetExists('アプリ設定');
 
   if (!isExist) {
     return false;

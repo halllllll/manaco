@@ -1,7 +1,7 @@
 /**
  * Common utilities for repository operations on Google Sheets
  */
-import { ss } from '@/server/utils/constants';
+import { type SHEET_NAME, ss } from '@/server/utils/constants';
 import { DataAccessError } from '@/server/utils/errors';
 import { columnToA1 } from '@/server/utils/helpers';
 import { validateSheetExists } from '@/server/utils/validation';
@@ -12,7 +12,7 @@ import { validateSheetExists } from '@/server/utils/validation';
  * @param includeHeader Whether to include the header row
  * @returns 2D array of values
  */
-export function getAllRows(sheetName: string, includeHeader = false): unknown[][] {
+export function getAllRows(sheetName: SHEET_NAME, includeHeader = false): unknown[][] {
   const { isExist, sheet } = validateSheetExists(sheetName);
   console.log(`sheet name? ${sheetName}`);
   if (!isExist) {
@@ -41,7 +41,7 @@ export function getAllRows(sheetName: string, includeHeader = false): unknown[][
 /**
  * Rangeを取得する
  */
-export function getAllDataRange(sheetName: string): GoogleAppsScript.Spreadsheet.Range {
+export function getAllDataRange(sheetName: SHEET_NAME): GoogleAppsScript.Spreadsheet.Range {
   const { isExist, sheet } = validateSheetExists(sheetName);
 
   if (!isExist) {
@@ -60,7 +60,7 @@ export function getAllDataRange(sheetName: string): GoogleAppsScript.Spreadsheet
  * @param sheetName Name of the sheet to append to
  * @param rowData Array of values to append
  */
-export function appendRow(sheetName: string, rowData: unknown[]): void {
+export function appendRow(sheetName: SHEET_NAME, rowData: unknown[]): void {
   const { isExist, sheet } = validateSheetExists(sheetName);
 
   if (!isExist) {
@@ -99,7 +99,7 @@ export function withLock<T>(operation: () => T): T {
  * @param name Name of the sheet to create
  * @returns The newly created sheet
  */
-export function createSheet(name: string): GoogleAppsScript.Spreadsheet.Sheet {
+export function createSheet(name: SHEET_NAME): GoogleAppsScript.Spreadsheet.Sheet {
   const targetSheet = ss.getSheetByName(name);
 
   if (targetSheet) {

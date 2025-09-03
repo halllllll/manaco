@@ -1,10 +1,7 @@
 import {
   LEARNING_ACTIVITY_SHEET_HEADERS,
-  LEARNING_ACTIVITY_SHEET_NAME,
   SETTINGS_SHEET_HEADERS,
-  SETTINGS_SHEET_NAME,
   USER_SHEET_HEADERS,
-  USER_SHEET_NAME,
 } from '@/server/utils/constants';
 import type { User } from '@/shared/types/user';
 import { getAndValidateHeaders } from '../utils/validation';
@@ -12,7 +9,7 @@ import { getAndValidateHeaders } from '../utils/validation';
 const StudentSheetValidationTest = () => {
   console.log('-- ユーザー情報シート -- ');
   console.info('正しい情報');
-  const result1 = getAndValidateHeaders<User[]>(USER_SHEET_NAME, [...USER_SHEET_HEADERS]);
+  const result1 = getAndValidateHeaders<User[]>('ユーザー情報', [...USER_SHEET_HEADERS]);
   console.info(result1);
   if (!result1.isValid) {
     throw new Error(result1.messages.join('\n'));
@@ -29,7 +26,7 @@ const StudentSheetValidationTest = () => {
     throw new Error(result2.messages.join('\n'));
   }
   console.info('ヘッダが異なる');
-  const result3 = getAndValidateHeaders<User[]>(USER_SHEET_NAME, [
+  const result3 = getAndValidateHeaders<User[]>('ユーザー情報', [
     'メールアドレス',
     'タイムスタンプ',
     '学習日',
@@ -46,9 +43,7 @@ const StudentSheetValidationTest = () => {
 const LearningLogSheetValidationTest = () => {
   console.log('-- 学習ログシート -- ');
   console.info('正しいデータ');
-  const result1 = getAndValidateHeaders(LEARNING_ACTIVITY_SHEET_NAME, [
-    ...LEARNING_ACTIVITY_SHEET_HEADERS,
-  ]);
+  const result1 = getAndValidateHeaders('学習ログ', [...LEARNING_ACTIVITY_SHEET_HEADERS]);
   console.info(result1);
   if (!result1.isValid) {
     throw new Error(result1.messages.join('\n'));
@@ -60,7 +55,7 @@ const LearningLogSheetValidationTest = () => {
     throw new Error(result2.messages.join('\n'));
   }
   console.info('ヘッダが異なる');
-  const result3 = getAndValidateHeaders(LEARNING_ACTIVITY_SHEET_NAME, [
+  const result3 = getAndValidateHeaders('学習ログ', [
     'メールアドレス',
     'タイムスタンプ',
     '学習日',
@@ -78,7 +73,7 @@ const LearningLogSheetValidationTest = () => {
 const AppSettingSheetValidationTest = () => {
   console.log('-- アプリ設定シート -- ');
   console.info('正しいデータ');
-  const result1 = getAndValidateHeaders(SETTINGS_SHEET_NAME, [...SETTINGS_SHEET_HEADERS]);
+  const result1 = getAndValidateHeaders('アプリ設定', [...SETTINGS_SHEET_HEADERS]);
   console.info(result1);
   if (!result1.isValid) {
     throw new Error(result1.messages.join('\n'));
@@ -90,7 +85,7 @@ const AppSettingSheetValidationTest = () => {
     throw new Error(result2.messages.join('\n'));
   }
   console.info('ヘッダが異なる');
-  const result3 = getAndValidateHeaders(SETTINGS_SHEET_NAME, [
+  const result3 = getAndValidateHeaders('アプリ設定', [
     'メールアドレス',
     'タイムスタンプ',
     '学習日',

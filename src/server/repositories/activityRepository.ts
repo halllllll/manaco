@@ -6,7 +6,7 @@ import { formatDate } from '@/server/utils/helpers';
 import { validateSheetExists } from '@/server/utils/validation';
 import type { LearningActivity, LearningActivityRequest } from '@/shared/types/activity';
 import type { Mood } from '@/shared/types/mood';
-import { LEARNING_ACTIVITY_SHEET_HEADERS, LEARNING_ACTIVITY_SHEET_NAME } from '../utils/constants';
+import { LEARNING_ACTIVITY_SHEET_HEADERS, type SHEET_NAME } from '../utils/constants';
 import { createSheet, getAllRows, withLock } from './sheetUtils';
 
 /**
@@ -15,7 +15,7 @@ import { createSheet, getAllRows, withLock } from './sheetUtils';
  */
 export function initActivitySheet(): GoogleAppsScript.Spreadsheet.Sheet {
   try {
-    const sheet = createSheet(LEARNING_ACTIVITY_SHEET_NAME);
+    const sheet = createSheet('学習ログ');
 
     // Set headers with styling
     const headerRange = sheet.getRange(1, 1, 1, LEARNING_ACTIVITY_SHEET_HEADERS.length);
@@ -40,7 +40,7 @@ export function initActivitySheet(): GoogleAppsScript.Spreadsheet.Sheet {
  */
 export function getAllActivityLogs(): (LearningActivity & { userId: string })[] {
   try {
-    const rows = getAllRows(LEARNING_ACTIVITY_SHEET_NAME);
+    const rows = getAllRows('学習ログ');
 
     return rows.map((row) => ({
       userId: String(row[1]),
@@ -53,7 +53,15 @@ export function getAllActivityLogs(): (LearningActivity & { userId: string })[] 
             .split(',')
             .map((s) => s.trim())
         : [],
-      memo: row[7] ? String(row[7]) : undefined,
+      memo: row[7]
+        ? [
+            {
+              label: 'メモ（あとでちゃんと取得した値にする）',
+              placeholder: 'placeholder（あとでちゃんと取得した値にする）',
+              value: String(row[7]),
+            },
+          ]
+        : undefined,
     }));
   } catch (error) {
     const err = error as unknown as Error;
@@ -85,10 +93,11 @@ export function getActivitiesByUserId(userId: string): LearningActivity[] {
 export function saveActivity(activity: LearningActivityRequest): { ok: boolean; message: string } {
   try {
     return withLock(() => {
-      const { isExist, sheet } = validateSheetExists(LEARNING_ACTIVITY_SHEET_NAME);
+      const sheetName: SHEET_NAME = '学習ログ';
+      const { isExist, sheet } = validateSheetExists(sheetName);
 
       if (!isExist) {
-        return { ok: false, message: `Sheet "${LEARNING_ACTIVITY_SHEET_NAME}" does not exist.` };
+        return { ok: false, message: `Sheet "${sheetName}" does not exist.` };
       }
 
       sheet.appendRow([
@@ -115,7 +124,7 @@ export function saveActivity(activity: LearningActivityRequest): { ok: boolean; 
  * @returns Validation result
  */
 export function validateActivitySheet(): boolean {
-  const { isExist, sheet } = validateSheetExists(LEARNING_ACTIVITY_SHEET_NAME);
+  const { isExist, sheet } = validateSheetExists('学習ログ');
 
   if (!isExist) {
     return false;

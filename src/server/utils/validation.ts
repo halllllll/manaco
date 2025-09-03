@@ -1,7 +1,7 @@
 /**
  * Validation utilities for data validation
  */
-import { ss } from './constants';
+import { type SHEET_NAME, ss } from './constants';
 import { ValidationError } from './errors';
 
 export interface SheetInfo {
@@ -21,7 +21,7 @@ export interface ValidationResult<T = unknown[][]> {
  * @param sheetName Name of the sheet to validate
  * @returns Object indicating if the sheet exists and the sheet object if it does
  */
-export function validateSheetExists(sheetName: string):
+export function validateSheetExists(sheetName: SHEET_NAME):
   | {
       sheet: GoogleAppsScript.Spreadsheet.Sheet;
       isExist: true;
@@ -44,7 +44,7 @@ export function validateSheetExists(sheetName: string):
  * @returns Validation result
  */
 export function getAndValidateHeaders<T>(
-  sheetName: string,
+  sheetName: SHEET_NAME,
   expectedHeaders: string[],
 ): ValidationResult<T[]> {
   const { isExist, sheet } = validateSheetExists(sheetName);
