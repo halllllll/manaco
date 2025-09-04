@@ -2,14 +2,9 @@
  * Constants used throughout the server application
  */
 
-export const ss = SpreadsheetApp.getActive();
+import type { Memo } from '@/shared/types/memo';
 
-// Sheet names
-// export const SETTINGS_SHEET_NAME = 'アプリ設定';
-// export const USER_SHEET_NAME = 'ユーザー情報';
-// export const LEARNING_ACTIVITY_SHEET_NAME = '学習ログ';
-// export const ACTIVITY_LIST_SHEET_NAME = '取り組みリスト';
-// export const MEMO_LIST_SHEET_NAME = '自由記述欄リスト';
+export const ss = SpreadsheetApp.getActive();
 
 export type SHEET_NAME =
   | 'アプリ名'
@@ -36,10 +31,10 @@ export const LEARNING_ACTIVITY_SHEET_HEADERS: readonly string[] = [
   'かかった時間（秒）',
   'きもち',
   '取り組んだ内容',
-  'メモ',
+  '自由記述欄',
 ] as const;
 
-export const ACTIVITY_LIST_SHEET_HEADERS: readonly string[] = ['名前', 'メモ'] as const;
+export const ACTIVITY_LIST_SHEET_HEADERS: readonly string[] = ['名前', '活動内容'] as const;
 
 export const MEMO_LIST_SHEET_HEADERS: readonly string[] = [
   'ラベル名',
@@ -54,7 +49,7 @@ export type SettingsItem =
   | '学習時間を記録'
   | '秒表示'
   | 'きもち表示'
-  | 'メモ表示'
+  | '自由記述欄表示'
   | '取り組み表示';
 export type SettingsType = 'number' | 'boolean' | 'date';
 
@@ -100,7 +95,7 @@ export const DefaultSettingsItemValue: {
     desc: 'フォームで「きもち」の表示切り替え',
   },
   {
-    name: 'メモ表示',
+    name: '自由記述欄表示',
     value: true,
     desc: 'フォームで「メモ」の表示切り替え（TRUEの場合、「自由記述欄リスト」の内容が反映されます）',
   },
@@ -124,6 +119,13 @@ export const DefaultActivityList: { name: string; color: string; desc: string }[
   { name: '読書', color: '#ede266', desc: '読書' },
   { name: '塾', color: '#a4a4a4', desc: '習い事' },
   { name: '日記', color: '#FFF', desc: '宿題' },
+];
+
+export const DefaultMemoList: Memo[] = [
+  {
+    label: '📝 メモ',
+    placeholder: 'メモや感想',
+  },
 ];
 
 export const SETTINGS_SHEET_LABEL: readonly SettingsSheetItem[] = [
@@ -158,7 +160,7 @@ export const SETTINGS_SHEET_LABEL: readonly SettingsSheetItem[] = [
     type: 'boolean',
   },
   {
-    name: 'メモ表示',
+    name: '自由記述欄表示',
     rowAt: 8,
     type: 'boolean',
   },

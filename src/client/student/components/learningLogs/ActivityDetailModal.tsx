@@ -190,31 +190,66 @@ export const ActivityDetailModal: FC<ActivityDetailModalProps> = ({
             )}
 
             {/* メモ表示 */}
-            {visibleDetailItems.some((item) => item.id === 'memo') && selectedActivity.memo && (
-              <div className="bg-base-200/60 rounded-lg p-4 mt-4 border-l-4 border-accent">
-                <div className="font-bold mb-2 flex items-center gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-accent"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <title>メモ</title>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                  メモ
-                </div>
-                <div className="bg-white/50 p-3 rounded-lg">
-                  <p className="whitespace-pre-wrap">{selectedActivity.memo}</p>
-                </div>
-              </div>
-            )}
+            {
+              visibleDetailItems.some((item) => item.id === 'memo') &&
+                selectedActivity.memo &&
+                selectedActivity.memo.map((memo, idx) => {
+                  return (
+                    <>
+                      <div
+                        className="bg-base-200/60 rounded-lg p-4 mt-4 border-l-4 border-accent"
+                        // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                        key={idx}
+                      >
+                        <div className="font-bold mb-2 flex items-center gap-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-accent"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <title>メモ</title>
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
+                          </svg>
+                          {memo.label}
+                        </div>
+                        <div className="bg-white/50 p-3 rounded-lg">
+                          <p className="whitespace-pre-wrap">{memo.value}</p>
+                        </div>
+                      </div>{' '}
+                    </>
+                  );
+                })
+              // <div className="bg-base-200/60 rounded-lg p-4 mt-4 border-l-4 border-accent">
+              //   <div className="font-bold mb-2 flex items-center gap-2">
+              //     <svg
+              //       xmlns="http://www.w3.org/2000/svg"
+              //       className="h-5 w-5 text-accent"
+              //       fill="none"
+              //       viewBox="0 0 24 24"
+              //       stroke="currentColor"
+              //     >
+              //       <title>メモ</title>
+              //       <path
+              //         strokeLinecap="round"
+              //         strokeLinejoin="round"
+              //         strokeWidth={2}
+              //         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              //       />
+              //     </svg>
+              //     メモ
+              //   </div>
+              //   <div className="bg-white/50 p-3 rounded-lg">
+              //     <p className="whitespace-pre-wrap">{selectedActivity.memo}</p>
+              //   </div>
+              // </div>
+            }
           </>
         )}
 

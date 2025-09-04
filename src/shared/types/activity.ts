@@ -1,3 +1,4 @@
+import type { MemoData } from './memo';
 import type { Mood } from './mood';
 
 export interface LearningActivity {
@@ -5,7 +6,7 @@ export interface LearningActivity {
   duration: number; // 秒単位
   score: number;
   mood?: Mood;
-  memo?: string;
+  memo?: MemoData[];
   activityType?: string[]; // 取り組みの種類
   subject?: string; // 教科
   studentId?: string; // 生徒ID（教師ビューでのみ使用）

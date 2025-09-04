@@ -1,4 +1,4 @@
-import type { FormData } from './types';
+import type { StudentFormData } from './types/FormTypes';
 
 /**
  * フォームのデフォルト値を取得
@@ -12,7 +12,7 @@ const dateTZOffset = () => {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 };
 
-export const getDefaultFormValues = (): FormData => ({
+export const getDefaultFormValues = (): StudentFormData => ({
   'target-date-btn': dateTZOffset(),
   study_time: {
     hour: 0,
@@ -21,14 +21,14 @@ export const getDefaultFormValues = (): FormData => ({
   },
   score: 0,
   mood: '',
-  memo: '',
+  memo: [{ label: 'メモ', value: '' }],
   activityType: [],
 });
 
 /**
  * 学習時間を秒数に変換
  */
-export const calculateDuration = (studyTime: FormData['study_time']): number => {
+export const calculateDuration = (studyTime: StudentFormData['study_time']): number => {
   return studyTime.hour * 3600 + studyTime.minutes * 60 + studyTime.seconds;
 };
 

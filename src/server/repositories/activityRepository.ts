@@ -5,6 +5,7 @@ import { DataAccessError } from '@/server/utils/errors';
 import { formatDate } from '@/server/utils/helpers';
 import { validateSheetExists } from '@/server/utils/validation';
 import type { LearningActivity, LearningActivityRequest } from '@/shared/types/activity';
+import type { MemoData } from '@/shared/types/memo';
 import type { Mood } from '@/shared/types/mood';
 import { LEARNING_ACTIVITY_SHEET_HEADERS, type SHEET_NAME } from '../utils/constants';
 import { createSheet, getAllRows, withLock } from './sheetUtils';
@@ -35,13 +36,36 @@ export function initActivitySheet(): GoogleAppsScript.Spreadsheet.Sheet {
 }
 
 /**
+ * Parse memo data from JSON string to MemoData array
+ * memoはSpreadsheetにはセル内にJSON文字列で保存されているのでそれをパースする
+ * @param memoString JSON string representation of memo data
+ * @returns Parsed memo data array or undefined
+ */
+function parseMemoData(memoString: string): MemoData[] | undefined {
+  if (!memoString || memoString.trim() === '') {
+    return undefined;
+  }
+
+  try {
+    const parsed = JSON.parse(memoString);
+    // Validate that it's an array of MemoData
+    if (Array.isArray(parsed)) {
+      return parsed as MemoData[];
+    }
+    return undefined;
+  } catch (error) {
+    console.warn('Failed to parse memo data:', error);
+    return undefined;
+  }
+}
+
+/**
  * Get all activity logs from the learning activity sheet
  * @returns Array of activity logs with user IDs
  */
 export function getAllActivityLogs(): (LearningActivity & { userId: string })[] {
   try {
     const rows = getAllRows('学習ログ');
-
     return rows.map((row) => ({
       userId: String(row[1]),
       activityDate: String(row[2]),
@@ -53,18 +77,11 @@ export function getAllActivityLogs(): (LearningActivity & { userId: string })[] 
             .split(',')
             .map((s) => s.trim())
         : [],
-      memo: row[7]
-        ? [
-            {
-              label: 'メモ（あとでちゃんと取得した値にする）',
-              placeholder: 'placeholder（あとでちゃんと取得した値にする）',
-              value: String(row[7]),
-            },
-          ]
-        : undefined,
+      memo: parseMemoData(String(row[7])),
     }));
   } catch (error) {
     const err = error as unknown as Error;
+    console.error(error);
     throw new DataAccessError('Failed to get activity logs', err.stack);
   }
 }
@@ -108,7 +125,8 @@ export function saveActivity(activity: LearningActivityRequest): { ok: boolean; 
         activity.duration,
         activity.mood,
         activity.activityType ? activity.activityType.join(', ') : '',
-        activity.memo,
+        // memoでーたは文字列として保存する。使用するときは使用する側の都合でparseする
+        JSON.stringify(activity.memo),
       ]);
 
       return { ok: true, message: 'Activity saved successfully' };

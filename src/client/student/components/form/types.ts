@@ -1,3 +1,4 @@
+import type { MemoData } from '@/shared/types/memo';
 import type { Mood } from '@/shared/types/mood';
 
 export interface FormData {
@@ -9,6 +10,6 @@ export interface FormData {
   };
   score: number;
   mood: Mood | '';
-  memo: string;
+  memo: MemoData[];
   activityType: string[];
 }

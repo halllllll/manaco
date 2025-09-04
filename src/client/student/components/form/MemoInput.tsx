@@ -1,13 +1,15 @@
+import type { Memo } from '@/shared/types/memo';
 import type { FC } from 'react';
 
 interface MemoInputProps {
   // biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)）
   field: any;
+  memoConfig: Memo;
+  index: number;
 }
 
-export const MemoInput: FC<MemoInputProps> = ({ field }) => {
-  const memoValue = typeof field.state.value === 'string' ? field.state.value : '';
-  console.log('MemoInput field:', field);
+export const MemoInput: FC<MemoInputProps> = ({ field, memoConfig }) => {
+  const memoValue = field.state.value?.value ?? '';
   return (
     <div className="form-control w-full mb-6">
       <label className="label" htmlFor={field.name}>
@@ -31,18 +33,18 @@ export const MemoInput: FC<MemoInputProps> = ({ field }) => {
             <title>{'comment'}</title>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
           </svg>
-          メモ
+          {memoConfig.label}
         </span>
       </label>
       <div>
         <textarea
           className="textarea textarea-bordered h-24 w-full"
-          placeholder="メモや感想"
+          placeholder={memoConfig.placeholder}
           name={field.name}
           id={field.name}
           value={memoValue}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            field.handleChange(e.target.value);
+            field.handleChange({ label: memoConfig.label, value: e.target.value });
           }}
         />
       </div>

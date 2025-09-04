@@ -12,7 +12,6 @@ import {
   ActivityTypeInput,
   DateInput,
   FormActions,
-  type FormSettings,
   MemoInput,
   MoodInput,
   ScoreInput,
@@ -26,6 +25,7 @@ import {
 import { useDashboard } from '@/api/dashboard/hooks';
 import { useGetUser } from '@/api/user/hook';
 import type { Mood } from '@/shared/types/mood';
+import type { FormSettings } from './form/types/FormTypes';
 
 export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
   // settings
@@ -43,10 +43,13 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
     showMemo: settingsData?.showMemo ?? false,
     scoreMin: settingsData?.scoreMin,
     scoreMax: settingsData?.scoreMax,
+    // 分岐が面倒なのでshowXXX のTFにかかわらず取得
     activityType:
       settingsData?.showActivity && settingsData?.activityItems
         ? settingsData.activityItems
         : undefined,
+    memoFields:
+      settingsData?.showMemo && settingsData?.memoFields ? settingsData.memoFields : undefined,
   };
 
   // dashboard (for update activity data)
@@ -103,7 +106,7 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
     },
   });
 
-  // カスタムフックでフィールドを取得（入れ子構造を解消）
+  // カスタムフックでフィールドを取得
   const fields = useFormFields(form);
 
   // モーダルを閉じる
@@ -193,13 +196,27 @@ export const FormModal: FC<ModalProps> = ({ isModalOpen, setIsModalOpen }) => {
                 </fields.ActivityTypeField>
               )}
 
-              {/* コメント */}
-              {formSettings.showMemo && (
-                <fields.MemoField name="memo">
-                  {/* biome-ignore lint/suspicious/noExplicitAny: TanStack FormのFieldApi型は複雑すぎるためanyを使用（Claude Sonnet 4 (Preview)） */}
-                  {(field: any) => <MemoInput field={field} />}
-                </fields.MemoField>
-              )}
+              {/* memo */}
+              {formSettings.showMemo &&
+                formSettings.memoFields &&
+                formSettings.memoFields
+                  .filter((memo) => memo.label.trim() !== '')
+                  .map((memoField, idx) => {
+                    return (
+                      <fields.MemoField
+                        name={`memo.${idx}`}
+                        key={`memo-${
+                          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                          idx
+                        }`}
+                      >
+                        {/* biome-ignore lint/suspicious/noExplicitAny: <explanation> */}
+                        {(field: any) => (
+                          <MemoInput field={field} memoConfig={memoField} index={idx} />
+                        )}
+                      </fields.MemoField>
+                    );
+                  })}
 
               {/* 送信ボタン */}
               <form.Subscribe

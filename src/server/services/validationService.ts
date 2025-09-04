@@ -5,6 +5,7 @@ import { initUserSheet } from '@/server/repositories/userRepository';
 import {
   ACTIVITY_LIST_SHEET_HEADERS,
   LEARNING_ACTIVITY_SHEET_HEADERS,
+  MEMO_LIST_SHEET_HEADERS,
   SETTINGS_SHEET_HEADERS,
   SETTINGS_SHEET_LABEL,
   type SHEET_NAME,
@@ -16,6 +17,7 @@ import {
 import { getAndValidateHeaders, validateSheetExists } from '@/server/utils/validation';
 
 import type { InitAppDTO, SpreadsheetValidateDTO } from '@/shared/types/dto';
+import { initMemoListSheet } from '../repositories/memoListRepository';
 
 /**
  * バリデーション結果を表す型
@@ -72,6 +74,7 @@ function createValidatorRegistry(): SheetValidatorEntry[] {
     createHeaderValidator('学習ログ', LEARNING_ACTIVITY_SHEET_HEADERS),
     createHeaderValidator('アプリ設定', SETTINGS_SHEET_HEADERS),
     createHeaderValidator('取り組みリスト', ACTIVITY_LIST_SHEET_HEADERS),
+    createHeaderValidator('自由記述欄リスト', MEMO_LIST_SHEET_HEADERS),
 
     // 設定シート特有のバリデーション
     createSettingsValidator('アプリ設定', SETTINGS_SHEET_LABEL),
@@ -171,20 +174,22 @@ export function initAppService(): InitAppDTO {
       const activitySheet = initActivitySheet();
       const settingsSheet = initSettingsSheet();
       const activityListSheet = initActivityListSheet();
+      const memoListSheet = initMemoListSheet();
 
       // Set the first row as frozen for all sheets (doing it here again to ensure consistency)
       userSheet.setFrozenRows(1);
       activitySheet.setFrozenRows(1);
       settingsSheet.setFrozenRows(1);
       activityListSheet.setFrozenRows(1);
+      memoListSheet.setFrozenRows(1);
 
+      ss.setActiveSheet(userSheet);
       // Log successful initialization
       console.info('All sheets initialized successfully');
     } finally {
       // Always delete the temporary sheet when done
       ss.deleteSheet(tempSheet);
     }
-
     return {
       success: true,
       data: null,

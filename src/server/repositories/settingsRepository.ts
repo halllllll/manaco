@@ -93,7 +93,7 @@ export function mapSettingsToAppSettings(settingsData: SettingsResult[]): AppSet
       case 'きもち表示':
         settings.showMood = Boolean(value);
         break;
-      case 'メモ表示':
+      case '自由記述欄表示':
         settings.showMemo = Boolean(value);
         break;
       case '秒表示':

@@ -24,7 +24,7 @@ export const mockTeachers: User[] = [
   },
 ];
 
-// クラスデータ（14クラスに増量）
+// クラスデータ（14クラス）
 export const mockClasses: ClassGroup[] = [
   { id: 'class-1', name: '1年1組', grade: 1 },
   { id: 'class-2', name: '1年2組', grade: 1 },
@@ -42,7 +42,7 @@ export const mockClasses: ClassGroup[] = [
   { id: 'class-14', name: '帰国子女クラス', grade: 0 },
 ];
 
-// 生徒データ（120名分に増量）
+// 生徒データ（120名）
 export const mockStudents: User[] = [
   // ... (Existing 80 students)
   { id: 'student-1', name: '佐藤 陽葵', belonging: 'class-1', role: 'student' },
@@ -125,8 +125,6 @@ export const mockStudents: User[] = [
   { id: 'student-78', name: '野口 航', belonging: 'class-8', role: 'student' },
   { id: 'student-79', name: '小山 栞', belonging: 'class-9', role: 'student' },
   { id: 'student-80', name: '今井 大雅', belonging: 'class-10', role: 'student' },
-
-  // 追加の40名
   { id: 'student-81', name: '藤井 美優', belonging: 'class-1', role: 'student' },
   { id: 'student-82', name: '岡田 大輝', belonging: 'class-2', role: 'student' },
   { id: 'student-83', name: '長田 結', belonging: 'class-3', role: 'student' },
@@ -171,207 +169,296 @@ export const mockStudents: User[] = [
   { id: 'student-120', name: 'Noah Martinez', belonging: 'class-14', role: 'student' },
 ];
 
-// 日付生成ヘルパー
-const d = (day: number) => `2025-06-${String(day).padStart(2, '0')}`;
-const m = (day: number) => `2025-05-${String(day).padStart(2, '0')}`;
-const a = (day: number) => `2025-04-${String(day).padStart(2, '0')}`;
+// 日付生成ヘルパー（ランダムに現時点の月と前2ヶ月分の日付を生成）
+const now = new Date();
+const currentYear = now.getFullYear();
+const currentMonth = now.getMonth(); // 0-based
 
-// 学習活動データ（ハードコード、大幅増量）
+/**
+ * ランダムに現時点の月と前2ヶ月分の日付を生成する関数
+ * @returns YYYY-MM-DD形式の日付文字列
+ */
+const generateRandomDate = (): string => {
+  // 月オフセットをランダムに選択（0: 現在の月, -1: 1ヶ月前, -2: 2ヶ月前）
+  const monthOffsets = [0, -1, -2];
+  const randomOffset = monthOffsets[Math.floor(Math.random() * monthOffsets.length)];
+
+  const targetDate = new Date(currentYear, currentMonth + randomOffset, 1);
+  const targetYear = targetDate.getFullYear();
+  const targetMonth = targetDate.getMonth() + 1; // 1-based
+
+  // 対象月の日数を計算（例: 2月は28/29日など）
+  const daysInMonth = new Date(targetYear, targetMonth, 0).getDate();
+  const randomDay = Math.floor(Math.random() * daysInMonth) + 1; // 1からdaysInMonthまで
+
+  return `${targetYear}-${String(targetMonth).padStart(2, '0')}-${String(randomDay).padStart(2, '0')}`;
+};
+
+// 学習活動データ
 export const mockActivities: Record<string, LearningActivity[]> = {
   // ... (Existing activities for students 1-80)
   'student-1': [
     {
-      activityDate: d(27),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 5400,
       score: 98,
       subject: '算数',
-      memo: '期末テストの復習。応用問題が解けた！',
+      memo: [{ label: '感想', value: '期末テストの復習。応用問題が解けた！' }],
       mood: 'happy',
     },
     {
-      activityDate: d(26),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 4800,
       score: 92,
       subject: '国語',
-      memo: '漢字の書き取りと、長文読解',
+      memo: [{ label: '感想', value: '漢字の書き取りと、長文読解' }],
     },
     {
-      activityDate: d(25),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 5000,
       score: 95,
       subject: '理科',
-      memo: '実験レポートの清書。',
+      memo: [{ label: '感想', value: '実験レポートの清書。' }],
     },
     {
-      activityDate: d(24),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 4500,
       score: 90,
       subject: '社会',
-      memo: '歴史の年号を暗記した。',
+      memo: [{ label: '感想', value: '歴史の年号を暗記した。' }],
     },
-    { activityDate: d(23), duration: 5200, score: 96, subject: '英語', memo: '新しい文法の予習。' },
     {
-      activityDate: d(22),
+      activityDate: generateRandomDate(), // Random date within 3 months
+      duration: 5200,
+      score: 96,
+      subject: '英語',
+      memo: [{ label: '感想', value: '新しい文法の予習。' }],
+    },
+    {
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 3600,
       score: 88,
       subject: '読書',
-      memo: '偉人の伝記を読んだ。',
+      memo: [{ label: '感想', value: '偉人の伝記を読んだ。' }],
     },
-    { activityDate: d(21), duration: 4000, score: 91, subject: 'プログラミング' },
-    { activityDate: d(20), duration: 4800, score: 93, subject: '算数' },
+    { activityDate: generateRandomDate(), duration: 4000, score: 91, subject: 'プログラミング' },
+    { activityDate: generateRandomDate(), duration: 4800, score: 93, subject: '算数' },
   ],
   'student-2': [
     {
-      activityDate: d(26),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 7200,
       score: 95,
       subject: '図画工作',
-      memo: 'コンクールの絵が完成！',
+      memo: [{ label: '感想', value: 'コンクールの絵が完成！' }],
       mood: 'happy',
     },
-    { activityDate: d(25), duration: 6800, score: 90, subject: '図画工作', memo: '背景の色塗り' },
-    { activityDate: d(20), duration: 2200, score: 80, subject: '算数' },
-    { activityDate: d(15), duration: 3000, score: 85, subject: '読書' },
-    { activityDate: m(30), duration: 1800, score: 75, subject: '国語', mood: 'normal' },
+    {
+      activityDate: generateRandomDate(), // Random date within 3 months
+      duration: 6800,
+      score: 90,
+      subject: '図画工作',
+      memo: [{ label: '感想', value: '背景の色塗り' }],
+    },
+    { activityDate: generateRandomDate(), duration: 2200, score: 80, subject: '算数' },
+    { activityDate: generateRandomDate(), duration: 3000, score: 85, subject: '読書' },
+    {
+      activityDate: generateRandomDate(),
+      duration: 1800,
+      score: 75,
+      subject: '国語',
+      mood: 'normal',
+    },
   ],
   'student-15': [
     {
-      activityDate: d(22),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 10800,
       score: 92,
       subject: '自主学習',
-      memo: '1週間の復習。苦手なところを重点的に。',
+      memo: [{ label: '感想', value: '1週間の復習。苦手なところを重点的に。' }],
     },
     {
-      activityDate: d(21),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 9000,
       score: 88,
       subject: 'プログラミング',
-      memo: '新しいゲーム作りに挑戦',
+      memo: [{ label: '感想', value: '新しいゲーム作りに挑戦' }],
     },
-    { activityDate: d(15), duration: 12000, score: 95, subject: '自主学習' },
-    { activityDate: d(8), duration: 9500, score: 90, subject: '自主学習' },
+    { activityDate: generateRandomDate(), duration: 12000, score: 95, subject: '自主学習' },
+    { activityDate: generateRandomDate(), duration: 9500, score: 90, subject: '自主学習' },
   ],
   'student-20': [
-    { activityDate: d(27), duration: 1500, score: 70, subject: '宿題', mood: 'tired' },
-    { activityDate: d(24), duration: 1800, score: 72, subject: '宿題' },
-    { activityDate: d(18), duration: 1300, score: 65, subject: '宿題', mood: 'hard' },
-    { activityDate: d(10), duration: 1200, score: 60, subject: '宿題' },
+    {
+      activityDate: generateRandomDate(),
+      duration: 1500,
+      score: 70,
+      subject: '宿題',
+      mood: 'tired',
+    },
+    { activityDate: generateRandomDate(), duration: 1800, score: 72, subject: '宿題' },
+    {
+      activityDate: generateRandomDate(),
+      duration: 1300,
+      score: 65,
+      subject: '宿題',
+      mood: 'hard',
+    },
+    { activityDate: generateRandomDate(), duration: 1200, score: 60, subject: '宿題' },
   ],
   'student-33': [
-    { activityDate: d(27), duration: 4000, score: 99, subject: '英語', memo: 'オンライン英会話' },
     {
-      activityDate: d(27),
+      activityDate: generateRandomDate(), // Random date within 3 months
+      duration: 4000,
+      score: 99,
+      subject: '英語',
+      memo: [{ label: '感想', value: 'オンライン英会話' }],
+    },
+    {
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 6000,
       score: 95,
       subject: 'プログラミング',
-      memo: '作ったアプリのデバッグ',
+      memo: [{ label: '感想', value: '作ったアプリのデバッグ' }],
     },
-    { activityDate: d(26), duration: 5500, score: 92, subject: 'プログラミング' },
-    { activityDate: d(25), duration: 3800, score: 98, subject: '英語' },
-    { activityDate: d(24), duration: 5800, score: 94, subject: 'プログラミング' },
+    { activityDate: generateRandomDate(), duration: 5500, score: 92, subject: 'プログラミング' },
+    { activityDate: generateRandomDate(), duration: 3800, score: 98, subject: '英語' }, // Changed to 1 month ago
+    { activityDate: generateRandomDate(), duration: 5800, score: 94, subject: 'プログラミング' },
   ],
   'student-45': [
     {
-      activityDate: d(27),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 1200,
       score: 55,
       subject: '算数',
-      memo: '全然集中できなかった',
+      memo: [{ label: '感想', value: '全然集中できなかった' }],
       mood: 'hard',
     },
-    { activityDate: d(26), duration: 1000, score: 52, subject: '国語', mood: 'tired' },
-    { activityDate: d(25), duration: 1500, score: 60, subject: '理科' },
+    {
+      activityDate: generateRandomDate(),
+      duration: 1000,
+      score: 52,
+      subject: '国語',
+      mood: 'tired',
+    },
+    { activityDate: generateRandomDate(), duration: 1500, score: 60, subject: '理科' }, // Changed to 1 month ago
   ],
   'student-50': [],
   'student-62': [
     {
-      activityDate: d(26),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 3000,
       score: 100,
       subject: '音楽',
-      memo: '合唱コンクールの練習',
+      memo: [{ label: '感想', value: '合唱コンクールの練習' }],
     },
     {
-      activityDate: d(24),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 3600,
       score: 100,
       subject: '体育',
       mood: 'happy',
-      memo: 'サッカーの試合で活躍！',
+      memo: [{ label: '感想', value: 'サッカーの試合で活躍！' }],
     },
-    { activityDate: d(19), duration: 2800, score: 100, subject: '音楽' },
-    { activityDate: d(17), duration: 4000, score: 100, subject: '体育' },
+    { activityDate: generateRandomDate(), duration: 2800, score: 100, subject: '音楽' }, // Changed to 2 months ago
+    { activityDate: generateRandomDate(), duration: 4000, score: 100, subject: '体育' },
   ],
   'student-70': [
-    { activityDate: d(27), duration: 2500, score: 85, subject: '社会' },
-    { activityDate: d(26), duration: 2800, score: 88, subject: '理科' },
-    { activityDate: d(25), duration: 2600, score: 82, subject: '国語' },
-    { activityDate: d(24), duration: 3000, score: 90, subject: '算数' },
-    { activityDate: d(23), duration: 2700, score: 86, subject: '英語' },
-    { activityDate: d(22), duration: 2400, score: 80, subject: '宿題' },
+    { activityDate: generateRandomDate(), duration: 2500, score: 85, subject: '社会' },
+    { activityDate: generateRandomDate(), duration: 2800, score: 88, subject: '理科' },
+    { activityDate: generateRandomDate(), duration: 2600, score: 82, subject: '国語' },
+    { activityDate: generateRandomDate(), duration: 3000, score: 90, subject: '算数' },
+    { activityDate: generateRandomDate(), duration: 2700, score: 86, subject: '英語' },
+    { activityDate: generateRandomDate(), duration: 2400, score: 80, subject: '宿題' },
   ],
   'student-80': [
-    { activityDate: d(27), duration: 2000, score: 78, subject: '自主学習', memo: '少しずつ頑張る' },
-    { activityDate: d(26), duration: 1800, score: 75, subject: '自主学習' },
-    { activityDate: m(20), duration: 900, score: 60, subject: '宿題', mood: 'tired' },
-    { activityDate: m(19), duration: 1000, score: 62, subject: '宿題', mood: 'tired' },
+    {
+      activityDate: generateRandomDate(), // Random date within 3 months
+      duration: 2000,
+      score: 78,
+      subject: '自主学習',
+      memo: [{ label: '感想', value: '少しずつ頑張る' }],
+    },
+    { activityDate: generateRandomDate(), duration: 1800, score: 75, subject: '自主学習' },
+    {
+      activityDate: generateRandomDate(),
+      duration: 900,
+      score: 60,
+      subject: '宿題',
+      mood: 'tired',
+    },
+    {
+      activityDate: generateRandomDate(),
+      duration: 1000,
+      score: 62,
+      subject: '宿題',
+      mood: 'tired',
+    },
   ],
 
-  // 追加生徒の活動データ
-  // student-85: 読書家
   'student-85': [
     {
-      activityDate: d(27),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 5000,
       score: 100,
       subject: '読書',
-      memo: 'シリーズ最新刊を読破！',
+      memo: [{ label: '感想', value: 'シリーズ最新刊を読破！' }],
     },
-    { activityDate: d(26), duration: 4800, score: 100, subject: '読書' },
-    { activityDate: d(25), duration: 5200, score: 100, subject: '読書' },
-    { activityDate: d(20), duration: 1800, score: 80, subject: '国語' },
+    { activityDate: generateRandomDate(), duration: 4800, score: 100, subject: '読書' },
+    { activityDate: generateRandomDate(), duration: 5200, score: 100, subject: '読書' }, // Changed to 1 month ago
+    { activityDate: generateRandomDate(), duration: 1800, score: 80, subject: '国語' },
   ],
-  // student-92: 宿題しかしない
+
   'student-92': [
-    { activityDate: d(27), duration: 1800, score: 70, subject: '宿題' },
-    { activityDate: d(26), duration: 2000, score: 75, subject: '宿題' },
-    { activityDate: d(25), duration: 1900, score: 72, subject: '宿題' },
+    { activityDate: generateRandomDate(), duration: 1800, score: 70, subject: '宿題' },
+    { activityDate: generateRandomDate(), duration: 2000, score: 75, subject: '宿題' },
+    { activityDate: generateRandomDate(), duration: 1900, score: 72, subject: '宿題' },
   ],
-  // student-100: 4月に頑張りすぎて燃え尽きた
+
   'student-100': [
-    { activityDate: a(30), duration: 4000, score: 90, subject: '自主学習' },
-    { activityDate: a(29), duration: 3800, score: 88, subject: '自主学習' },
-    { activityDate: a(28), duration: 4200, score: 92, subject: '自主学習' },
+    { activityDate: generateRandomDate(), duration: 4000, score: 90, subject: '自主学習' },
+    { activityDate: generateRandomDate(), duration: 3800, score: 88, subject: '自主学習' },
+    { activityDate: generateRandomDate(), duration: 4200, score: 92, subject: '自主学習' },
   ],
-  // student-111: 特別支援クラスの生徒（学習時間は短め、内容は基礎的）
+
   'student-111': [
     {
-      activityDate: d(27),
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 900,
       score: 80,
       subject: '漢字練習',
-      memo: 'ゆっくり丁寧に書いた',
+      memo: [{ label: '感想', value: 'ゆっくり丁寧に書いた' }],
     },
-    { activityDate: d(26), duration: 1000, score: 85, subject: '計算ドリル' },
-    { activityDate: d(25), duration: 800, score: 78, subject: '音読' },
+    { activityDate: generateRandomDate(), duration: 1000, score: 85, subject: '計算ドリル' },
+    { activityDate: generateRandomDate(), duration: 800, score: 78, subject: '音読' }, // Changed to 1 month ago
   ],
-  // student-114: 帰国子女（英語のスコアが高い）
   'student-114': [
-    { activityDate: d(27), duration: 3600, score: 100, subject: '英語', memo: 'Native speaker' },
     {
-      activityDate: d(26),
+      activityDate: generateRandomDate(), // Random date within 3 months
+      duration: 3600,
+      score: 100,
+      subject: '英語',
+      memo: [{ label: '感想', value: 'Native speaker' }],
+    },
+    {
+      activityDate: generateRandomDate(), // Random date within 3 months
       duration: 1800,
       score: 70,
       subject: '国語',
-      memo: '漢字が難しい',
+      memo: [{ label: '感想', value: '漢字が難しい' }],
       mood: 'hard',
     },
-    { activityDate: d(25), duration: 2000, score: 75, subject: '社会' },
+    { activityDate: generateRandomDate(), duration: 2000, score: 75, subject: '社会' }, // Changed to 2 months ago
   ],
   // student-120: 最近入ってきた転校生
   'student-120': [
-    { activityDate: d(27), duration: 2200, score: 80, subject: '自主学習', memo: '早く慣れたい' },
+    {
+      activityDate: generateRandomDate(), // Random date within 3 months
+      duration: 2200,
+      score: 80,
+      subject: '自主学習',
+      memo: [{ label: '感想', value: '早く慣れたい' }],
+    },
   ],
 };
 

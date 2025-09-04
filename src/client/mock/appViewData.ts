@@ -12,6 +12,10 @@ export const mockAppSettingsData: Record<string, AppSettingResponseData> = {
     showSecond: false,
     showStudyTime: false,
     showActivity: false,
+    memoFields: [
+      { label: 'メモ1', placeholder: 'ここにメモを入力' },
+      { label: 'メモ2', placeholder: '追加のメモ' },
+    ],
   },
   '2': {
     showScore: true,
@@ -57,6 +61,7 @@ export const mockAppSettingsData: Record<string, AppSettingResponseData> = {
       { name: '試験勉強', color: '#F1C40F' },
       { name: '読書', color: '#9B59B6' },
     ],
+    memoFields: [{ label: '授業メモ', placeholder: '授業の感想' }],
   },
   '4': {
     showScore: false,
@@ -67,6 +72,7 @@ export const mockAppSettingsData: Record<string, AppSettingResponseData> = {
     showSecond: false,
     showStudyTime: true,
     showActivity: false,
+    memoFields: [{ label: '日記', placeholder: '今日の出来事' }],
   },
 };
 

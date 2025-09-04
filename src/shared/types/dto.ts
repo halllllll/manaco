@@ -1,6 +1,7 @@
 import type { ValidationResult } from '@/server/utils/validation';
 import type { UserWithActivities } from '@/shared/types/user';
 import type { ActivityItem } from './activity';
+import type { Memo } from './memo';
 import type { AppSettings } from './settings';
 import type { User } from './user';
 
@@ -25,12 +26,10 @@ export type UserDTO = BaseResponse<User | null>;
 
 export type InitAppDTO = BaseResponse<null>;
 
-export type AppSettingResponseData =
-  | (AppSettings & {
-      showActivity: true;
-      activityItems: ActivityItem[];
-    })
-  | (AppSettings & { showActivity: false });
+export type AppSettingResponseData = AppSettings & {
+  activityItems?: ActivityItem[];
+  memoFields?: Memo[];
+};
 
 export type AppSettingResponse = BaseResponse<AppSettingResponseData>;
 
@@ -38,3 +37,5 @@ export type AppSettingResponse = BaseResponse<AppSettingResponseData>;
 export type UserActivityDTO = BaseResponse<null>;
 
 export type ActivityItemDTO = BaseResponse<ActivityItem[]>;
+
+export type MemoListDTO = BaseResponse<Memo[]>;

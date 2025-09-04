@@ -1,4 +1,5 @@
 import type { ActivityItem } from '@/shared/types/activity';
+import type { Memo, MemoData } from '@/shared/types/memo';
 import type { Mood } from '@/shared/types/mood';
 
 export interface StudyTime {
@@ -7,12 +8,12 @@ export interface StudyTime {
   seconds: number;
 }
 
-export interface FormData {
+export interface StudentFormData {
   'target-date-btn': string;
   study_time: StudyTime;
   score: number;
   mood: Mood | '';
-  memo: string;
+  memo: MemoData[];
   activityType: string[];
 }
 
@@ -25,4 +26,5 @@ export interface FormSettings {
   scoreMin?: number;
   scoreMax?: number;
   activityType?: ActivityItem[];
+  memoFields?: Memo[];
 }

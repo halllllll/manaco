@@ -2,6 +2,7 @@
  * API handler for settings-related endpoints
  */
 import { getActivityListService } from '@/server/services/activityListService';
+import { getMemoListService } from '@/server/services/memoService';
 import { getSettingsService } from '@/server/services/settingsService';
 import type { AppSettingResponse } from '@/shared/types/dto';
 
@@ -19,31 +20,26 @@ export function getSettingsHandler(): AppSettingResponse {
     };
   }
 
-  if (settings.success && settings.data.showActivity) {
-    const activityItems = getActivityListService();
-    if (!activityItems.success) {
-      // エラー
-      return {
-        success: false,
-        message: activityItems.message || 'Failed to retrieve activity items',
-      };
-    }
-    // 空じゃない場合のみ許容
-    if (activityItems.success && activityItems.data.length > 0) {
-      return {
-        success: true,
-        data: {
-          ...settings.data,
-          activityItems: activityItems.data,
-        },
-      };
-    }
+  // Descriminiated Unionsでの分岐が面倒なので、showXXXにかかわらず、とりあえず取得する。showXXXにかかわらず、それに付随するデータは返す。存在しない場合は空配列になる。クライアント側で表示二利用するときはよしなにやる
+  // TODO: 並行で取得
+  const activityItems = getActivityListService();
+  const memos = getMemoListService();
+  if (activityItems.success && memos.success) {
+    return {
+      success: true,
+      data: {
+        ...settings.data,
+        showActivity: settings.data.showActivity,
+        activityItems: activityItems.data,
+        showMemo: settings.data.showMemo,
+        memoFields: memos.data,
+      },
+    };
   }
+
   return {
-    success: true,
-    data: {
-      ...settings.data,
-      showActivity: false,
-    },
+    success: false,
+    message: `${!activityItems.success && `${activityItems.message} - ${activityItems.details}`}
+      ${!memos.success && `\n${memos.message} - ${memos.details}`}`,
   };
 }
