@@ -1,11 +1,7 @@
 /**
  * Repository layer for activity sheet initialization
  */
-import {
-  ACTIVITY_LIST_SHEET_HEADERS,
-  // ACTIVITY_LIST_SHEET_NAME,
-  DefaultActivityList,
-} from '@/server/utils/constants';
+import { ACTIVITY_LIST_SHEET_HEADERS, DefaultActivityList } from '@/server/utils/constants';
 import { DataAccessError } from '@/server/utils/errors';
 import type { ActivityItem } from '@/shared/types/activity';
 import { createSheet, getAllDataRange } from './sheetUtils';
@@ -44,6 +40,7 @@ export function initActivityListSheet(): GoogleAppsScript.Spreadsheet.Sheet {
 
 export function getActivityItems(): ActivityItem[] {
   const dataRange = getAllDataRange('取り組みリスト');
+  // セルの背景色を取得して文字列として扱う
   const backgrounds = dataRange.getBackgrounds().slice(1);
   const values = dataRange.getValues().slice(1); // Skip header row
 

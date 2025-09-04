@@ -9,7 +9,7 @@ export const useDashboard = () => {
     API_ENDPOINTS.DASHBOARD,
     DashboardAPI.getDashboard,
   );
-  // const [_, setActivityData] = useState<LearningActivity[]>(data?.activities || []);
+
   const updateActivities = (newActivity: LearningActivity) => {
     if (!data) return;
     mutate(

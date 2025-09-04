@@ -14,7 +14,6 @@ import { validateSheetExists } from '@/server/utils/validation';
  */
 export function getAllRows(sheetName: SHEET_NAME, includeHeader = false): unknown[][] {
   const { isExist, sheet } = validateSheetExists(sheetName);
-  console.log(`sheet name? ${sheetName}`);
   if (!isExist) {
     throw new DataAccessError(`Sheet "${sheetName}" does not exist.`);
   }
@@ -51,6 +50,7 @@ export function getAllDataRange(sheetName: SHEET_NAME): GoogleAppsScript.Spreads
   try {
     return sheet.getDataRange();
   } catch (error) {
+    console.error(error);
     throw new DataAccessError(`Failed to get range from sheet "${sheetName}"`, { cause: error });
   }
 }
@@ -70,6 +70,7 @@ export function appendRow(sheetName: SHEET_NAME, rowData: unknown[]): void {
   try {
     sheet.appendRow(rowData);
   } catch (error) {
+    console.error(error);
     throw new DataAccessError(`Failed to append row to sheet "${sheetName}"`, { cause: error });
   }
 }

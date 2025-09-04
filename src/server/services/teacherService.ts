@@ -76,8 +76,6 @@ export function getTeacherDashboardService(): TeacherDashboardData {
     activityHeatmap,
   };
 
-  console.info('Server: getTeacherDashboardService result:', JSON.stringify(result));
-
   return result;
 }
 

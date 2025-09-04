@@ -94,62 +94,6 @@ const AppSettingSheetValidationTest = () => {
   if (result3.isValid) {
     throw new Error(result3.messages.join('\n'));
   }
-
-  // console.info('設定項目が正しい');
-  // const resutl4 = validateSettingSheetItems(SETTINGS_SHEET_NAME, [...SETTINGS_SHEET_LABEL]);
-  // console.info(resutl4);
-  // if (!resutl4.isValid) {
-  //   throw new Error(resutl4.messages.join('\n'));
-  // }
-  // console.info('設定項目が異なる');
-  // const result5 = validateSettingSheetItems(SETTINGS_SHEET_NAME, [
-  //   {
-  //     rowAt: 2,
-  //     name: '点数下限',
-  //     type: 'number',
-  //   },
-  //   {
-  //     rowAt: 3,
-  //     name: '点数上限',
-  //     type: 'number',
-  //   },
-  //   {
-  //     rowAt: 5,
-  //     name: 'きもち表示',
-  //     type: 'boolean',
-  //   },
-  //   {
-  //     rowAt: 6,
-  //     name: 'メモ表示',
-  //     type: 'boolean',
-  //   },
-  //   {
-  //     rowAt: 7,
-  //     name: 'きもち表示',
-  //     type: 'boolean',
-  //   },
-  // ]);
-  // console.info(result5);
-  // if (result5.isValid) {
-  //   throw new Error(result5.messages.join('\n'));
-  // }
-  // console.info('設定項目の値が異なる');
-  // const result6 = validateSettingSheetItems(SETTINGS_SHEET_NAME, [
-  //   {
-  //     rowAt: 2,
-  //     name: '点数下限',
-  //     type: 'number',
-  //   },
-  //   {
-  //     rowAt: 3,
-  //     name: '点数上限',
-  //     type: 'number',
-  //   },
-  // ]);
-  // console.info(result6);
-  // if (result6.isValid) {
-  //   throw new Error(result6.messages.join('\n'));
-  // }
 };
 export {
   AppSettingSheetValidationTest,
