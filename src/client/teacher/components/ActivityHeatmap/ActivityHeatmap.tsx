@@ -1,4 +1,5 @@
 import type { User } from '@/shared/types/user';
+import HolidayJp from '@holiday-jp/holiday_jp';
 import {
   createColumnHelper,
   flexRender,
@@ -6,6 +7,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { format } from 'date-fns';
 import type { FC } from 'react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { type HeatmapDay, useHeatmapData } from './useHeatmapData';
@@ -21,6 +23,59 @@ const columnHelper = createColumnHelper<User & { activities: Record<string, bool
 // デフォルトの列幅設定
 const DEFAULT_STUDENT_NAME_WIDTH = 200;
 const DEFAULT_DATE_COLUMN_WIDTH = 80;
+
+// 日付の種別（平日/土日/祝日）を判定する関数
+const getDateType = (dateStr: string) => {
+  try {
+    const date = new Date(dateStr);
+
+    // 祝日判定
+    if (HolidayJp.isHoliday(date)) {
+      return 'holiday';
+    }
+
+    // 日曜日判定（getDay()で0が日曜日）
+    if (date.getDay() === 0) {
+      return 'sunday';
+    }
+
+    // 土曜日判定（getDay()で6が土曜日）
+    if (date.getDay() === 6) {
+      return 'saturday';
+    }
+
+    return 'weekday';
+  } catch (error) {
+    console.warn('Date parsing error:', error);
+    return 'weekday';
+  }
+};
+
+// 日付タイプに応じたスタイルを取得する関数
+const getDateHeaderStyle = (dateType: string) => {
+  switch (dateType) {
+    case 'holiday':
+    case 'sunday':
+      return 'bg-red-50 text-red-700 border-red-200';
+    case 'saturday':
+      return 'bg-blue-50 text-blue-700 border-blue-200';
+    default:
+      return 'bg-base-100 text-base-content border-base-300';
+  }
+};
+
+// セルの背景色を取得する関数
+const getDateCellStyle = (dateType: string) => {
+  switch (dateType) {
+    case 'holiday':
+    case 'sunday':
+      return 'bg-red-50/30';
+    case 'saturday':
+      return 'bg-blue-50/30';
+    default:
+      return 'bg-base-100';
+  }
+};
 
 /**
  * 活動ヒートマップコンポーネント
@@ -121,6 +176,34 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
     return Math.max(80, containerWidth * 0.08);
   }, [containerWidth]);
 
+  // 日付情報を事前計算
+  const dateColumns = useMemo(() => {
+    return (heatmapData || [])
+      .slice()
+      .sort((a, b) => {
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      })
+      .map((day: HeatmapDay) => {
+        const formatDate = (dateStr: string) => {
+          try {
+            if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              return format(new Date(dateStr), 'MM/dd');
+            }
+            return dateStr.replace(/[月日]/g, '');
+          } catch (error) {
+            console.warn('Date format error:', error);
+            return dateStr;
+          }
+        };
+
+        return {
+          ...day,
+          formattedDate: formatDate(day.date),
+          dateType: getDateType(day.date),
+        };
+      });
+  }, [heatmapData]);
+
   // React Tableのカラム定義
   const columns = useMemo(
     () => [
@@ -138,46 +221,42 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
         size: STUDENT_NAME_WIDTH,
         minSize: DEFAULT_STUDENT_NAME_WIDTH,
       }),
-      ...(heatmapData || [])
-        .slice()
-        // .reverse() を削除し、代わりに日付でソート
-        .sort((a, b) => {
-          // 日付文字列をDate型に変換してソート（昇順 - 古い日付から新しい日付へ）
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        })
-        .map((day: HeatmapDay) =>
-          columnHelper.display({
-            id: day.date,
-            header: () => (
-              <div className="text-center whitespace-nowrap p-2 w-full">
-                {/* スマホ表示では短い日付表示 */}
-                <span className="sm:hidden">{day.date.replace(/[月日]/g, '')}</span>
-                <span className="hidden sm:inline">{day.date}</span>
-              </div>
-            ),
-            cell: (info) => {
-              const hasActivity = day.activities[info.row.original.id] || false;
-              return (
-                <div className="text-center p-2 w-full">
-                  <div
-                    className={`w-6 h-6 sm:w-8 sm:h-8 mx-auto rounded-full flex items-center justify-center
+      ...dateColumns.map((dayInfo) => {
+        const headerStyle = getDateHeaderStyle(dayInfo.dateType);
+
+        return columnHelper.display({
+          id: dayInfo.date,
+          header: () => (
+            <div className={`text-center whitespace-nowrap p-2 w-full border-r ${headerStyle}`}>
+              {/* スマホ表示では短い日付表示 */}
+              <span className="sm:hidden">{dayInfo.formattedDate}</span>
+              <span className="hidden sm:inline">{dayInfo.formattedDate}</span>
+            </div>
+          ),
+          cell: (info) => {
+            const hasActivity = dayInfo.activities[info.row.original.id] || false;
+            const cellBgStyle = getDateCellStyle(dayInfo.dateType);
+            return (
+              <div className={`text-center p-2 w-full ${cellBgStyle}`}>
+                <div
+                  className={`w-6 h-6 sm:w-8 sm:h-8 mx-auto rounded-full flex items-center justify-center
                   ${
                     hasActivity
                       ? 'bg-primary/20 text-primary-content'
                       : 'bg-base-200 text-base-content/30'
                   }`}
-                  >
-                    {hasActivity ? '○' : '−'}
-                  </div>
+                >
+                  {hasActivity ? '○' : '−'}
                 </div>
-              );
-            },
-            size: DATE_COLUMN_WIDTH,
-            minSize: DEFAULT_DATE_COLUMN_WIDTH,
-          }),
-        ),
+              </div>
+            );
+          },
+          size: DATE_COLUMN_WIDTH,
+          minSize: DEFAULT_DATE_COLUMN_WIDTH,
+        });
+      }),
     ],
-    [heatmapData, STUDENT_NAME_WIDTH, DATE_COLUMN_WIDTH],
+    [dateColumns, STUDENT_NAME_WIDTH, DATE_COLUMN_WIDTH],
   );
 
   const table = useReactTable({
@@ -309,7 +388,6 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                 height: `${rowVirtualizer.getTotalSize()}px`,
                 width: `${Math.max(actualTableWidth, containerWidth)}px`,
                 minWidth: '100%',
-                // width: `${totalTableWidth}px`, // Explicitly set tbody width
               }}
             >
               {rowVirtualizer.getVirtualItems().map((virtualRow) => {
