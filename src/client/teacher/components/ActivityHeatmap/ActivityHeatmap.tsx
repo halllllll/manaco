@@ -226,12 +226,13 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
 
     const handleScroll = () => {
       if (headerRef.current && bodyRef.current) {
+        // ヘッダーコンテナ全体を同期（生徒名列はstickyで固定される）
         headerRef.current.scrollLeft = bodyRef.current.scrollLeft;
       }
     };
 
     const bodyElement = bodyRef.current;
-    bodyElement.addEventListener('scroll', handleScroll);
+    bodyElement.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       bodyElement.removeEventListener('scroll', handleScroll);
@@ -297,21 +298,24 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
         </div>
 
         {/* レスポンシブ対応のテーブル構造 */}
-        <div className="w-full flex flex-col" ref={containerRef}>
-          {/* ヘッダー部分 - 固定 */}
+        <div className="w-full flex flex-col border border-base-300 rounded-lg overflow-hidden" ref={containerRef}>
+          {/* ヘッダー部分 - スクロール同期 */}
           <div
             ref={headerRef}
-            className="w-full bg-base-100 z-10 sticky top-0 border-b border-base-300"
+            className="w-full bg-base-100 border-b border-base-300 sticky top-0 z-10 scrollbar-none"
             style={{
-              overflow: 'hidden',
-              position: 'sticky',
-              top: 0,
-              zIndex: 10,
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
             }}
           >
             <div
               className="flex"
-              style={{ width: `${Math.max(actualTableWidth, containerWidth)}px`, minWidth: '100%' }}
+              style={{ 
+                width: `${Math.max(actualTableWidth, containerWidth)}px`, 
+                minWidth: '100%'
+              }}
             >
               {headerGroup.headers.map((header) => (
                 <div
@@ -339,6 +343,7 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
               maxHeight: 'calc(100vh - 350px)',
               minHeight: containerWidth < 640 ? '300px' : '400px',
               position: 'relative',
+              scrollbarGutter: 'stable'
             }}
           >
             <div
