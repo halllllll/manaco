@@ -1,5 +1,5 @@
 import type { User } from '@/shared/types/user';
-import HolidayJp from '@holiday-jp/holiday_jp';
+import { isHoliday } from '@holiday-jp/holiday_jp';
 import {
   createColumnHelper,
   flexRender,
@@ -7,7 +7,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { format } from 'date-fns';
+import { format, isSaturday, isSunday, parseISO } from 'date-fns';
 import type { FC } from 'react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { type HeatmapDay, useHeatmapData } from './useHeatmapData';
@@ -24,62 +24,9 @@ const columnHelper = createColumnHelper<User & { activities: Record<string, bool
 const DEFAULT_STUDENT_NAME_WIDTH = 200;
 const DEFAULT_DATE_COLUMN_WIDTH = 80;
 
-// 日付の種別（平日/土日/祝日）を判定する関数
-const getDateType = (dateStr: string) => {
-  try {
-    const date = new Date(dateStr);
-
-    // 祝日判定
-    if (HolidayJp.isHoliday(date)) {
-      return 'holiday';
-    }
-
-    // 日曜日判定（getDay()で0が日曜日）
-    if (date.getDay() === 0) {
-      return 'sunday';
-    }
-
-    // 土曜日判定（getDay()で6が土曜日）
-    if (date.getDay() === 6) {
-      return 'saturday';
-    }
-
-    return 'weekday';
-  } catch (error) {
-    console.warn('Date parsing error:', error);
-    return 'weekday';
-  }
-};
-
-// 日付タイプに応じたスタイルを取得する関数
-const getDateHeaderStyle = (dateType: string) => {
-  switch (dateType) {
-    case 'holiday':
-    case 'sunday':
-      return 'bg-red-50 text-red-700 border-red-200';
-    case 'saturday':
-      return 'bg-blue-50 text-blue-700 border-blue-200';
-    default:
-      return 'bg-base-100 text-base-content border-base-300';
-  }
-};
-
-// セルの背景色を取得する関数
-const getDateCellStyle = (dateType: string) => {
-  switch (dateType) {
-    case 'holiday':
-    case 'sunday':
-      return 'bg-red-50/30';
-    case 'saturday':
-      return 'bg-blue-50/30';
-    default:
-      return 'bg-base-100';
-  }
-};
-
 /**
  * 活動ヒートマップコンポーネント
- * 直近10日間の生徒の学習活動の有無を表示する
+ * 直近14日間の生徒の学習活動の有無を表示する
  */
 export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onStudentSelect }) => {
   // ヒートマップデータを取得（カスタムフック）
@@ -176,42 +123,40 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
     return Math.max(80, containerWidth * 0.08);
   }, [containerWidth]);
 
-  // 日付情報を事前計算
-  const dateColumns = useMemo(() => {
-    return (heatmapData || [])
-      .slice()
-      .sort((a, b) => {
-        return new Date(a.date).getTime() - new Date(b.date).getTime();
-      })
-      .map((day: HeatmapDay) => {
-        const formatDate = (dateStr: string) => {
-          try {
-            if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-              return format(new Date(dateStr), 'MM/dd');
-            }
-            return dateStr.replace(/[月日]/g, '');
-          } catch (error) {
-            console.warn('Date format error:', error);
-            return dateStr;
-          }
-        };
+  // 日付から表示形式と背景色を決定するヘルパー関数
+  const getDateInfo = useMemo(() => {
+    return (dateStr: string) => {
+      // yyyy-MM-dd形式の文字列から日付を解析
+      const date = parseISO(dateStr);
+      const formattedDate = format(date, 'MM/dd');
 
-        return {
-          ...day,
-          formattedDate: formatDate(day.date),
-          dateType: getDateType(day.date),
-        };
-      });
-  }, [heatmapData]);
+      let bgColorClass = '';
+
+      // 祝日チェック（日本の祝日）
+      if (isHoliday(date)) {
+        bgColorClass = 'bg-pink-50'; // 薄い桃色
+      } else if (isSunday(date)) {
+        bgColorClass = 'bg-pink-50'; // 薄い桃色
+      } else if (isSaturday(date)) {
+        bgColorClass = 'bg-sky-50'; // 薄い水色
+      }
+
+      return { formattedDate, bgColorClass };
+    };
+  }, []);
 
   // React Tableのカラム定義
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
         id: 'studentName',
-        header: () => <div className="sticky left-0 bg-base-100 z-10 p-2 w-full">生徒名</div>,
+        header: () => (
+          <div className="sticky left-0 bg-base-100 z-30 p-2 w-full border-r border-base-300 shadow-lg">
+            生徒名
+          </div>
+        ),
         cell: (info) => (
-          <div className="sticky left-0 bg-base-100 z-10 font-medium p-2 w-full">
+          <div className="sticky left-0 z-20 font-medium p-2 w-full h-full border-r border-base-300 shadow-lg bg-base-100 group-hover:!bg-base-200 group-focus:!bg-base-200">
             {info.getValue()}
             <span className="text-xs text-gray-500 ml-2 hidden sm:inline">
               {info.row.original.belonging || '未設定'}
@@ -221,42 +166,47 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
         size: STUDENT_NAME_WIDTH,
         minSize: DEFAULT_STUDENT_NAME_WIDTH,
       }),
-      ...dateColumns.map((dayInfo) => {
-        const headerStyle = getDateHeaderStyle(dayInfo.dateType);
-
-        return columnHelper.display({
-          id: dayInfo.date,
-          header: () => (
-            <div className={`text-center whitespace-nowrap p-2 w-full border-r ${headerStyle}`}>
-              {/* スマホ表示では短い日付表示 */}
-              <span className="sm:hidden">{dayInfo.formattedDate}</span>
-              <span className="hidden sm:inline">{dayInfo.formattedDate}</span>
-            </div>
-          ),
-          cell: (info) => {
-            const hasActivity = dayInfo.activities[info.row.original.id] || false;
-            const cellBgStyle = getDateCellStyle(dayInfo.dateType);
-            return (
-              <div className={`text-center p-2 w-full ${cellBgStyle}`}>
-                <div
-                  className={`w-6 h-6 sm:w-8 sm:h-8 mx-auto rounded-full flex items-center justify-center
+      ...(heatmapData || [])
+        .slice()
+        // .reverse() を削除し、代わりに日付でソート
+        .sort((a, b) => {
+          // 日付文字列をDate型に変換してソート（昇順 - 古い日付から新しい日付へ）
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        })
+        .map((day: HeatmapDay) => {
+          const { formattedDate, bgColorClass } = getDateInfo(day.date);
+          return columnHelper.display({
+            id: day.date,
+            header: () => (
+              <div className={`text-center whitespace-nowrap p-2 w-full ${bgColorClass}`}>
+                {/* スマホ表示では短い日付表示 */}
+                <span className="sm:hidden">{formattedDate.replace('/', '')}</span>
+                <span className="hidden sm:inline">{formattedDate}</span>
+              </div>
+            ),
+            cell: (info) => {
+              const hasActivity = day.activities[info.row.original.id] || false;
+              return (
+                <div className={`text-center p-2 w-full ${bgColorClass}`}>
+                  <div
+                    className={`w-6 h-6 sm:w-8 sm:h-8 mx-auto rounded-full flex items-center justify-center
                   ${
                     hasActivity
                       ? 'bg-primary/20 text-primary-content'
                       : 'bg-base-200 text-base-content/30'
                   }`}
-                >
-                  {hasActivity ? '○' : '−'}
+                  >
+                    {hasActivity ? '○' : '−'}
+                  </div>
                 </div>
-              </div>
-            );
-          },
-          size: DATE_COLUMN_WIDTH,
-          minSize: DEFAULT_DATE_COLUMN_WIDTH,
-        });
-      }),
+              );
+            },
+            size: DATE_COLUMN_WIDTH,
+            minSize: DEFAULT_DATE_COLUMN_WIDTH,
+          });
+        }),
     ],
-    [dateColumns, STUDENT_NAME_WIDTH, DATE_COLUMN_WIDTH],
+    [heatmapData, STUDENT_NAME_WIDTH, DATE_COLUMN_WIDTH, getDateInfo],
   );
 
   const table = useReactTable({
@@ -324,7 +274,7 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
     <div className={`card bg-base-100 shadow-lg ${className}`}>
       <div className="card-body">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-          <h3 className="card-title text-lg sm:text-xl">活動状況（直近10日間）</h3>
+          <h3 className="card-title text-lg sm:text-xl">活動状況（直近14日間）</h3>
           <div className="flex items-center gap-2">
             <span className="text-xs sm:text-sm">並び順:</span>
             <div className="btn-group">
@@ -351,8 +301,13 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
           {/* ヘッダー部分 - 固定 */}
           <div
             ref={headerRef}
-            className="w-full overflow-hidden bg-base-100 z-50 sticky top-0"
-            style={{ overflowX: 'hidden' }}
+            className="w-full bg-base-100 z-10 sticky top-0 border-b border-base-300"
+            style={{
+              overflow: 'hidden',
+              position: 'sticky',
+              top: 0,
+              zIndex: 10,
+            }}
           >
             <div
               className="flex"
@@ -364,6 +319,9 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                   style={{
                     width: `${Math.max(header.getSize(), header.column.columnDef.minSize || 0)}px`,
                     flex: `0 0 ${Math.max(header.getSize(), header.column.columnDef.minSize || 0)}px`,
+                    position: header.column.id === 'studentName' ? 'sticky' : 'relative',
+                    left: header.column.id === 'studentName' ? 0 : 'auto',
+                    zIndex: header.column.id === 'studentName' ? 30 : 'auto',
                   }}
                   className="overflow-hidden"
                 >
@@ -376,10 +334,11 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
           {/* 本体部分 - スクロール可能 */}
           <div
             ref={bodyRef}
-            className="w-full overflow-auto"
+            className="w-full overflow-auto relative"
             style={{
               maxHeight: 'calc(100vh - 350px)',
               minHeight: containerWidth < 640 ? '300px' : '400px',
+              position: 'relative',
             }}
           >
             <div
@@ -388,6 +347,7 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                 height: `${rowVirtualizer.getTotalSize()}px`,
                 width: `${Math.max(actualTableWidth, containerWidth)}px`,
                 minWidth: '100%',
+                // width: `${totalTableWidth}px`, // Explicitly set tbody width
               }}
             >
               {rowVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -397,14 +357,18 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                 return (
                   <div
                     key={row.id}
-                    className={`absolute flex w-full ${
-                      onStudentSelect ? 'cursor-pointer hover:bg-base-200' : ''
+                    className={`absolute flex w-full border-b border-base-200 transition-all duration-200 group ${
+                      onStudentSelect
+                        ? 'cursor-pointer hover:bg-base-100/50 hover:shadow-sm hover:border-primary/20 focus:bg-base-100 focus:shadow-md focus:border-primary/30 focus:outline-1 focus:outline-primary/40'
+                        : ''
                     }`}
                     style={{
                       transform: `translateY(${virtualRow.start}px)`,
                       height: `${virtualRow.size}px`,
                     }}
-                    onClick={() => onStudentSelect?.(student.id)}
+                    onClick={() => {
+                      onStudentSelect?.(student.id);
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -413,6 +377,7 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                     }}
                     tabIndex={onStudentSelect ? 0 : undefined}
                     role={onStudentSelect ? 'button' : undefined}
+                    aria-label={onStudentSelect ? `生徒: ${student.name}を選択` : undefined}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <div
@@ -421,6 +386,9 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                         style={{
                           width: `${Math.max(cell.column.getSize(), cell.column.columnDef.minSize || 0)}px`,
                           flex: `0 0 ${Math.max(cell.column.getSize(), cell.column.columnDef.minSize || 0)}px`,
+                          position: cell.column.id === 'studentName' ? 'sticky' : 'relative',
+                          left: cell.column.id === 'studentName' ? 0 : 'auto',
+                          zIndex: cell.column.id === 'studentName' ? 20 : 'auto',
                         }}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
