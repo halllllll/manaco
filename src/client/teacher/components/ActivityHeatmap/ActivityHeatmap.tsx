@@ -9,7 +9,7 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { format, isSaturday, isSunday, parseISO } from 'date-fns';
 import type { FC } from 'react';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { type HeatmapDay, useHeatmapData } from './useHeatmapData';
 
 type ActivityHeatmapProps = {
@@ -32,10 +32,8 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
   // ヒートマップデータを取得（カスタムフック）
   const { isLoading, error, heatmapData, sortOption, setSortOption, students } = useHeatmapData();
 
-  // ヘッダーテーブル参照
-  const headerRef = useRef<HTMLDivElement>(null);
-  // 本体テーブル参照
-  const bodyRef = useRef<HTMLDivElement>(null);
+  // ヘッダー/ボディ共通のスクロールコンテナ参照（Safari対応のため1本化）
+  const scrollRef = useRef<HTMLDivElement>(null);
   // テーブルコンテナ参照
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -220,28 +218,11 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
 
   const { rows } = table.getRowModel();
 
-  // スクロール同期のためのイベントハンドラ
-  useLayoutEffect(() => {
-    if (!bodyRef.current || !headerRef.current) return;
-
-    const handleScroll = () => {
-      if (headerRef.current && bodyRef.current) {
-        // ヘッダーコンテナ全体を同期（生徒名列はstickyで固定される）
-        headerRef.current.scrollLeft = bodyRef.current.scrollLeft;
-      }
-    };
-
-    const bodyElement = bodyRef.current;
-    bodyElement.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      bodyElement.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+  // スクロール同期は不要（単一のスクロールコンテナでヘッダーとボディを内包）
 
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
-    getScrollElement: () => bodyRef.current,
+    getScrollElement: () => scrollRef.current,
     estimateSize: () => 50, // 各行の推定高さ (px)
     overscan: 5,
   });
@@ -297,62 +278,55 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
           </div>
         </div>
 
-        {/* レスポンシブ対応のテーブル構造 */}
-        <div className="w-full flex flex-col border border-base-300 rounded-lg overflow-hidden" ref={containerRef}>
-          {/* ヘッダー部分 - スクロール同期 */}
+        {/* レスポンシブ対応のテーブル構造（Safari対策: 単一スクロールコンテナ + transform排除） */}
+        <div
+          className="w-full flex flex-col border border-base-300 rounded-lg overflow-hidden"
+          ref={containerRef}
+        >
           <div
-            ref={headerRef}
-            className="w-full bg-base-100 border-b border-base-300 sticky top-0 z-10 scrollbar-none"
-            style={{
-              overflowX: 'auto',
-              overflowY: 'hidden',
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
-            }}
-          >
-            <div
-              className="flex"
-              style={{ 
-                width: `${Math.max(actualTableWidth, containerWidth)}px`, 
-                minWidth: '100%'
-              }}
-            >
-              {headerGroup.headers.map((header) => (
-                <div
-                  key={header.id}
-                  style={{
-                    width: `${Math.max(header.getSize(), header.column.columnDef.minSize || 0)}px`,
-                    flex: `0 0 ${Math.max(header.getSize(), header.column.columnDef.minSize || 0)}px`,
-                    position: header.column.id === 'studentName' ? 'sticky' : 'relative',
-                    left: header.column.id === 'studentName' ? 0 : 'auto',
-                    zIndex: header.column.id === 'studentName' ? 30 : 'auto',
-                  }}
-                  className="overflow-hidden"
-                >
-                  {flexRender(header.column.columnDef.header, header.getContext())}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 本体部分 - スクロール可能 */}
-          <div
-            ref={bodyRef}
+            ref={scrollRef}
             className="w-full overflow-auto relative"
             style={{
               maxHeight: 'calc(100vh - 350px)',
               minHeight: containerWidth < 640 ? '300px' : '400px',
-              position: 'relative',
-              scrollbarGutter: 'stable'
+              WebkitOverflowScrolling: 'touch',
+              scrollbarGutter: 'stable',
             }}
           >
+            {/* ヘッダー（sticky） */}
+            <div className="sticky top-0 z-20 bg-base-100 border-b border-base-300">
+              <div
+                className="flex"
+                style={{
+                  width: `${Math.max(actualTableWidth, containerWidth)}px`,
+                  minWidth: '100%',
+                }}
+              >
+                {headerGroup.headers.map((header) => (
+                  <div
+                    key={header.id}
+                    style={{
+                      width: `${Math.max(header.getSize(), header.column.columnDef.minSize || 0)}px`,
+                      flex: `0 0 ${Math.max(header.getSize(), header.column.columnDef.minSize || 0)}px`,
+                      position: header.column.id === 'studentName' ? 'sticky' : 'relative',
+                      left: header.column.id === 'studentName' ? 0 : 'auto',
+                      zIndex: header.column.id === 'studentName' ? 30 : 'auto',
+                    }}
+                    className="overflow-hidden"
+                  >
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ボディ（バーチャルリスト） */}
             <div
               style={{
                 position: 'relative',
                 height: `${rowVirtualizer.getTotalSize()}px`,
                 width: `${Math.max(actualTableWidth, containerWidth)}px`,
                 minWidth: '100%',
-                // width: `${totalTableWidth}px`, // Explicitly set tbody width
               }}
             >
               {rowVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -362,18 +336,14 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                 return (
                   <div
                     key={row.id}
-                    className={`absolute flex w-full border-b border-base-200 transition-all duration-200 group ${
-                      onStudentSelect
-                        ? 'cursor-pointer hover:bg-base-100/50 hover:shadow-sm hover:border-primary/20 focus:bg-base-100 focus:shadow-md focus:border-primary/30 focus:outline-1 focus:outline-primary/40'
-                        : ''
+                    className={`absolute left-0 flex w-full border-b border-base-200 transition-colors duration-150 group ${
+                      onStudentSelect ? 'cursor-pointer hover:bg-base-100/50' : ''
                     }`}
                     style={{
-                      transform: `translateY(${virtualRow.start}px)`,
+                      top: `${virtualRow.start}px`,
                       height: `${virtualRow.size}px`,
                     }}
-                    onClick={() => {
-                      onStudentSelect?.(student.id);
-                    }}
+                    onClick={() => onStudentSelect?.(student.id)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -394,6 +364,10 @@ export const ActivityHeatmap: FC<ActivityHeatmapProps> = ({ className = '', onSt
                           position: cell.column.id === 'studentName' ? 'sticky' : 'relative',
                           left: cell.column.id === 'studentName' ? 0 : 'auto',
                           zIndex: cell.column.id === 'studentName' ? 20 : 'auto',
+                          background:
+                            cell.column.id === 'studentName'
+                              ? 'var(--fallback-b1,oklch(var(--b1)))'
+                              : undefined,
                         }}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
